@@ -25,6 +25,9 @@
 *.png
 !public/**/*.png
 
+# launch workspace — local-only, keep out of public repo
+launch/
+
 # production
 /build
 

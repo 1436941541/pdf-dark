@@ -96,6 +96,25 @@ export default function AboutPage() {
         </ul>
 
         <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
+          Open source
+        </h2>
+        <p>
+          PDF Dark is open source under the MIT license. The full codebase —
+          including the saturation algorithm, Web Worker logic, and the Sentry
+          masking config — lives at{" "}
+          <a
+            href="https://github.com/1436941541/pdf-dark"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-amber-400 hover:underline"
+          >
+            github.com/1436941541/pdf-dark
+          </a>
+          . The &ldquo;your file never leaves your browser&rdquo; promise is
+          something you can verify line by line, not just take on trust.
+        </p>
+
+        <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
           Why it&apos;s free
         </h2>
         <p>

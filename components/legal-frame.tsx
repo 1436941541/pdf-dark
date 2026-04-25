@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Footer } from "@/components/footer";
 
 /**
  * Shared chrome for legal pages (Privacy / Terms).
@@ -27,22 +28,7 @@ export function LegalFrame({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1 w-full">{children}</main>
 
-      <footer className="w-full border-t border-neutral-900 mt-4">
-        <div className="max-w-5xl mx-auto px-6 py-6 text-sm text-neutral-500 flex items-center justify-between">
-          <span>© {new Date().getFullYear()} PDF Dark</span>
-          <div className="flex gap-4">
-            <Link href="/about" className="hover:text-neutral-300">
-              About
-            </Link>
-            <Link href="/privacy" className="hover:text-neutral-300">
-              Privacy
-            </Link>
-            <Link href="/terms" className="hover:text-neutral-300">
-              Terms
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
