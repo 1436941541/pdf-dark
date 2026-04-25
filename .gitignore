@@ -15,7 +15,15 @@
 
 # next.js
 /.next/
+/.next.stale-*/
 /out/
+
+# playwright / test artifacts
+/.playwright-mcp/
+
+# stray screenshots / dev captures (commit by adding to public/)
+*.png
+!public/**/*.png
 
 # production
 /build

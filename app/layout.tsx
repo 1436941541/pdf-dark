@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: "PDF Dark Mode — Convert Any PDF to Night Mode Online (Free, No Upload)",
   description:
     "Instantly convert PDFs to dark mode in your browser. 100% private—no upload, no signup. Keeps images original, download as a new PDF. Better than Chrome extensions.",
@@ -23,11 +25,22 @@ export const metadata: Metadata = {
     "pdf dark mode converter",
     "read pdf at night",
   ],
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "PDF Dark Mode — Free Online Converter",
     description:
       "Convert PDFs to dark mode. 100% browser-side. Download the dark version.",
     type: "website",
+    url: "/",
+    siteName: "PDF Dark",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PDF Dark Mode — Free Online Converter",
+    description:
+      "Convert PDFs to dark mode in your browser. No upload, no signup.",
   },
 };
 
