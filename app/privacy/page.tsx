@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Privacy — PDF Dark",
   description:
     "Your PDF files never leave your browser. No accounts, no analytics cookies, no tracking. Here's exactly what we do and don't collect.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

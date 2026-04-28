@@ -5,6 +5,7 @@ export const metadata: Metadata = {
   title: "Terms — PDF Dark",
   description:
     "The short, plain-English terms of using PDF Dark. Use it freely, but at your own risk — no warranty, no liability.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {
