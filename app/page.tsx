@@ -13,14 +13,21 @@ const COMPARISON_ROWS: [string, string, string, string][] = [
   ["100% local (no upload)", "yes", "yes", "no"],
 ];
 
-const FAQ_ITEMS: { q: string; a: string }[] = [
+type FaqItem = {
+  q: string;
+  a: string;
+  link?: { href: string; text: string };
+};
+
+const FAQ_ITEMS: FaqItem[] = [
   {
     q: "Is my PDF uploaded to your server?",
     a: "No. PDF Dark runs 100% in your browser. We literally don't have a server that receives your file.",
   },
   {
     q: "How can I print a PDF in dark mode?",
-    a: "Click download after conversion, then print the downloaded dark PDF from any reader.",
+    a: "Click download after conversion, then print the downloaded dark PDF from any reader. Because the dark theme is baked into the file itself, the print output is dark too — not just the on-screen view.",
+    link: { href: "/convert-pdf-to-dark-mode", text: "Convert PDF to Dark Mode" },
   },
   {
     q: "Does this work on iPhone or iPad?",
@@ -29,10 +36,12 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   {
     q: "How is this different from a browser dark-mode extension?",
     a: "Most dark-mode extensions invert everything including images. PDF Dark detects image regions and keeps them in their original colors, so photos and charts look right.",
+    link: { href: "/pdf-dark-mode-chrome", text: "PDF Dark Mode in Chrome" },
   },
   {
     q: "Does it work for scanned PDFs?",
-    a: "Yes. We render each page as an image and apply theme inversion. Handwriting and scanned text become light-on-dark automatically.",
+    a: "Yes. We render each page as an image and apply theme inversion. Handwriting and scanned text become light-on-dark automatically. Because images get color-aware inversion, scanned signatures stay legible instead of turning into negatives.",
+    link: { href: "/invert-pdf-colors", text: "Invert PDF Colors" },
   },
   {
     q: "How do I read a PDF at night without eye strain?",
@@ -45,6 +54,12 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   {
     q: "Is this a dark mode for Adobe Acrobat?",
     a: "Not exactly. Acrobat has its own in-app dark mode, but it only affects how you see the PDF inside Acrobat—the file itself stays light. PDF Dark produces a real dark-mode PDF file you can open in any reader (Acrobat, Preview, browser) and it stays dark.",
+    link: { href: "/convert-pdf-to-dark-mode", text: "Convert PDF to Dark Mode" },
+  },
+  {
+    q: "Does PDF dark mode work in Firefox?",
+    a: "Yes. Firefox's built-in PDF.js viewer only darkens the toolbar, not the page content. PDF Dark converts the actual page content so the file looks dark in every viewer, including Firefox.",
+    link: { href: "/pdf-dark-mode-firefox", text: "PDF Dark Mode in Firefox" },
   },
 ];
 
@@ -320,7 +335,21 @@ export default function Home() {
                     ⌄
                   </span>
                 </summary>
-                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">{f.a}</p>
+                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">
+                  {f.a}
+                  {f.link && (
+                    <>
+                      {" "}
+                      <Link
+                        href={f.link.href}
+                        className="text-amber-400 hover:underline"
+                      >
+                        {f.link.text}
+                      </Link>
+                      .
+                    </>
+                  )}
+                </p>
               </details>
             ))}
           </div>

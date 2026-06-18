@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
 import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/components/icons";
+import { RelatedVariants } from "@/components/related-variants";
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/convert-pdf-to-dark-mode";
@@ -275,13 +276,15 @@ export default function ConvertVariantPage() {
           </div>
         </section>
 
+        <RelatedVariants currentSlug="convert-pdf-to-dark-mode" />
+
         {/* FAQ */}
         <section
           id="faq"
           className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
         >
           <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
-            FAQ
+            Convert PDF to dark mode FAQ
           </h2>
           <div className="space-y-3">
             {FAQ.map((f) => (

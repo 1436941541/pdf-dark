@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
 import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/components/icons";
+import { RelatedVariants } from "@/components/related-variants";
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/pdf-dark-mode-firefox";
@@ -279,13 +280,15 @@ export default function FirefoxVariantPage() {
           </p>
         </section>
 
+        <RelatedVariants currentSlug="pdf-dark-mode-firefox" />
+
         {/* FAQ */}
         <section
           id="faq"
           className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
         >
           <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
-            FAQ
+            PDF dark mode in Firefox FAQ
           </h2>
           <div className="space-y-3">
             {FAQ.map((f) => (

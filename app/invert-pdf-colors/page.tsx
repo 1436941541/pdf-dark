@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
 import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/components/icons";
+import { RelatedVariants } from "@/components/related-variants";
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/invert-pdf-colors";
@@ -264,13 +265,15 @@ export default function InvertPdfColorsPage() {
           </div>
         </section>
 
+        <RelatedVariants currentSlug="invert-pdf-colors" />
+
         {/* FAQ */}
         <section
           id="faq"
           className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
         >
           <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
-            FAQ
+            Invert PDF colors FAQ
           </h2>
           <div className="space-y-3">
             {FAQ.map((f) => (
