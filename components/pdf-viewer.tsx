@@ -11,11 +11,12 @@ import type {
 type PageImage = {
   /** Full-color rendered PDF page (source of truth, never modified). */
   originalDataUrl: string;
-  /** Cached decoded bitmap for fast worker hand-off. Consumed once per theme switch. */
   width: number;
   height: number;
-  /** Current dark-themed version shown to the user. Regenerated on theme change. */
+  /** Current dark-themed version shown to the user. */
   displayDataUrl: string;
+  /** Per-theme cache of already-darkified dataUrls — lets re-applying a theme skip the worker. */
+  byTheme: Partial<Record<ThemeId, string>>;
 };
 
 type Props = {
@@ -32,6 +33,10 @@ export function PdfViewer({ file, onReset }: Props) {
     total: 0,
   });
   const [themeApplying, setThemeApplying] = useState(false);
+  const [themeProgress, setThemeProgress] = useState<{
+    current: number;
+    total: number;
+  }>({ current: 0, total: 0 });
   const [downloading, setDownloading] = useState(false);
 
   const themeVersionRef = useRef(0);
@@ -165,11 +170,16 @@ export function PdfViewer({ file, onReset }: Props) {
             width: canvas.width,
             height: canvas.height,
             displayDataUrl: "",
+            byTheme: {},
           };
           const display = await darkifyViaWorker(stub, theme);
           if (cancelledRef.current) return;
 
-          rendered.push({ ...stub, displayDataUrl: display });
+          rendered.push({
+            ...stub,
+            displayDataUrl: display,
+            byTheme: { [theme]: display },
+          });
           setProgress({ done: i, total: pdf.numPages });
         }
 
@@ -192,13 +202,43 @@ export function PdfViewer({ file, onReset }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file, darkifyViaWorker]);
 
-  // Theme switch: re-darkify pages, starting from whatever the user is looking at
+  // Theme switch: re-darkify pages, starting from whatever the user is looking at.
+  // Fast path: if every page already has this theme cached, swap dataUrls instantly.
   useEffect(() => {
     if (status !== "ready" || pages.length === 0) return;
-    if (lastAppliedThemeRef.current === theme) return;
 
+    // Bump version up-front — aborts any in-flight worker loop from a previous switch.
     themeVersionRef.current += 1;
     const version = themeVersionRef.current;
+
+    // User toggled back to the already-applied theme (often mid-flight, when
+    // they cancel a switch). Recover any pages that were partially committed
+    // to the canceled theme, then reset the applying-state so Download unlocks.
+    if (lastAppliedThemeRef.current === theme) {
+      setPages((cur) =>
+        cur.map((p) => {
+          const cached = p.byTheme[theme];
+          return cached && p.displayDataUrl !== cached
+            ? { ...p, displayDataUrl: cached }
+            : p;
+        }),
+      );
+      setThemeApplying(false);
+      setThemeProgress({ current: 0, total: 0 });
+      return;
+    }
+
+    const allCached = pages.every((p) => p.byTheme[theme] !== undefined);
+    if (allCached) {
+      setPages((cur) =>
+        cur.map((p) => ({ ...p, displayDataUrl: p.byTheme[theme]! })),
+      );
+      lastAppliedThemeRef.current = theme;
+      setThemeApplying(false);
+      setThemeProgress({ current: 0, total: 0 });
+      return;
+    }
+
     let aborted = false;
     setThemeApplying(true);
 
@@ -207,18 +247,35 @@ export function PdfViewer({ file, onReset }: Props) {
       const focused = focusedPageIndex();
       const order = expandingOrder(focused, next.length);
       const VISIBLE_COMMIT = 6; // commit per page for the first N (around user's view)
+      const toCompute = order.filter(
+        (idx) => next[idx].byTheme[theme] === undefined,
+      ).length;
+      setThemeProgress({ current: 0, total: toCompute });
+      let computed = 0;
 
       for (let k = 0; k < order.length; k++) {
         if (aborted || themeVersionRef.current !== version) return;
         const idx = order[k];
         const p = next[idx];
-        try {
-          const display = await darkifyViaWorker(p, theme);
-          if (aborted || themeVersionRef.current !== version) return;
-          next[idx] = { ...p, displayDataUrl: display };
-        } catch (err) {
-          console.error("[pdf-dark] darkify failed", err);
-          Sentry.captureException(err, { tags: { stage: "darkify" } });
+
+        const cached = p.byTheme[theme];
+        if (cached !== undefined) {
+          next[idx] = { ...p, displayDataUrl: cached };
+        } else {
+          try {
+            const display = await darkifyViaWorker(p, theme);
+            if (aborted || themeVersionRef.current !== version) return;
+            next[idx] = {
+              ...p,
+              displayDataUrl: display,
+              byTheme: { ...p.byTheme, [theme]: display },
+            };
+            computed++;
+            setThemeProgress({ current: computed, total: toCompute });
+          } catch (err) {
+            console.error("[pdf-dark] darkify failed", err);
+            Sentry.captureException(err, { tags: { stage: "darkify" } });
+          }
         }
         // Commit frequently near the user's view; batch later pages.
         if (k < VISIBLE_COMMIT || k % 4 === 0) {
@@ -230,6 +287,7 @@ export function PdfViewer({ file, onReset }: Props) {
         setPages(next);
         lastAppliedThemeRef.current = theme;
         setThemeApplying(false);
+        setThemeProgress({ current: 0, total: 0 });
       }
     })();
 
@@ -285,7 +343,10 @@ export function PdfViewer({ file, onReset }: Props) {
         <div className="flex-1 min-w-0 text-sm text-neutral-300 truncate">
           {file.name}
           {themeApplying && (
-            <span className="ml-2 text-xs text-amber-400">applying theme…</span>
+            <span className="ml-2 text-xs text-amber-400">
+              Applying {THEMES[theme].label} · {themeProgress.current} /{" "}
+              {themeProgress.total} pages
+            </span>
           )}
         </div>
 
@@ -314,7 +375,11 @@ export function PdfViewer({ file, onReset }: Props) {
           disabled={status !== "ready" || downloading || themeApplying}
           className="px-4 py-1.5 rounded-full text-sm font-semibold bg-amber-400 text-neutral-950 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          {downloading ? "Building..." : "Download"}
+          {downloading
+            ? "Building..."
+            : themeApplying
+              ? "Applying…"
+              : "Download"}
         </button>
 
         <button
