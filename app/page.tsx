@@ -34,6 +34,18 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
     q: "Does it work for scanned PDFs?",
     a: "Yes. We render each page as an image and apply theme inversion. Handwriting and scanned text become light-on-dark automatically.",
   },
+  {
+    q: "How do I read a PDF at night without eye strain?",
+    a: "Convert the PDF to dark mode here and pick OLED or Midnight—both turn the white background into pure or near-pure black so your eyes don't have to fight a bright page in a dim room. The text inverts to light, images stay normal.",
+  },
+  {
+    q: "Can I change a PDF background to black?",
+    a: "Yes. The OLED theme renders the background as pure black (#000) and text as light gray, which is the most aggressive dark mode for PDFs. Saving downloads the PDF with that black background baked in.",
+  },
+  {
+    q: "Is this a dark mode for Adobe Acrobat?",
+    a: "Not exactly. Acrobat has its own in-app dark mode, but it only affects how you see the PDF inside Acrobat—the file itself stays light. PDF Dark produces a real dark-mode PDF file you can open in any reader (Acrobat, Preview, browser) and it stays dark.",
+  },
 ];
 
 function StructuredData() {
@@ -46,7 +58,7 @@ function StructuredData() {
     applicationCategory: "UtilityApplication",
     operatingSystem: "Any (browser-based)",
     description:
-      "Free, browser-side PDF dark mode converter. Keeps images in original color, runs 100% locally, downloads as a new PDF.",
+      "Free, browser-side PDF dark mode and night mode converter. A dark PDF reader that keeps images in their original color, runs 100% locally, and downloads as a new PDF—built for reading PDFs at night.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -114,8 +126,10 @@ export default function Home() {
             Free PDF Dark Mode Converter
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Instantly convert any PDF to dark mode. 100% private—runs entirely in
-            your browser. No upload, no signup. Download the dark version.
+            Convert any PDF to dark mode or night mode in your browser. A free,
+            online dark PDF reader that keeps images in their original colors—no
+            upload, no signup, no install. Download the themed PDF and read at
+            night without eye strain.
           </p>
 
           {/* Trust badges — outline pill + stroke icon */}
@@ -145,7 +159,14 @@ export default function Home() {
           id="how"
           className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900"
         >
-          <h2 className="text-2xl font-bold mb-10 text-center">How it works</h2>
+          <h2 className="text-2xl font-bold mb-3 text-center">
+            How to convert a PDF to dark mode
+          </h2>
+          <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
+            PDF dark mode means re-rendering each page so text and background
+            are inverted into a low-light theme, while photos and charts keep
+            their original colors. Three steps:
+          </p>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
               { n: "1", t: "Drop your PDF", d: "Drag & drop or click to browse. Never leaves your browser.", offset: "sm:translate-y-0" },
@@ -171,11 +192,12 @@ export default function Home() {
         >
           <div className="max-w-4xl mx-auto px-6">
             <h2 className="text-2xl font-bold mb-3 text-center">
-              How PDF Dark compares
+              PDF dark mode: PDF Dark vs Chrome extensions vs online tools
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              There are a few ways to read PDFs in dark mode today. Here&apos;s
-              how our approach stacks up.
+              There are a few ways to read PDFs in dark mode or night mode
+              today—browser extensions, other online converters, native readers.
+              Here&apos;s how each compares for everyday use.
             </p>
 
             {/* Desktop: full comparison table */}
@@ -243,11 +265,12 @@ export default function Home() {
             className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900"
           >
             <h2 className="text-2xl font-bold mb-3 text-center">
-              More PDF tools
+              More PDF dark mode tools
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              Looking for something more specific? We have dedicated pages for
-              common workflows.
+              Looking for something more specific—inverting PDF colors,
+              browser-specific dark mode, or a PDF night mode workflow? We have
+              dedicated pages for each.
             </p>
             <div className="grid sm:grid-cols-2 gap-4">
               {VARIANTS.map((v) => (
@@ -279,7 +302,9 @@ export default function Home() {
           id="faq"
           className="max-w-3xl mx-auto px-6 py-20"
         >
-          <h2 className="text-2xl font-bold mb-10 text-center">FAQ</h2>
+          <h2 className="text-2xl font-bold mb-10 text-center">
+            PDF dark mode FAQ
+          </h2>
           <div className="space-y-3">
             {FAQ_ITEMS.map((f) => (
               <details
