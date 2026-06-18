@@ -22,8 +22,8 @@ export function RelatedVariants({ currentSlug }: { currentSlug: string }) {
             href={`/${v.slug}`}
             className="group p-5 rounded-xl border border-neutral-800 bg-neutral-900/30 hover:bg-neutral-900/60 hover:border-amber-400/40 transition-colors"
           >
-            <div className="font-semibold text-neutral-50 group-hover:text-amber-400 transition-colors flex items-center justify-between">
-              <span>{v.title}</span>
+            <div className="text-neutral-50 group-hover:text-amber-400 transition-colors flex items-center justify-between">
+              <h3 className="text-base font-semibold m-0">{v.title}</h3>
               <span
                 aria-hidden
                 className="text-neutral-600 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all"

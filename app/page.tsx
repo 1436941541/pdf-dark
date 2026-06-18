@@ -290,7 +290,7 @@ export default function Home() {
                   key={feat}
                   className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/40"
                 >
-                  <div className="font-medium text-neutral-100 mb-3">{feat}</div>
+                  <h3 className="font-medium text-base text-neutral-100 m-0 mb-3">{feat}</h3>
                   <div className="grid grid-cols-3 gap-2 text-xs">
                     <div className="flex flex-col items-center">
                       <span className="text-amber-400 text-base"><Mark v={a} /></span>
@@ -333,8 +333,8 @@ export default function Home() {
                   href={`/${v.slug}`}
                   className="group p-5 rounded-xl border border-neutral-800 bg-neutral-900/30 hover:bg-neutral-900/60 hover:border-amber-400/40 transition-colors"
                 >
-                  <div className="font-semibold text-neutral-50 group-hover:text-amber-400 transition-colors flex items-center justify-between">
-                    <span>{v.title}</span>
+                  <div className="text-neutral-50 group-hover:text-amber-400 transition-colors flex items-center justify-between">
+                    <h3 className="text-base font-semibold m-0">{v.title}</h3>
                     <span
                       aria-hidden
                       className="text-neutral-600 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all"
