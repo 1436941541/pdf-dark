@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@/components/analytics";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -56,6 +57,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100">
         {children}
+        <Analytics />
       </body>
     </html>
   );

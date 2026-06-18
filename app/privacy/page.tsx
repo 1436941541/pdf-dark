@@ -4,7 +4,7 @@ import { LegalFrame } from "@/components/legal-frame";
 export const metadata: Metadata = {
   title: "Privacy — PDF Dark",
   description:
-    "Your PDF files never leave your browser. No accounts, no analytics cookies, no tracking. Here's exactly what we do and don't collect.",
+    "Your PDF files never leave your browser. No accounts, no signup. Here's exactly what we do and don't collect, including the limited analytics we use.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
         <h1 className="text-3xl font-bold text-neutral-50 mb-2">Privacy</h1>
         <p className="text-sm text-neutral-500 mb-10">
-          Last updated: April 24, 2026
+          Last updated: June 18, 2026
         </p>
 
         <p className="text-lg mb-8">
@@ -22,8 +22,8 @@ export default function PrivacyPage() {
           <strong className="text-amber-400">
             your PDF file never leaves your browser.
           </strong>{" "}
-          No accounts, no tracking cookies, no analytics profiles. The details
-          below cover exactly what does and doesn&apos;t happen on this site.
+          No accounts, no signup, no PDF uploads. We do use lightweight
+          analytics to see how the site is used in aggregate — details below.
         </p>
 
         {/* Core promise */}
@@ -59,20 +59,47 @@ export default function PrivacyPage() {
         </h2>
         <ul className="space-y-2 list-disc pl-6 text-neutral-300">
           <li>
-            We don&apos;t run Google Analytics, Microsoft Clarity, Facebook
-            Pixel, or any other behavioural analytics.
+            We don&apos;t upload, store, or read your PDF file — name, content,
+            and extracted text all stay on your device.
           </li>
-          <li>We don&apos;t set tracking cookies.</li>
           <li>
             We don&apos;t collect your email. There&apos;s no signup, no
             account.
           </li>
           <li>
-            We don&apos;t read your PDF file name, content, or any text
-            extracted from it — none of that reaches any server.
+            We don&apos;t run Facebook Pixel, ad-retargeting pixels, or sell
+            data to third parties.
           </li>
-          <li>We don&apos;t sell data. There&apos;s no data to sell.</li>
         </ul>
+
+        {/* Analytics */}
+        <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
+          Analytics
+        </h2>
+        <p className="mb-4">
+          To understand which pages people find useful and where the site is
+          slow or broken, we run two privacy-respecting analytics tools:
+        </p>
+        <ul className="space-y-2 list-disc pl-6 text-neutral-300 mb-4">
+          <li>
+            <strong className="text-neutral-100">Google Analytics 4</strong>{" "}
+            — aggregate page views, referrers, country, device type. We
+            don&apos;t use Google Signals or ad personalization. IP addresses
+            are anonymized by GA4 by default and not stored.
+          </li>
+          <li>
+            <strong className="text-neutral-100">Microsoft Clarity</strong>{" "}
+            — anonymous heatmaps and session recordings of how people
+            interact with the page (clicks, scrolls). Clarity masks text and
+            inputs by default, so the content of your PDF and any text you
+            type are not captured.
+          </li>
+        </ul>
+        <p>
+          Neither tool sees your PDF file. If you&apos;d rather not be counted,
+          a browser-level tracker blocker (uBlock Origin, Brave Shields, etc.)
+          will block both.
+        </p>
 
         {/* Error monitoring */}
         <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
@@ -144,10 +171,11 @@ export default function PrivacyPage() {
         </h2>
         <p>
           Since we don&apos;t have accounts or profiles, there&apos;s almost
-          nothing tied to you personally — the only traces are short-term
-          Vercel access logs and (if something crashes) a masked Sentry error
-          report. If you still want to check, correct, or delete anything
-          under GDPR / UK / CCPA, or just have a question, email{" "}
+          nothing tied to you personally — the traces we have are aggregate
+          Google Analytics and Clarity events, short-term Vercel access
+          logs, and (if something crashes) a masked Sentry error report. If
+          you want to check, correct, or delete anything under GDPR / UK /
+          CCPA, or just have a question, email{" "}
           <a
             href="mailto:hello@pdfdark.org"
             className="text-amber-400 hover:underline"
