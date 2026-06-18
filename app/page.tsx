@@ -193,7 +193,7 @@ export default function Home() {
                 className={`p-6 rounded-xl border border-neutral-800 bg-neutral-900/30 transition-transform ${s.offset}`}
               >
                 <div className="text-2xl font-bold text-amber-400">{s.n}</div>
-                <div className="mt-2 font-semibold text-neutral-50">{s.t}</div>
+                <h3 className="mt-2 font-semibold text-neutral-50">{s.t}</h3>
                 <div className="mt-1 text-sm text-neutral-400">{s.d}</div>
               </div>
             ))}
@@ -326,8 +326,8 @@ export default function Home() {
                 key={f.q}
                 className="group rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60 transition-colors [&_summary::-webkit-details-marker]:hidden"
               >
-                <summary className="cursor-pointer font-medium p-4 flex items-center justify-between list-none text-neutral-100">
-                  <span>{f.q}</span>
+                <summary className="cursor-pointer p-4 flex items-center justify-between list-none text-neutral-100">
+                  <h3 className="font-medium text-base m-0">{f.q}</h3>
                   <span
                     aria-hidden
                     className="text-neutral-500 transition-transform group-open:rotate-180 group-hover:text-amber-400"
