@@ -4,7 +4,7 @@ import { LegalFrame } from "@/components/legal-frame";
 export const metadata: Metadata = {
   title: "Privacy — PDF Dark",
   description:
-    "Your PDF files never leave your browser. No accounts, no signup. Here's exactly what we do and don't collect, including the limited analytics we use.",
+    "Your PDF file never leaves your browser. No accounts, no signup. Here's exactly what we do and don't collect on the site itself, including analytics and ads.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -14,16 +14,18 @@ export default function PrivacyPage() {
       <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
         <h1 className="text-3xl font-bold text-neutral-50 mb-2">Privacy</h1>
         <p className="text-sm text-neutral-500 mb-10">
-          Last updated: June 18, 2026
+          Last updated: June 19, 2026
         </p>
 
         <p className="text-lg mb-8">
-          PDF Dark is built around one simple promise:{" "}
+          PDF Dark is built around one core promise:{" "}
           <strong className="text-amber-400">
             your PDF file never leaves your browser.
           </strong>{" "}
-          No accounts, no signup, no PDF uploads. We do use lightweight
-          analytics to see how the site is used in aggregate — details below.
+          The file you drop in — its name, content, text, and images — stays
+          on your device. The site itself (this page, page-view analytics,
+          and the ads we may show to keep the tool free) works like any
+          normal free utility — details below.
         </p>
 
         {/* Core promise */}
@@ -63,29 +65,34 @@ export default function PrivacyPage() {
             and extracted text all stay on your device.
           </li>
           <li>
-            We don&apos;t collect your email. There&apos;s no signup, no
-            account.
+            We don&apos;t ask for your email, log you in, or build a long-term
+            profile tied to you.
           </li>
           <li>
-            We don&apos;t run Facebook Pixel, ad-retargeting pixels, or sell
-            data to third parties.
+            We don&apos;t correlate the file you converted with anything else
+            — not with the analytics events, not with the ads, not with any
+            third party. Your file is processed locally and forgotten.
+          </li>
+          <li>
+            We don&apos;t sell your data. We don&apos;t have a database of
+            user data to sell.
           </li>
         </ul>
 
-        {/* Analytics */}
+        {/* Site analytics */}
         <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
-          Analytics
+          Site analytics
         </h2>
         <p className="mb-4">
           To understand which pages people find useful and where the site is
-          slow or broken, we run two privacy-respecting analytics tools:
+          slow or broken, we run two analytics tools — both on the site
+          itself, never on your PDF file:
         </p>
         <ul className="space-y-2 list-disc pl-6 text-neutral-300 mb-4">
           <li>
             <strong className="text-neutral-100">Google Analytics 4</strong>{" "}
-            — aggregate page views, referrers, country, device type. We
-            don&apos;t use Google Signals or ad personalization. IP addresses
-            are anonymized by GA4 by default and not stored.
+            — aggregate page views, referrers, country, device type. IP
+            addresses are anonymized by GA4 by default and not stored.
           </li>
           <li>
             <strong className="text-neutral-100">Microsoft Clarity</strong>{" "}
@@ -99,6 +106,47 @@ export default function PrivacyPage() {
           Neither tool sees your PDF file. If you&apos;d rather not be counted,
           a browser-level tracker blocker (uBlock Origin, Brave Shields, etc.)
           will block both.
+        </p>
+
+        {/* Ads */}
+        <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
+          Ads
+        </h2>
+        <p className="mb-4">
+          PDF Dark is free and runs on a paid hosting bill, so we plan to
+          show display ads on the site to cover costs. We&apos;ll likely use
+          Google AdSense (the standard publisher network), which means:
+        </p>
+        <ul className="space-y-2 list-disc pl-6 text-neutral-300 mb-4">
+          <li>
+            Ads appear <em>on the site</em>, in clearly marked slots — never
+            inside the PDF you download, and never on top of the converter
+            in a way that gets in the way of the tool.
+          </li>
+          <li>
+            Like all AdSense placements, ads may use cookies for frequency
+            capping, fraud prevention, and basic targeting. You can opt out
+            of personalized ads at{" "}
+            <a
+              href="https://adssettings.google.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              Google&apos;s Ad Settings
+            </a>
+            , or block them entirely with a tracker blocker.
+          </li>
+          <li>
+            Ad networks do not receive your PDF file or anything extracted
+            from it — your file never leaves your browser, so there&apos;s
+            nothing to send.
+          </li>
+        </ul>
+        <p>
+          When ads go live, we&apos;ll bump the &ldquo;Last updated&rdquo;
+          date and list the exact networks here so you know what cookies to
+          expect.
         </p>
 
         {/* Error monitoring */}
@@ -159,10 +207,11 @@ export default function PrivacyPage() {
           Changes
         </h2>
         <p>
-          If this ever changes — for example, if we add ads to keep the tool
-          free — we&apos;ll update this page first, bump the &ldquo;Last
-          updated&rdquo; date above, and disclose what changed before the new
-          code ships.
+          If anything material changes — a new analytics or ad network, a new
+          third-party script, anything that touches the &ldquo;your file
+          never leaves your browser&rdquo; promise — we&apos;ll update this
+          page first, bump the &ldquo;Last updated&rdquo; date above, and
+          disclose what changed before the new code ships.
         </p>
 
         {/* Contact */}
@@ -172,10 +221,11 @@ export default function PrivacyPage() {
         <p>
           Since we don&apos;t have accounts or profiles, there&apos;s almost
           nothing tied to you personally — the traces we have are aggregate
-          Google Analytics and Clarity events, short-term Vercel access
-          logs, and (if something crashes) a masked Sentry error report. If
-          you want to check, correct, or delete anything under GDPR / UK /
-          CCPA, or just have a question, email{" "}
+          Google Analytics and Clarity events, ad-network cookies (once ads
+          are live), short-term Vercel access logs, and (if something
+          crashes) a masked Sentry error report. If you want to check,
+          correct, or delete anything under GDPR / UK / CCPA, or just have a
+          question, email{" "}
           <a
             href="mailto:hello@pdfdark.org"
             className="text-amber-400 hover:underline"
