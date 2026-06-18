@@ -169,6 +169,44 @@ export default function Home() {
           </div>
         </section>
 
+        {/* What & why — semantic primer for keyword variants */}
+        <section
+          id="what"
+          className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900"
+        >
+          <h2 className="text-2xl font-bold mb-5 text-center">
+            What is PDF dark mode?
+          </h2>
+          <p className="text-neutral-300 leading-relaxed">
+            PDF dark mode is a way to read PDFs with a dark background and
+            light text instead of the default white page. You may also see it
+            called PDF night mode, a dark PDF reader, or an inverted PDF —
+            different names for the same thing: a low-light theme baked into
+            the file so it stays dark in every viewer, not just the one you
+            opened it in.
+          </p>
+          <p className="text-neutral-300 leading-relaxed mt-4">
+            People use a dark mode PDF to read at night without eye strain, to
+            extend battery life on OLED phones, to study late-night research
+            papers, and to make code- or text-heavy documents less harsh
+            under bright office lights. Browser extensions can fake a dark
+            theme inside the viewer, but the underlying PDF file stays light.
+            PDF Dark produces an actual dark-themed PDF you can save, share,
+            and reopen anywhere — a real dark PDF, not a viewer trick.
+          </p>
+          <p className="text-neutral-300 leading-relaxed mt-4">
+            A good dark mode reader for PDFs does more than paint the screen
+            dark — it rewrites the file with inverted colors so the PDF stays
+            in dark mode wherever you open it. With PDF Dark you can read PDFs
+            in dark mode on Chrome, Firefox, Safari, or Edge, and then carry
+            that dark mode PDF to your phone or e-reader. Files never leave
+            your device: the entire conversion runs in your browser via a Web
+            Worker, so you can read PDFs at night without ever uploading the
+            document. That&apos;s how to read PDFs in dark mode without
+            handing your file to anyone.
+          </p>
+        </section>
+
         {/* How it works */}
         <section
           id="how"

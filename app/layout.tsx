@@ -16,9 +16,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: "PDF Dark Mode — Convert Any PDF to Night Mode Online (Free, No Upload)",
+  title: "PDF Dark Mode — Free Online PDF to Night Mode Converter",
   description:
-    "Instantly convert PDFs to dark mode in your browser. 100% private—no upload, no signup. Keeps images original, download as a new PDF. Better than Chrome extensions.",
+    "Convert any PDF to dark mode or night mode in your browser. Free, no upload, no signup. Keeps images in original color. Download as a permanent dark PDF.",
   keywords: [
     "pdf dark mode",
     "pdf night mode",
