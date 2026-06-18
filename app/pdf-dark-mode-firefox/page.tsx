@@ -175,9 +175,9 @@ export default function FirefoxVariantPage() {
 
             <div className="space-y-5">
               <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="font-semibold text-neutral-50 mb-1">
+                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                   PDF.js renders the page faithfully
-                </div>
+                </h3>
                 <p className="text-sm text-neutral-400">
                   PDF.js treats a PDF as authoritative — if the page background
                   is white, it paints white. That&apos;s the right default for
@@ -189,11 +189,11 @@ export default function FirefoxVariantPage() {
               </div>
 
               <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="font-semibold text-neutral-50 mb-1">
+                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                   <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">
                     about:config → pdfjs.viewerCssTheme
                   </code>
-                </div>
+                </h3>
                 <p className="text-sm text-neutral-400">
                   This one comes up on every forum. Setting it to{" "}
                   <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
@@ -206,9 +206,9 @@ export default function FirefoxVariantPage() {
               </div>
 
               <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="font-semibold text-neutral-50 mb-1">
+                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                   Dark Reader and similar extensions
-                </div>
+                </h3>
                 <p className="text-sm text-neutral-400">
                   These apply a CSS filter on top of the rendered page. The
                   result is the same as naive invert: photos become negatives,
@@ -219,9 +219,9 @@ export default function FirefoxVariantPage() {
               </div>
 
               <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-                <div className="font-semibold text-amber-400 mb-1">
+                <h3 className="font-semibold text-amber-400 mb-1 text-base m-0 mt-0">
                   What PDF Dark does differently
-                </div>
+                </h3>
                 <ul className="text-sm text-neutral-300 list-disc pl-5 space-y-1.5">
                   <li>
                     Uses the same PDF.js underneath — so compatibility is

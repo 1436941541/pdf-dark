@@ -171,9 +171,9 @@ export default function ChromeVariantPage() {
 
             <div className="space-y-5">
               <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="font-semibold text-neutral-50 mb-1">
+                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                   Chrome&apos;s built-in viewer
-                </div>
+                </h3>
                 <p className="text-sm text-neutral-400">
                   Despite Chrome respecting your OS dark theme for the browser
                   UI, the embedded PDF viewer always renders pages on a white
@@ -187,9 +187,9 @@ export default function ChromeVariantPage() {
               </div>
 
               <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="font-semibold text-neutral-50 mb-1">
+                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                   Extensions like &ldquo;Dark Reader for PDF&rdquo;
-                </div>
+                </h3>
                 <p className="text-sm text-neutral-400 mb-3">
                   They apply a CSS invert filter over the page. This has three
                   concrete problems:
@@ -225,9 +225,9 @@ export default function ChromeVariantPage() {
               </div>
 
               <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-                <div className="font-semibold text-amber-400 mb-1">
+                <h3 className="font-semibold text-amber-400 mb-1 text-base m-0 mt-0">
                   What PDF Dark does differently
-                </div>
+                </h3>
                 <ul className="text-sm text-neutral-300 list-disc pl-5 space-y-1.5">
                   <li>
                     Runs on one webpage — no install, no extension permissions

@@ -173,9 +173,9 @@ export default function ConvertVariantPage() {
 
             <div className="grid sm:grid-cols-2 gap-5">
               <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="text-sm font-semibold text-neutral-400 mb-3">
+                <h3 className="text-sm font-semibold text-neutral-400 mb-3 m-0">
                   Viewer / extension / OS toggle
-                </div>
+                </h3>
                 <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
                   <li>Dark only while that app/extension is running</li>
                   <li>Reopen in another reader → white again</li>
@@ -189,9 +189,9 @@ export default function ConvertVariantPage() {
               </div>
 
               <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-                <div className="text-sm font-semibold text-amber-400 mb-3">
+                <h3 className="text-sm font-semibold text-amber-400 mb-3 m-0">
                   A converted PDF file
-                </div>
+                </h3>
                 <ul className="space-y-2 text-sm text-neutral-300 list-disc pl-5">
                   <li>
                     <strong className="text-neutral-100">Permanent</strong> —
@@ -231,9 +231,9 @@ export default function ConvertVariantPage() {
 
           <div className="space-y-6">
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <div className="font-semibold text-neutral-50 mb-1">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 Sending a paper to a collaborator at 11 PM
-              </div>
+              </h3>
               <p className="text-sm text-neutral-400">
                 Your colleague is reading in bed. You can forward the original
                 and ask them to enable Smart Invert — or you can send the dark
@@ -242,9 +242,9 @@ export default function ConvertVariantPage() {
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <div className="font-semibold text-neutral-50 mb-1">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 Archiving documents you&apos;ll reread often
-              </div>
+              </h3>
               <p className="text-sm text-neutral-400">
                 Research papers, meeting notes, eBooks — once converted, the
                 dark copy lives in your library permanently. No per-device
@@ -253,9 +253,9 @@ export default function ConvertVariantPage() {
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <div className="font-semibold text-neutral-50 mb-1">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 E-readers and e-ink devices
-              </div>
+              </h3>
               <p className="text-sm text-neutral-400">
                 Kindle, Kobo, Boox — most e-readers have no in-app dark toggle
                 for sideloaded PDFs. A pre-converted dark PDF is the only way
@@ -264,9 +264,9 @@ export default function ConvertVariantPage() {
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <div className="font-semibold text-neutral-50 mb-1">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 Sharing accessible reading material
-              </div>
+              </h3>
               <p className="text-sm text-neutral-400">
                 Readers with photosensitivity, migraine issues, or low vision
                 often prefer persistent high-contrast. Sharing a dark copy

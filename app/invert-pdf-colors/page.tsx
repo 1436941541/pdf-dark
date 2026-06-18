@@ -170,9 +170,9 @@ export default function InvertPdfColorsPage() {
 
             <div className="grid sm:grid-cols-2 gap-5">
               <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="text-sm font-semibold text-red-400 mb-2">
+                <h3 className="text-sm font-semibold text-red-400 mb-2 m-0">
                   Naive invert
-                </div>
+                </h3>
                 <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
                   <li>Sky turns <span className="text-neutral-200">orange</span></li>
                   <li>Skin turns <span className="text-neutral-200">blue</span></li>
@@ -183,9 +183,9 @@ export default function InvertPdfColorsPage() {
               </div>
 
               <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-                <div className="text-sm font-semibold text-amber-400 mb-2">
+                <h3 className="text-sm font-semibold text-amber-400 mb-2 m-0">
                   PDF Dark&apos;s approach
-                </div>
+                </h3>
                 <ul className="space-y-2 text-sm text-neutral-300 list-disc pl-5">
                   <li>
                     <strong className="text-neutral-100">Detects images</strong>{" "}
@@ -219,9 +219,9 @@ export default function InvertPdfColorsPage() {
 
           <div className="space-y-6">
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <div className="font-semibold text-neutral-50 mb-1">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 Reading long PDFs at night
-              </div>
+              </h3>
               <p className="text-sm text-neutral-400">
                 White PDF backgrounds are painful in a dimly-lit room. Invert
                 once, save the output, and keep that copy for any time you need
@@ -230,9 +230,9 @@ export default function InvertPdfColorsPage() {
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <div className="font-semibold text-neutral-50 mb-1">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 OLED phones and e-ink displays
-              </div>
+              </h3>
               <p className="text-sm text-neutral-400">
                 Black pixels are literally &ldquo;off&rdquo; on OLED and save
                 power. Pick the <strong className="text-neutral-100">OLED</strong> theme for
@@ -241,9 +241,9 @@ export default function InvertPdfColorsPage() {
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <div className="font-semibold text-neutral-50 mb-1">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 Accessibility and low-vision reading
-              </div>
+              </h3>
               <p className="text-sm text-neutral-400">
                 High-contrast light-on-dark is easier for many readers with
                 astigmatism, migraine sensitivity, or low vision. Produces a
@@ -253,9 +253,9 @@ export default function InvertPdfColorsPage() {
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <div className="font-semibold text-neutral-50 mb-1">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 Sharing a &ldquo;night-friendly&rdquo; copy
-              </div>
+              </h3>
               <p className="text-sm text-neutral-400">
                 Unlike an OS-level invert toggle, the inverted PDF is a real
                 file you can email, AirDrop, or upload anywhere. The recipient
