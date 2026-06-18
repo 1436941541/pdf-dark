@@ -30,18 +30,14 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "PDF Dark Mode — Free Online Converter",
-    description:
-      "Convert PDFs to dark mode. 100% browser-side. Download the dark version.",
+    // title + description inherit from root metadata above — single source of truth.
     type: "website",
     url: "/",
     siteName: "PDF Dark",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PDF Dark Mode — Free Online Converter",
-    description:
-      "Convert PDFs to dark mode in your browser. No upload, no signup.",
+    // title + description inherit from root metadata above.
   },
 };
 

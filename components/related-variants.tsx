@@ -8,11 +8,12 @@ export function RelatedVariants({ currentSlug }: { currentSlug: string }) {
   return (
     <section className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900">
       <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-        Related PDF dark mode tools
+        Related PDF dark mode guides
       </h2>
       <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-        Different angles on the same problem — pick the one that matches what
-        you actually need.
+        Same converter, different angles — pick the guide that matches the
+        scenario you&apos;re actually in. The drop zone is at the top of
+        every page.
       </p>
       <div className="grid sm:grid-cols-3 gap-4">
         {others.map((v) => (

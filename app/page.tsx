@@ -128,7 +128,7 @@ export default function Home() {
           </div>
           <nav className="text-sm text-neutral-400 flex gap-5">
             <a href="#how" className="hover:text-neutral-100">How it works</a>
-            <a href="#tools" className="hover:text-neutral-100">Tools</a>
+            <a href="#tools" className="hover:text-neutral-100">Guides</a>
             <a href="#faq" className="hover:text-neutral-100">FAQ</a>
           </nav>
         </div>
@@ -318,12 +318,13 @@ export default function Home() {
             className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900"
           >
             <h2 className="text-2xl font-bold mb-3 text-center">
-              More PDF dark mode tools
+              PDF dark mode guides
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              Looking for something more specific—inverting PDF colors,
-              browser-specific dark mode, or a PDF night mode workflow? We have
-              dedicated pages for each.
+              Deeper write-ups for specific scenarios — inverting PDF colors,
+              browser quirks, and producing a permanent dark-themed file.
+              Each guide has the converter inline, so you can read or just
+              drop a PDF in and go.
             </p>
             <div className="grid sm:grid-cols-2 gap-4">
               {VARIANTS.map((v) => (
