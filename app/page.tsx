@@ -174,9 +174,13 @@ export default function Home() {
           id="what"
           className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900"
         >
-          <h2 className="text-2xl font-bold mb-5 text-center">
+          <h2 className="text-2xl font-bold mb-8 text-center">
             What is PDF dark mode?
           </h2>
+
+          <h3 className="text-lg font-semibold text-neutral-100 mt-2 mb-3">
+            PDF dark mode at a glance
+          </h3>
           <p className="text-neutral-300 leading-relaxed">
             PDF dark mode is a way to read PDFs with a dark background and
             light text instead of the default white page. You may also see it
@@ -185,7 +189,11 @@ export default function Home() {
             the file so it stays dark in every viewer, not just the one you
             opened it in.
           </p>
-          <p className="text-neutral-300 leading-relaxed mt-4">
+
+          <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
+            Why use a dark mode PDF
+          </h3>
+          <p className="text-neutral-300 leading-relaxed">
             People use a dark mode PDF to read at night without eye strain, to
             extend battery life on OLED phones, to study late-night research
             papers, and to make code- or text-heavy documents less harsh
@@ -194,7 +202,11 @@ export default function Home() {
             PDF Dark produces an actual dark-themed PDF you can save, share,
             and reopen anywhere — a real dark PDF, not a viewer trick.
           </p>
-          <p className="text-neutral-300 leading-relaxed mt-4">
+
+          <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
+            Conversion, not just a viewer hack
+          </h3>
+          <p className="text-neutral-300 leading-relaxed">
             A good dark mode reader for PDFs does more than paint the screen
             dark — it rewrites the file with inverted colors so the PDF stays
             in dark mode wherever you open it. With PDF Dark you can read PDFs
