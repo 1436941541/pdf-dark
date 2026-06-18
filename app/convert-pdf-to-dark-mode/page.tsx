@@ -9,10 +9,10 @@ import { getSiteUrl } from "@/lib/site";
 const SLUG = "/convert-pdf-to-dark-mode";
 const TITLE = "Convert PDF to Dark Mode — Download as a Permanent File";
 const DESCRIPTION =
-  "Convert any PDF to dark mode and download a real, reusable PDF file. Unlike viewer toggles or extensions, the result is permanent — email it, sync it, open it anywhere.";
+  "Convert any PDF to dark mode and download a reusable file. Unlike viewer toggles or extensions, the dark theme is baked in — email it, sync it, anywhere.";
 
 export const metadata: Metadata = {
-  title: `${TITLE} | PDF Dark`,
+  title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: SLUG },
   openGraph: {

@@ -9,10 +9,10 @@ import { getSiteUrl } from "@/lib/site";
 const SLUG = "/pdf-dark-mode-firefox";
 const TITLE = "PDF Dark Mode in Firefox — Beyond the about:config Hack";
 const DESCRIPTION =
-  "Firefox's PDF.js viewer only darkens the toolbar, not the page content. Here's the actual fix — convert any PDF to dark mode without tweaking about:config or installing extensions.";
+  "Firefox's PDF.js viewer only darkens the toolbar, not the page content. Convert any PDF to dark mode in your browser — no about:config, no extensions.";
 
 export const metadata: Metadata = {
-  title: `${TITLE} | PDF Dark`,
+  title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: SLUG },
   openGraph: {

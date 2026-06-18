@@ -12,7 +12,7 @@ const DESCRIPTION =
   "Chrome's built-in PDF viewer has no dark mode toggle. Skip the extensions and their permissions — convert any PDF to dark mode right in your browser, free.";
 
 export const metadata: Metadata = {
-  title: `${TITLE} | PDF Dark`,
+  title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: SLUG },
   openGraph: {

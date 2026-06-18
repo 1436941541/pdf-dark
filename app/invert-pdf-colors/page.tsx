@@ -12,7 +12,7 @@ const DESCRIPTION =
   "Invert a PDF's colors in your browser while keeping photos, charts, and diagrams in their original color. Free, no upload, downloads as a new PDF.";
 
 export const metadata: Metadata = {
-  title: `${TITLE} | PDF Dark`,
+  title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: SLUG },
   openGraph: {
