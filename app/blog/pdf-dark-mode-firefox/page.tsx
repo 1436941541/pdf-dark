@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
-import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/components/icons";
 import { RelatedVariants } from "@/components/related-variants";
 import { getSiteUrl } from "@/lib/site";
 
-const SLUG = "/pdf-dark-mode-firefox";
+const SLUG = "/blog/pdf-dark-mode-firefox";
 const TITLE = "PDF Dark Mode in Firefox — Beyond the about:config Hack";
 const DESCRIPTION =
   "Firefox's PDF.js viewer only darkens the toolbar, not the page content. Convert any PDF to dark mode in your browser — no about:config, no extensions.";
@@ -121,8 +119,11 @@ export default function FirefoxVariantPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Hero */}
-        <section className="max-w-4xl mx-auto px-6 pt-16 pb-20 text-center">
+        {/* Article hero */}
+        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
+          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
+            Blog
+          </p>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
             PDF Dark Mode in Firefox
             <span className="block text-amber-400 mt-2">
@@ -132,30 +133,14 @@ export default function FirefoxVariantPage() {
           <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
             Firefox&apos;s PDF.js viewer only darkens the{" "}
             <em className="text-neutral-200">toolbar</em> — pages still render
-            on white.{" "}
-            <strong className="text-neutral-100">
-              Drop your PDF below for an actual dark copy
-            </strong>{" "}
-            — no extensions, no config flags.
+            on white. Here&apos;s the actual fix.
           </p>
-
-          <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconLock className="text-neutral-500" /> No about:config edits
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconPalette className="text-neutral-500" /> Images stay in color
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconDownload className="text-neutral-500" /> Download as new PDF
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconSmartphone className="text-neutral-500" /> Works on Firefox Mobile
-            </span>
-          </div>
-
-          <div className="mt-14">
-            <Converter />
+          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
+            <span>By PDF Dark Team</span>
+            <span aria-hidden>·</span>
+            <span>Updated June 19, 2026</span>
+            <span aria-hidden>·</span>
+            <span>8 min read</span>
           </div>
         </section>
 
@@ -245,39 +230,103 @@ export default function FirefoxVariantPage() {
           </div>
         </section>
 
-        {/* How to use in Firefox */}
+        {/* How it works in Firefox */}
         <section className="max-w-3xl mx-auto px-6 py-20">
           <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
-            Using this tool in Firefox
+            How PDF Dark works in Firefox
           </h2>
-          <ol className="space-y-5 text-neutral-300 list-decimal pl-6">
-            <li>
-              Scroll up to the drop zone, or refresh the page.
-            </li>
-            <li>
-              Drop a PDF from your desktop, Downloads folder, or any file
-              picker. Firefox will hand it to the page via the File API — no
-              upload happens.
-            </li>
-            <li>
-              The pages render in your tab. Pick a theme:{" "}
-              <strong className="text-neutral-100">Midnight</strong>,{" "}
-              <strong className="text-neutral-100">Sepia</strong>,{" "}
-              <strong className="text-neutral-100">Solarized</strong>, or{" "}
-              <strong className="text-neutral-100">OLED</strong>.
-            </li>
-            <li>
-              Click <strong className="text-neutral-100">Download</strong>.
-              Firefox saves the dark version to your Downloads folder. Open it
-              in Firefox again or hand it off to another reader — it stays
-              dark.
-            </li>
-          </ol>
+          <div className="space-y-8">
+            <div>
+              <div className="text-xs text-amber-400 font-semibold mb-1">
+                Step 1
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
+                You drop a PDF on the home page
+              </h3>
+              <p className="text-neutral-300 leading-relaxed">
+                From the{" "}
+                <Link href="/" className="text-amber-400 hover:underline">
+                  PDF Dark home page
+                </Link>
+                , drag a PDF from your desktop, Downloads folder, or any
+                Firefox file picker. Firefox hands the file to the page via
+                the File API — no upload, no extension, no about:config.
+              </p>
+            </div>
 
-          <p className="mt-8 text-sm text-neutral-500">
+            <div>
+              <div className="text-xs text-amber-400 font-semibold mb-1">
+                Step 2
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
+                Pages render inside the tab
+              </h3>
+              <p className="text-neutral-300 leading-relaxed">
+                We use the same PDF.js engine Firefox ships with, so anything
+                Firefox can read, PDF Dark can read. Pages are painted to a
+                canvas in your tab — same compatibility, just with the dark
+                theme applied.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs text-amber-400 font-semibold mb-1">
+                Step 3
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
+                You pick a theme
+              </h3>
+              <p className="text-neutral-300 leading-relaxed">
+                Choose from{" "}
+                <strong className="text-neutral-100">Midnight</strong>,{" "}
+                <strong className="text-neutral-100">Sepia</strong>,{" "}
+                <strong className="text-neutral-100">Solarized</strong>, or{" "}
+                <strong className="text-neutral-100">OLED</strong>. The
+                conversion runs in a Web Worker, so even a long document
+                doesn&apos;t freeze the Firefox UI.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs text-amber-400 font-semibold mb-1">
+                Step 4
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
+                You download the dark PDF
+              </h3>
+              <p className="text-neutral-300 leading-relaxed">
+                Click <strong className="text-neutral-100">Download</strong>{" "}
+                and Firefox saves the dark version to your Downloads folder.
+                Open it in Firefox again or hand it off to another reader —
+                it stays dark, no per-viewer toggle needed.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-10 text-sm text-neutral-500">
             Works on Firefox for Windows, macOS, Linux, and Android. Needs
             Firefox 90+ (Web Workers + OffscreenCanvas support).
           </p>
+        </section>
+
+        {/* CTA — back to the tool */}
+        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
+          <h2 className="text-xl font-semibold text-neutral-50 mb-2">
+            Ready to read a PDF in dark mode on Firefox?
+          </h2>
+          <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
+            3 steps, no about:config, no extensions
+          </h3>
+          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
+            Drop a PDF on the PDF Dark home page and download the dark
+            version — runs right in Firefox.
+          </p>
+          <Link
+            href="/"
+            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+          >
+            Try PDF Dark →
+          </Link>
         </section>
 
         <RelatedVariants currentSlug="pdf-dark-mode-firefox" />

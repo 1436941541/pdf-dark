@@ -128,7 +128,7 @@ export default function Home() {
           </div>
           <nav className="text-sm text-neutral-400 flex gap-5">
             <a href="#how" className="hover:text-neutral-100">How it works</a>
-            <a href="#tools" className="hover:text-neutral-100">Guides</a>
+            <a href="#tools" className="hover:text-neutral-100">Blog</a>
             <a href="#faq" className="hover:text-neutral-100">FAQ</a>
           </nav>
         </div>
@@ -330,19 +330,19 @@ export default function Home() {
             className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900"
           >
             <h2 className="text-2xl font-bold mb-3 text-center">
-              PDF dark mode guides
+              From the PDF Dark blog
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              Deeper write-ups for specific scenarios — inverting PDF colors,
-              browser quirks, and producing a permanent dark-themed file.
-              Each guide has the converter inline, so you can read or just
-              drop a PDF in and go.
+              Posts on PDF dark mode workflows — inverting colors,
+              browser-specific tips, and producing a permanent dark-themed
+              file. Each post has the converter inline if you&apos;d rather
+              just drop in a PDF.
             </p>
             <div className="grid sm:grid-cols-2 gap-4">
               {VARIANTS.map((v) => (
                 <Link
                   key={v.slug}
-                  href={`/${v.slug}`}
+                  href={`/blog/${v.slug}`}
                   className="group p-5 rounded-xl border border-neutral-800 bg-neutral-900/30 hover:bg-neutral-900/60 hover:border-amber-400/40 transition-colors"
                 >
                   <div className="text-neutral-50 group-hover:text-amber-400 transition-colors flex items-center justify-between">

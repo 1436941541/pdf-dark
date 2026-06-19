@@ -13,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     ...VARIANTS.map((v) => ({
-      url: `${base}/${v.slug}`,
+      url: `${base}/blog/${v.slug}`,
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.9,

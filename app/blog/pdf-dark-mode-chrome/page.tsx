@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
-import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/components/icons";
 import { RelatedVariants } from "@/components/related-variants";
 import { getSiteUrl } from "@/lib/site";
 
-const SLUG = "/pdf-dark-mode-chrome";
+const SLUG = "/blog/pdf-dark-mode-chrome";
 const TITLE = "PDF Dark Mode in Chrome — Without Installing an Extension";
 const DESCRIPTION =
   "Chrome's built-in PDF viewer has no dark mode toggle. Skip the extensions and their permissions — convert any PDF to dark mode right in your browser, free.";
@@ -121,8 +119,11 @@ export default function ChromeVariantPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Hero */}
-        <section className="max-w-4xl mx-auto px-6 pt-16 pb-20 text-center">
+        {/* Article hero */}
+        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
+          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
+            Blog
+          </p>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
             PDF Dark Mode in Chrome
             <span className="block text-amber-400 mt-2">No Extension Needed</span>
@@ -132,26 +133,14 @@ export default function ChromeVariantPage() {
             <strong className="text-neutral-100">
               Skip the extensions and their permissions
             </strong>{" "}
-            — drop your PDF below and get a dark-themed copy in seconds.
+            — here&apos;s the cleaner way.
           </p>
-
-          <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconLock className="text-neutral-500" /> No extension to install
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconPalette className="text-neutral-500" /> Images stay in color
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconDownload className="text-neutral-500" /> Download as new PDF
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconSmartphone className="text-neutral-500" /> Works on Mobile Chrome
-            </span>
-          </div>
-
-          <div className="mt-14">
-            <Converter />
+          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
+            <span>By PDF Dark Team</span>
+            <span aria-hidden>·</span>
+            <span>Updated June 19, 2026</span>
+            <span aria-hidden>·</span>
+            <span>8 min read</span>
           </div>
         </section>
 
@@ -250,40 +239,107 @@ export default function ChromeVariantPage() {
           </div>
         </section>
 
-        {/* How to use in Chrome */}
+        {/* How it works in Chrome */}
         <section className="max-w-3xl mx-auto px-6 py-20">
           <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
-            Using this tool in Chrome
+            How PDF Dark works in Chrome
           </h2>
-          <ol className="space-y-5 text-neutral-300 list-decimal pl-6">
-            <li>
-              Scroll back to the top of this page (or refresh) — the drop zone
-              is right there.
-            </li>
-            <li>
-              Drop a PDF from your desktop, or click to pick from File Explorer
-              / Finder / Downloads.
-            </li>
-            <li>
-              Pages render in Chrome&apos;s tab. Pick a theme:{" "}
-              <strong className="text-neutral-100">Midnight</strong>,{" "}
-              <strong className="text-neutral-100">Sepia</strong>,{" "}
-              <strong className="text-neutral-100">Solarized</strong>, or{" "}
-              <strong className="text-neutral-100">OLED</strong> (pure black,
-              great on OLED laptops).
-            </li>
-            <li>
-              Click <strong className="text-neutral-100">Download</strong>.
-              Chrome saves the dark version to your usual Downloads folder.
-              Reopen it anywhere — it stays dark forever.
-            </li>
-          </ol>
+          <div className="space-y-8">
+            <div>
+              <div className="text-xs text-amber-400 font-semibold mb-1">
+                Step 1
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
+                You drop a PDF on the home page
+              </h3>
+              <p className="text-neutral-300 leading-relaxed">
+                From the{" "}
+                <Link href="/" className="text-amber-400 hover:underline">
+                  PDF Dark home page
+                </Link>
+                , drag a PDF from your desktop or click to pick from File
+                Explorer / Finder / Downloads. Chrome hands the file to the
+                page via the File API — no upload happens, no extension is
+                involved.
+              </p>
+            </div>
 
-          <p className="mt-8 text-sm text-neutral-500">
+            <div>
+              <div className="text-xs text-amber-400 font-semibold mb-1">
+                Step 2
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
+                Pages render in your Chrome tab
+              </h3>
+              <p className="text-neutral-300 leading-relaxed">
+                PDF.js (Mozilla&apos;s JavaScript PDF renderer, which Chrome
+                also relies on internally) parses the file and paints each
+                page onto a canvas inside your browser tab. The full document
+                stays in memory locally.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs text-amber-400 font-semibold mb-1">
+                Step 3
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
+                You pick a theme
+              </h3>
+              <p className="text-neutral-300 leading-relaxed">
+                Choose from{" "}
+                <strong className="text-neutral-100">Midnight</strong>,{" "}
+                <strong className="text-neutral-100">Sepia</strong>,{" "}
+                <strong className="text-neutral-100">Solarized</strong>, or{" "}
+                <strong className="text-neutral-100">OLED</strong> (pure black
+                — best on OLED laptops). The dark-mode algorithm runs in a
+                Web Worker so the toolbar and viewer stay smooth even on a
+                100-page document.
+              </p>
+            </div>
+
+            <div>
+              <div className="text-xs text-amber-400 font-semibold mb-1">
+                Step 4
+              </div>
+              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
+                You download the dark PDF
+              </h3>
+              <p className="text-neutral-300 leading-relaxed">
+                Click <strong className="text-neutral-100">Download</strong>{" "}
+                and Chrome saves the dark version to your usual Downloads
+                folder. Reopen it anywhere — Acrobat, Preview, your phone,
+                an e-reader — it stays dark forever, no per-app toggle
+                needed.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-10 text-sm text-neutral-500">
             Works on Chrome on Windows, Mac, Linux, ChromeOS, and Android.
             Needs modern Chrome (v90+), which covers the last 4 years of
             releases.
           </p>
+        </section>
+
+        {/* CTA — back to the tool */}
+        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
+          <h2 className="text-xl font-semibold text-neutral-50 mb-2">
+            Ready to read a PDF in dark mode on Chrome?
+          </h2>
+          <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
+            3 steps, no Chrome extension, no permissions
+          </h3>
+          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
+            Drop a PDF on the PDF Dark home page and download the dark
+            version — runs right in Chrome.
+          </p>
+          <Link
+            href="/"
+            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+          >
+            Try PDF Dark →
+          </Link>
         </section>
 
         <RelatedVariants currentSlug="pdf-dark-mode-chrome" />

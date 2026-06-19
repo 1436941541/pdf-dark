@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
-import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/components/icons";
 import { RelatedVariants } from "@/components/related-variants";
 import { getSiteUrl } from "@/lib/site";
 
-const SLUG = "/convert-pdf-to-dark-mode";
+const SLUG = "/blog/convert-pdf-to-dark-mode";
 const TITLE = "Convert PDF to Dark Mode — Download as a Permanent File";
 const DESCRIPTION =
   "Convert any PDF to dark mode and download a reusable file. Unlike viewer toggles or extensions, the dark theme is baked in — email it, sync it, anywhere.";
@@ -121,8 +119,11 @@ export default function ConvertVariantPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Hero */}
-        <section className="max-w-4xl mx-auto px-6 pt-16 pb-20 text-center">
+        {/* Article hero */}
+        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
+          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
+            Blog
+          </p>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
             Convert PDF to Dark Mode
             <span className="block text-amber-400 mt-2">
@@ -132,28 +133,15 @@ export default function ConvertVariantPage() {
           <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
             Not a viewer toggle. Not an extension trick.{" "}
             <strong className="text-neutral-100">
-              Drop a PDF, pick a theme, download a new PDF
-            </strong>{" "}
-            — dark in every reader, forever.
+              An actual dark PDF file — dark in every reader, forever.
+            </strong>
           </p>
-
-          <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconLock className="text-neutral-500" /> 100% Browser-side
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconPalette className="text-neutral-500" /> 4 dark themes
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconDownload className="text-neutral-500" /> Reusable PDF file
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconSmartphone className="text-neutral-500" /> Works on Mobile
-            </span>
-          </div>
-
-          <div className="mt-14">
-            <Converter />
+          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
+            <span>By PDF Dark Team</span>
+            <span aria-hidden>·</span>
+            <span>Updated June 19, 2026</span>
+            <span aria-hidden>·</span>
+            <span>8 min read</span>
           </div>
         </section>
 
@@ -274,6 +262,26 @@ export default function ConvertVariantPage() {
               </p>
             </div>
           </div>
+        </section>
+
+        {/* CTA — back to the tool */}
+        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
+          <h2 className="text-xl font-semibold text-neutral-50 mb-2">
+            Ready to convert a PDF to permanent dark mode?
+          </h2>
+          <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
+            3 steps, a real dark PDF file, opens dark in every reader
+          </h3>
+          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
+            Drop a PDF on the PDF Dark home page, pick a theme, and download
+            the file — email it, sync it, open it anywhere.
+          </p>
+          <Link
+            href="/"
+            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+          >
+            Try PDF Dark →
+          </Link>
         </section>
 
         <RelatedVariants currentSlug="convert-pdf-to-dark-mode" />
