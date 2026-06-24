@@ -51,6 +51,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="" />
+        <link rel="preconnect" href="https://scripts.clarity.ms" crossOrigin="" />
+      </head>
       <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100">
         {children}
         <Analytics />
