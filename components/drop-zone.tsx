@@ -68,7 +68,7 @@ export function DropZone({ onFile }: Props) {
           <input
             type="file"
             accept="application/pdf"
-            className="hidden"
+            className="sr-only"
             onChange={(e) => accept(e.target.files?.[0])}
           />
           <div className="text-5xl mb-4 transition-transform group-hover:scale-110">📄</div>
