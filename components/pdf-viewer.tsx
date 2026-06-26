@@ -45,13 +45,10 @@ export function PdfViewer({ file, onReset }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(1);
   const [pageInput, setPageInput] = useState("1");
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
   const themeVersionRef = useRef(0);
   const cancelledRef = useRef(false);
   const lastAppliedThemeRef = useRef<ThemeId | null>(null);
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
 
   // Worker setup
@@ -119,16 +116,6 @@ export function PdfViewer({ file, onReset }: Props) {
     setPageInput(String(currentPage));
   }, [currentPage]);
 
-  // Track fullscreen state so the button label/icon flips correctly even when
-  // the user exits with Esc.
-  useEffect(() => {
-    const onChange = () => {
-      setIsFullscreen(document.fullscreenElement === containerRef.current);
-    };
-    document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
-  }, []);
-
   const scrollToPage = useCallback((target: number) => {
     const clamped = Math.max(1, Math.min(pageRefs.current.length, target));
     const el = pageRefs.current[clamped - 1];
@@ -180,28 +167,11 @@ export function PdfViewer({ file, onReset }: Props) {
           e.preventDefault();
           setZoom(1);
           break;
-        case "f":
-        case "F":
-          e.preventDefault();
-          if (document.fullscreenElement) {
-            document.exitFullscreen();
-          } else {
-            containerRef.current?.requestFullscreen?.();
-          }
-          break;
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [status, currentPage, scrollToPage]);
-
-  const toggleFullscreen = useCallback(() => {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      containerRef.current?.requestFullscreen?.();
-    }
-  }, []);
 
   const submitJumpInput = useCallback(() => {
     const n = parseInt(pageInput, 10);
@@ -484,13 +454,7 @@ export function PdfViewer({ file, onReset }: Props) {
   const totalPages = progress.total || pages.length;
 
   return (
-    <div
-      ref={containerRef}
-      className={`w-full max-w-5xl mx-auto ${
-        isFullscreen ? "max-w-none h-screen overflow-y-auto px-4 py-3" : ""
-      }`}
-      style={isFullscreen ? { background: themeBg } : undefined}
-    >
+    <div className="w-full max-w-5xl mx-auto">
       {/* Toolbar */}
       <div className="sticky top-0 z-10 rounded-2xl border border-neutral-800 bg-neutral-900/80 backdrop-blur px-4 py-3 mb-6 space-y-2">
         {/* Row 1 — file, themes, download, reset */}
@@ -569,7 +533,7 @@ export function PdfViewer({ file, onReset }: Props) {
           </button>
         </div>
 
-        {/* Row 2 — reader controls (page nav, zoom, fullscreen) */}
+        {/* Row 2 — reader controls (page nav, zoom) */}
         {status === "ready" && totalPages > 0 && (
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-800/60">
             <div className="flex items-center gap-1">
@@ -651,14 +615,6 @@ export function PdfViewer({ file, onReset }: Props) {
                 +
               </button>
             </div>
-
-            <button
-              onClick={toggleFullscreen}
-              className="px-3 py-1 rounded-full text-xs text-neutral-300 hover:text-neutral-50 border border-neutral-800 hover:border-neutral-700 transition-colors"
-              title="Toggle fullscreen (F)"
-            >
-              {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-            </button>
           </div>
         )}
       </div>
