@@ -41,10 +41,11 @@ export default function AboutPage() {
           </li>
           <li>
             <strong className="text-neutral-100">
-              Images keep their original colors.
+              One consistent rule, the whole page.
             </strong>{" "}
-            A saturation-based algorithm detects photos and figures and leaves
-            them untouched while it darkens the rest.
+            Every pixel — text, background, photos — is brightness-mapped into
+            your theme. No edge halos on colored text, no &ldquo;half darkened&rdquo;
+            artifacts; the page reads as one calm dark surface.
           </li>
         </ul>
         <p>
@@ -78,8 +79,8 @@ export default function AboutPage() {
           </li>
           <li>
             <strong className="text-neutral-100">Dark-mode algorithm:</strong>{" "}
-            pixel saturation classification, runs in a Web Worker so the UI
-            never blocks
+            per-pixel brightness mapping into the chosen theme color, runs in
+            a Web Worker so the UI never blocks
           </li>
           <li>
             <strong className="text-neutral-100">PDF assembly:</strong>{" "}
@@ -100,8 +101,8 @@ export default function AboutPage() {
         </h2>
         <p>
           PDF Dark is open source under the MIT license. The full codebase —
-          including the saturation algorithm, Web Worker logic, and the Sentry
-          masking config — lives at{" "}
+          including the brightness-mapping algorithm, Web Worker logic, and the
+          Sentry masking config — lives at{" "}
           <a
             href="https://github.com/1436941541/pdf-dark"
             target="_blank"

@@ -41,7 +41,7 @@ const FAQ = [
   },
   {
     q: "What happens to images in my PDF?",
-    a: "They keep their original colors. Our algorithm detects image regions by pixel saturation and leaves them alone while it darkens the surrounding text and diagrams.",
+    a: "Every pixel is brightness-mapped into your theme: text and backgrounds invert as expected, photos desaturate into theme-tinted shades. There's no hue flipping — no orange skies or blue skin like channel-wise invert produces — but colored photos won't keep their original hue either. If image color fidelity matters, keep the original file alongside the dark copy.",
   },
   {
     q: "Does it work on Chrome for Android?",
@@ -222,8 +222,8 @@ export default function ChromeVariantPage() {
                     Runs on one webpage — no install, no extension permissions
                   </li>
                   <li>
-                    Detects image regions by saturation so photos stay in
-                    original color
+                    Brightness-mapped per pixel — no hue flips, no halos on
+                    colored text, one consistent dark page
                   </li>
                   <li>
                     Produces a downloadable dark-themed PDF that&apos;s dark in

@@ -7,7 +7,7 @@ import { VARIANTS } from "@/lib/variants";
 
 const COMPARISON_ROWS: [string, string, string, string][] = [
   ["No install needed", "yes", "no", "yes"],
-  ["Images keep original colors", "yes", "no", "no"],
+  ["Read in-browser before downloading", "yes", "no", "no"],
   ["Save as new PDF file", "yes", "no", "no"],
   ["Works on iOS Safari", "yes", "no", "yes"],
   ["100% local (no upload)", "yes", "yes", "no"],
@@ -35,17 +35,20 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "How is this different from a browser dark-mode extension?",
-    a: "Most dark-mode extensions invert everything including images. PDF Dark detects image regions and keeps them in their original colors, so photos and charts look right.",
+    a: "Extensions only restyle the page while it's open in your browser — close the tab or hand the file to someone else and it's bright again. PDF Dark rewrites the actual PDF: every pixel is brightness-mapped into your chosen theme, then re-encoded back into the file. The dark theme stays with the PDF wherever you open it.",
     link: { href: "/pdf-dark-mode-chrome", text: "PDF Dark Mode in Chrome" },
   },
   {
     q: "Does it work for scanned PDFs?",
-    a: "Yes. We render each page as an image and apply theme inversion. Handwriting and scanned text become light-on-dark automatically. Because images get color-aware inversion, scanned signatures stay legible instead of turning into negatives.",
-    link: { href: "/invert-pdf-colors", text: "Invert PDF Colors" },
+    a: "Yes. We render each page as an image and apply theme inversion uniformly, so handwriting and scanned text become light-on-dark automatically — even old yellowed scans normalize to your theme background.",
+    link: {
+      href: "/blog/darken-scanned-pdf-online",
+      text: "Darken a Scanned PDF Online",
+    },
   },
   {
     q: "How do I read a PDF at night without eye strain?",
-    a: "Convert the PDF to dark mode here and pick OLED or Midnight—both turn the white background into pure or near-pure black so your eyes don't have to fight a bright page in a dim room. The text inverts to light, images stay normal.",
+    a: "Convert the PDF to dark mode here and pick OLED or Midnight—both turn the white background into pure or near-pure black so your eyes don't have to fight a bright page in a dim room. Text and figures invert to light tones in one consistent pass.",
   },
   {
     q: "Can I change a PDF background to black?",
@@ -73,7 +76,7 @@ function StructuredData() {
     applicationCategory: "UtilityApplication",
     operatingSystem: "Any (browser-based)",
     description:
-      "Free, browser-side PDF dark mode and night mode converter. A dark PDF reader that keeps images in their original color, runs 100% locally, and downloads as a new PDF—built for reading PDFs at night.",
+      "Free, browser-side PDF dark mode and night mode converter. Read PDFs on a dark background right in your browser or download the themed file. Runs 100% locally — built for reading PDFs at night.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -82,7 +85,7 @@ function StructuredData() {
     featureList: [
       "100% browser-side conversion (no upload)",
       "Four themes: Midnight, Sepia, Solarized, OLED",
-      "Preserves original image colors",
+      "Read in the browser before downloading",
       "Download as new PDF",
       "Works on iOS Safari",
     ],
@@ -138,13 +141,12 @@ export default function Home() {
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-16 pb-20 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Free PDF Dark Mode Converter
+            Read &amp; Convert PDFs in Dark Mode
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Convert any PDF to dark mode or night mode in your browser. A free,
-            online dark PDF reader that keeps images in their original colors—no
-            upload, no signup, no install. Download the themed PDF and read at
-            night without eye strain.
+            Drop a PDF and read it on a dark background right here, or download
+            the darkened file to keep. The whole thing runs in your browser —
+            no upload, no signup, no install.
           </p>
 
           {/* Trust badges — outline pill + stroke icon */}
@@ -225,18 +227,18 @@ export default function Home() {
           className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900"
         >
           <h2 className="text-2xl font-bold mb-3 text-center">
-            How to convert a PDF to dark mode
+            How to read or convert a PDF in dark mode
           </h2>
           <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-            PDF dark mode means re-rendering each page so text and background
-            are inverted into a low-light theme, while photos and charts keep
-            their original colors. Three steps:
+            Each page is re-rendered with text and background inverted into a
+            low-light theme. You can start reading immediately, then download
+            the new PDF if you want to keep it.
           </p>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
               { n: "1", t: "Drop your PDF", d: "Drag & drop or click to browse. Never leaves your browser.", offset: "sm:translate-y-0" },
               { n: "2", t: "Pick a theme", d: "Midnight, Sepia, Solarized, or OLED pure black.", offset: "sm:-translate-y-2" },
-              { n: "3", t: "Download", d: "Save the dark-mode PDF to your device.", offset: "sm:translate-y-0" },
+              { n: "3", t: "Read or save", d: "Page through the darkened version right here, or download the new PDF.", offset: "sm:translate-y-0" },
             ].map((s) => (
               <div
                 key={s.n}

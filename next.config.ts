@@ -4,9 +4,18 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      // /blog/invert-pdf-colors was retired — its content overlapped almost
+      // entirely with /blog/convert-pdf-to-dark-mode once the "preserves
+      // image color" differentiator was dropped. The legacy short link folds
+      // through to the same destination.
       {
         source: "/invert-pdf-colors",
-        destination: "/blog/invert-pdf-colors",
+        destination: "/blog/convert-pdf-to-dark-mode",
+        permanent: true,
+      },
+      {
+        source: "/blog/invert-pdf-colors",
+        destination: "/blog/convert-pdf-to-dark-mode",
         permanent: true,
       },
       {

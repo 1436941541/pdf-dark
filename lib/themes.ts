@@ -1,31 +1,40 @@
-// Dark-mode theme filters, applied via CSS `filter` on each rendered page.
-// These are v1 global filters. v2 will do smarter color mapping (keep images original).
+// Dark-mode themes. Each theme defines the background RGB the algorithm
+// in pixel-dark.ts / dark-worker.ts maps "white" pixels to (black pixels map
+// to white). `swatch` is the same color in hex, used to paint the page frame.
 
 export type ThemeId = "midnight" | "sepia" | "solarized" | "oled";
 
 export const THEMES: Record<
   ThemeId,
-  { label: string; filter: string; swatch: string }
+  { label: string; r: number; g: number; b: number; swatch: string }
 > = {
   midnight: {
     label: "Midnight",
-    filter: "invert(1) hue-rotate(180deg)",
-    swatch: "#0a0a0a",
+    r: 25,
+    g: 30,
+    b: 45,
+    swatch: "rgb(25, 30, 45)",
   },
   sepia: {
     label: "Sepia",
-    filter: "invert(0.92) hue-rotate(180deg) sepia(0.4)",
-    swatch: "#3b2e1f",
+    r: 40,
+    g: 35,
+    b: 25,
+    swatch: "rgb(40, 35, 25)",
   },
   solarized: {
     label: "Solarized",
-    filter: "invert(0.9) hue-rotate(170deg) saturate(0.6) brightness(1.02)",
-    swatch: "#073642",
+    r: 0,
+    g: 43,
+    b: 54,
+    swatch: "rgb(0, 43, 54)",
   },
   oled: {
     label: "OLED",
-    filter: "invert(1) contrast(1.12)",
-    swatch: "#000000",
+    r: 0,
+    g: 0,
+    b: 0,
+    swatch: "rgb(0, 0, 0)",
   },
 };
 

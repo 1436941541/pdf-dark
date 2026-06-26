@@ -194,8 +194,8 @@ export default function ConvertVariantPage() {
                     sees the dark version with zero setup
                   </li>
                   <li>
-                    Images stay in original color thanks to saturation-based
-                    detection
+                    Brightness-mapped pages — one consistent rule, no halos
+                    or hue flips
                   </li>
                   <li>
                     Works offline after download — no internet needed to read

@@ -41,7 +41,7 @@ const FAQ = [
   },
   {
     q: "Why is this page using PDF.js too?",
-    a: "Yes — we also use Mozilla's PDF.js for rendering. The difference is we render each page to a canvas, then apply a saturation-based color algorithm that treats text and images differently before reassembling the PDF. Same rendering library, very different post-processing.",
+    a: "Yes — we also use Mozilla's PDF.js for rendering. The difference is we render each page to a canvas, then brightness-map every pixel into your chosen theme color before reassembling the PDF. Same rendering library, very different post-processing — and the result is a downloadable file, not just a viewer toggle.",
   },
   {
     q: "Does this work on Firefox for Android?",
@@ -213,8 +213,9 @@ export default function FirefoxVariantPage() {
                     identical to Firefox
                   </li>
                   <li>
-                    Post-processes each rendered page pixel by pixel, detecting
-                    images by saturation before applying the theme
+                    Post-processes each rendered page pixel by pixel,
+                    brightness-mapping into your chosen theme — one consistent
+                    rule for the whole document
                   </li>
                   <li>
                     Produces a downloadable dark PDF — no about:config, no

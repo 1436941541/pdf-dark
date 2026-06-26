@@ -71,7 +71,7 @@ export default function OpenGraphImage() {
             display: "flex",
           }}
         >
-          Free. No upload, no signup. Keeps images in color.
+          Free. No upload, no signup. Read or download a dark PDF.
         </div>
       </div>
     ),

@@ -11,12 +11,6 @@ export type Variant = {
 
 export const VARIANTS: Variant[] = [
   {
-    slug: "invert-pdf-colors",
-    title: "Invert PDF Colors",
-    blurb:
-      "Flip a PDF to a dark background while keeping photos and charts in original color.",
-  },
-  {
     slug: "pdf-dark-mode-chrome",
     title: "PDF Dark Mode in Chrome",
     blurb:
@@ -33,5 +27,17 @@ export const VARIANTS: Variant[] = [
     title: "Convert PDF to Dark Mode",
     blurb:
       "Produce a permanent dark-themed PDF file you can email, sync, and reopen anywhere — not a one-off viewer trick.",
+  },
+  {
+    slug: "how-to-darken-a-pdf",
+    title: "How to Darken a PDF",
+    blurb:
+      "A three-step walkthrough: drop, pick a theme, download. No accounts, no extensions, no uploads.",
+  },
+  {
+    slug: "darken-scanned-pdf-online",
+    title: "Darken a Scanned PDF Online",
+    blurb:
+      "Free, browser-only tool for scanned PDFs that wash out your screen at night. Pick OLED for the deepest contrast.",
   },
 ];

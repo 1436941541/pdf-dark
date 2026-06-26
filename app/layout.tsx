@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: "PDF Dark Mode — Free Online PDF to Night Mode Converter",
   description:
-    "Convert any PDF to dark mode or night mode in your browser. Free, no upload, no signup. Keeps images in original color. Download as a permanent dark PDF.",
+    "Convert any PDF to dark mode or night mode in your browser. Free, no upload, no signup. Read it right here or download a permanent dark PDF.",
   keywords: [
     "pdf dark mode",
     "pdf night mode",

@@ -39,10 +39,20 @@ export function PdfViewer({ file, onReset }: Props) {
   }>({ current: 0, total: 0 });
   const [downloading, setDownloading] = useState(false);
 
+  // Reader controls — current page tracked from scroll, zoom factor applied
+  // to each page's display width, pageInput is the controlled value of the
+  // "jump to page" text field.
+  const [currentPage, setCurrentPage] = useState(1);
+  const [zoom, setZoom] = useState(1);
+  const [pageInput, setPageInput] = useState("1");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   const themeVersionRef = useRef(0);
   const cancelledRef = useRef(false);
   const lastAppliedThemeRef = useRef<ThemeId | null>(null);
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const scrollRootRef = useRef<HTMLDivElement | null>(null);
 
   // Worker setup
   const workerRef = useRef<Worker | null>(null);
@@ -68,6 +78,136 @@ export function PdfViewer({ file, onReset }: Props) {
       workerRef.current = null;
     };
   }, []);
+
+  // Track which page is currently in view. We pick the entry with the largest
+  // intersection ratio so a long page in the middle "wins" over a tiny sliver
+  // of the next one.
+  useEffect(() => {
+    if (status !== "ready" || pages.length === 0) return;
+    const visible = new Map<number, number>();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const idx = Number((e.target as HTMLElement).dataset.pageIndex);
+          if (e.isIntersecting) {
+            visible.set(idx, e.intersectionRatio);
+          } else {
+            visible.delete(idx);
+          }
+        }
+        if (visible.size === 0) return;
+        let bestIdx = 0;
+        let bestRatio = -1;
+        visible.forEach((ratio, idx) => {
+          if (ratio > bestRatio) {
+            bestRatio = ratio;
+            bestIdx = idx;
+          }
+        });
+        setCurrentPage(bestIdx + 1);
+      },
+      { threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    pageRefs.current.forEach((el) => {
+      if (el) io.observe(el);
+    });
+    return () => io.disconnect();
+  }, [status, pages.length]);
+
+  // Keep the jump-to-page input synced when scroll changes currentPage.
+  useEffect(() => {
+    setPageInput(String(currentPage));
+  }, [currentPage]);
+
+  // Track fullscreen state so the button label/icon flips correctly even when
+  // the user exits with Esc.
+  useEffect(() => {
+    const onChange = () => {
+      setIsFullscreen(document.fullscreenElement === containerRef.current);
+    };
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  const scrollToPage = useCallback((target: number) => {
+    const clamped = Math.max(1, Math.min(pageRefs.current.length, target));
+    const el = pageRefs.current[clamped - 1];
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
+  // Keyboard navigation. Skip when focus is inside a text input so the user
+  // can type page numbers without triggering arrow-key page jumps.
+  useEffect(() => {
+    if (status !== "ready") return;
+    const isTypingTarget = (t: EventTarget | null) => {
+      if (!(t instanceof HTMLElement)) return false;
+      const tag = t.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || t.isContentEditable;
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (isTypingTarget(e.target)) return;
+      switch (e.key) {
+        case "ArrowRight":
+        case "PageDown":
+        case "j":
+          e.preventDefault();
+          scrollToPage(currentPage + 1);
+          break;
+        case "ArrowLeft":
+        case "PageUp":
+        case "k":
+          e.preventDefault();
+          scrollToPage(currentPage - 1);
+          break;
+        case "Home":
+          e.preventDefault();
+          scrollToPage(1);
+          break;
+        case "End":
+          e.preventDefault();
+          scrollToPage(pageRefs.current.length);
+          break;
+        case "+":
+        case "=":
+          e.preventDefault();
+          setZoom((z) => Math.min(2, Math.round((z + 0.25) * 100) / 100));
+          break;
+        case "-":
+          e.preventDefault();
+          setZoom((z) => Math.max(0.5, Math.round((z - 0.25) * 100) / 100));
+          break;
+        case "0":
+          e.preventDefault();
+          setZoom(1);
+          break;
+        case "f":
+        case "F":
+          e.preventDefault();
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          } else {
+            containerRef.current?.requestFullscreen?.();
+          }
+          break;
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [status, currentPage, scrollToPage]);
+
+  const toggleFullscreen = useCallback(() => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      containerRef.current?.requestFullscreen?.();
+    }
+  }, []);
+
+  const submitJumpInput = useCallback(() => {
+    const n = parseInt(pageInput, 10);
+    if (Number.isFinite(n)) scrollToPage(n);
+    else setPageInput(String(currentPage));
+  }, [pageInput, currentPage, scrollToPage]);
 
   /** Convert an original dataUrl → worker-processed themed dataUrl. */
   const darkifyViaWorker = useCallback(
@@ -152,7 +292,13 @@ export function PdfViewer({ file, onReset }: Props) {
         if (cancelledRef.current) return;
         setProgress({ done: 0, total: pdf.numPages });
 
+        // Stream pages to React as soon as each finishes. The user can start
+        // reading after page 1 — they don't have to wait for the whole PDF.
         const rendered: PageImage[] = [];
+        // Lock the theme for the entire initial pass to avoid racing with the
+        // theme-switch effect (which is disabled in UI while
+        // isInitialRendering is true).
+        lastAppliedThemeRef.current = theme;
         for (let i = 1; i <= pdf.numPages; i++) {
           if (cancelledRef.current) return;
           const page = await pdf.getPage(i);
@@ -180,13 +326,9 @@ export function PdfViewer({ file, onReset }: Props) {
             displayDataUrl: display,
             byTheme: { [theme]: display },
           });
+          setPages([...rendered]);
           setProgress({ done: i, total: pdf.numPages });
-        }
-
-        if (!cancelledRef.current) {
-          setPages(rendered);
-          lastAppliedThemeRef.current = theme;
-          setStatus("ready");
+          if (i === 1) setStatus("ready");
         }
       } catch (e) {
         console.error("[pdf-dark] render failed", e);
@@ -335,59 +477,190 @@ export function PdfViewer({ file, onReset }: Props) {
   }, [pages, theme, file.name]);
 
   const themeBg = THEMES[theme].swatch;
+  // While the initial render is still streaming pages in, we know the final
+  // page count from `progress.total` but `pages.length` is still catching up.
+  const isInitialRendering =
+    progress.total > 0 && pages.length < progress.total;
+  const totalPages = progress.total || pages.length;
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div
+      ref={containerRef}
+      className={`w-full max-w-5xl mx-auto ${
+        isFullscreen ? "max-w-none h-screen overflow-y-auto px-4 py-3" : ""
+      }`}
+      style={isFullscreen ? { background: themeBg } : undefined}
+    >
       {/* Toolbar */}
-      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-neutral-800 bg-neutral-900/80 backdrop-blur px-4 py-3 mb-6">
-        <div className="flex-1 min-w-0 text-sm text-neutral-300 truncate">
-          {file.name}
-          {themeApplying && (
-            <span className="ml-2 text-xs text-amber-400">
-              Applying {THEMES[theme].label} · {themeProgress.current} /{" "}
-              {themeProgress.total} pages
-            </span>
-          )}
+      <div className="sticky top-0 z-10 rounded-2xl border border-neutral-800 bg-neutral-900/80 backdrop-blur px-4 py-3 mb-6 space-y-2">
+        {/* Row 1 — file, themes, download, reset */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex-1 min-w-0 text-sm text-neutral-300 truncate">
+            {file.name}
+            {isInitialRendering && (
+              <span className="ml-2 text-xs text-amber-400">
+                Rendering {progress.done} / {progress.total} pages — you can
+                start reading now
+              </span>
+            )}
+            {!isInitialRendering && themeApplying && (
+              <span className="ml-2 text-xs text-amber-400">
+                Applying {THEMES[theme].label} · {themeProgress.current} /{" "}
+                {themeProgress.total} pages
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1 rounded-full border border-neutral-800 p-1">
+            {THEME_IDS.map((id) => {
+              const active = theme === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => setTheme(id)}
+                  disabled={isInitialRendering}
+                  className={`px-3 py-1 rounded-full text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                    active
+                      ? "bg-amber-400 text-neutral-950 font-semibold"
+                      : "text-neutral-400 hover:text-neutral-100"
+                  }`}
+                  aria-pressed={active}
+                  title={
+                    isInitialRendering
+                      ? "Wait until the first pass finishes"
+                      : undefined
+                  }
+                >
+                  {THEMES[id].label}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={handleDownload}
+            disabled={
+              status !== "ready" ||
+              downloading ||
+              themeApplying ||
+              isInitialRendering
+            }
+            className="px-4 py-1.5 rounded-full text-sm font-semibold bg-amber-400 text-neutral-950 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            title={
+              isInitialRendering
+                ? "Wait until all pages finish rendering"
+                : undefined
+            }
+          >
+            {downloading
+              ? "Building..."
+              : themeApplying
+                ? "Applying…"
+                : isInitialRendering
+                  ? `Rendering ${progress.done}/${progress.total}`
+                  : "Download"}
+          </button>
+
+          <button
+            onClick={onReset}
+            className="px-3 py-1.5 rounded-full text-sm text-neutral-400 hover:text-neutral-100 border border-neutral-800"
+          >
+            New file
+          </button>
         </div>
 
-        <div className="flex items-center gap-1 rounded-full border border-neutral-800 p-1">
-          {THEME_IDS.map((id) => {
-            const active = theme === id;
-            return (
+        {/* Row 2 — reader controls (page nav, zoom, fullscreen) */}
+        {status === "ready" && totalPages > 0 && (
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-800/60">
+            <div className="flex items-center gap-1">
               <button
-                key={id}
-                onClick={() => setTheme(id)}
-                className={`px-3 py-1 rounded-full text-xs transition-colors ${
-                  active
-                    ? "bg-amber-400 text-neutral-950 font-semibold"
-                    : "text-neutral-400 hover:text-neutral-100"
-                }`}
-                aria-pressed={active}
+                onClick={() => scrollToPage(currentPage - 1)}
+                disabled={currentPage <= 1}
+                className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                aria-label="Previous page"
+                title="Previous page (←)"
               >
-                {THEMES[id].label}
+                ‹
               </button>
-            );
-          })}
-        </div>
+              <div className="flex items-center gap-1 text-sm text-neutral-300">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={pageInput}
+                  onChange={(e) =>
+                    setPageInput(e.target.value.replace(/[^0-9]/g, ""))
+                  }
+                  onBlur={submitJumpInput}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      submitJumpInput();
+                      (e.target as HTMLInputElement).blur();
+                    }
+                  }}
+                  className="w-12 px-2 py-1 rounded bg-neutral-800 text-center text-neutral-100 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                  aria-label="Jump to page"
+                />
+                <span className="text-neutral-500">/ {totalPages}</span>
+              </div>
+              <button
+                onClick={() => scrollToPage(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+                className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                aria-label="Next page"
+                title="Next page (→)"
+              >
+                ›
+              </button>
+            </div>
 
-        <button
-          onClick={handleDownload}
-          disabled={status !== "ready" || downloading || themeApplying}
-          className="px-4 py-1.5 rounded-full text-sm font-semibold bg-amber-400 text-neutral-950 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          {downloading
-            ? "Building..."
-            : themeApplying
-              ? "Applying…"
-              : "Download"}
-        </button>
+            <div className="flex-1" />
 
-        <button
-          onClick={onReset}
-          className="px-3 py-1.5 rounded-full text-sm text-neutral-400 hover:text-neutral-100 border border-neutral-800"
-        >
-          New file
-        </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() =>
+                  setZoom((z) =>
+                    Math.max(0.5, Math.round((z - 0.25) * 100) / 100),
+                  )
+                }
+                disabled={zoom <= 0.5}
+                className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                aria-label="Zoom out"
+                title="Zoom out (−)"
+              >
+                −
+              </button>
+              <button
+                onClick={() => setZoom(1)}
+                className="px-2 py-1 text-xs text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 rounded transition-colors min-w-[3.5rem]"
+                title="Reset zoom (0)"
+              >
+                {Math.round(zoom * 100)}%
+              </button>
+              <button
+                onClick={() =>
+                  setZoom((z) =>
+                    Math.min(2, Math.round((z + 0.25) * 100) / 100),
+                  )
+                }
+                disabled={zoom >= 2}
+                className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                aria-label="Zoom in"
+                title="Zoom in (+)"
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              onClick={toggleFullscreen}
+              className="px-3 py-1 rounded-full text-xs text-neutral-300 hover:text-neutral-50 border border-neutral-800 hover:border-neutral-700 transition-colors"
+              title="Toggle fullscreen (F)"
+            >
+              {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+            </button>
+          </div>
+        )}
       </div>
 
       {status === "loading" && (
@@ -415,15 +688,16 @@ export function PdfViewer({ file, onReset }: Props) {
       )}
 
       {status === "ready" && (
-        <div className="space-y-4">
+        <div ref={scrollRootRef} className="space-y-4">
           {pages.map((p, i) => (
             <div
               key={i}
+              data-page-index={i}
               ref={(el) => {
                 pageRefs.current[i] = el;
               }}
               className="mx-auto overflow-hidden rounded-lg shadow-2xl"
-              style={{ maxWidth: p.width, background: themeBg }}
+              style={{ maxWidth: p.width * zoom, background: themeBg }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
