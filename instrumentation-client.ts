@@ -26,6 +26,14 @@ if (dsn) {
       }),
     ],
 
+    // Ad-blockers / privacy extensions kill GA + Clarity requests; treat as noise, not a bug.
+    denyUrls: [
+      /google-analytics\.com/i,
+      /googletagmanager\.com/i,
+      /clarity\.ms/i,
+      /\/gtag\/js/i,
+    ],
+
     tracesSampleRate: 0,
   });
 }
