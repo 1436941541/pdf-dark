@@ -141,7 +141,7 @@ export default function Home() {
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-16 pb-20 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Read &amp; Convert PDFs in Dark Mode
+            Read &amp; Convert PDF to Dark Mode
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
             Drop a PDF and read it on a dark background right here, or download
@@ -181,10 +181,10 @@ export default function Home() {
           </h2>
 
           <h3 className="text-lg font-semibold text-neutral-100 mt-2 mb-3">
-            PDF dark mode at a glance
+            The short version
           </h3>
           <p className="text-neutral-300 leading-relaxed">
-            PDF dark mode is a way to read PDFs with a dark background and
+            It&apos;s a way to read PDFs with a dark background and
             light text instead of the default white page. You may also see it
             called PDF night mode, a dark PDF reader, or an inverted PDF —
             different names for the same thing: a low-light theme baked into
@@ -259,7 +259,7 @@ export default function Home() {
         >
           <div className="max-w-4xl mx-auto px-6">
             <h2 className="text-2xl font-bold mb-3 text-center">
-              PDF dark mode: PDF Dark vs Chrome extensions vs online tools
+              PDF Dark vs Chrome extensions vs online tools
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
               There are a few ways to read PDFs in dark mode or night mode
@@ -335,7 +335,7 @@ export default function Home() {
               From the PDF Dark blog
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              Posts on PDF dark mode workflows — inverting colors,
+              Guides on converting, inverting, and darkening PDFs —
               browser-specific tips, and producing a permanent dark-themed
               file. Each post has the converter inline if you&apos;d rather
               just drop in a PDF.
@@ -371,7 +371,7 @@ export default function Home() {
           className="max-w-3xl mx-auto px-6 py-20"
         >
           <h2 className="text-2xl font-bold mb-10 text-center">
-            PDF dark mode FAQ
+            Frequently Asked Questions
           </h2>
           <div className="space-y-3">
             {FAQ_ITEMS.map((f) => (
