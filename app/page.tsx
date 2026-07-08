@@ -144,9 +144,10 @@ export default function Home() {
             Read &amp; Convert PDF to Dark Mode
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Drop a PDF and read it on a dark background right here, or download
-            the darkened file to keep. The whole thing runs in your browser —
-            no upload, no signup, no install.
+            Drop a PDF and read it on a dark background right here for
+            comfortable reading, or download the darkened file to keep. The
+            whole thing runs in your browser — no upload, no signup, no
+            install.
           </p>
 
           {/* Trust badges — outline pill + stroke icon */}
@@ -184,7 +185,7 @@ export default function Home() {
             The short version
           </h3>
           <p className="text-neutral-300 leading-relaxed">
-            It&apos;s a way to read PDFs with a dark background and
+            It&apos;s a way to read PDF documents with a dark background and
             light text instead of the default white page. You may also see it
             called PDF night mode, a dark PDF reader, or an inverted PDF —
             different names for the same thing: a low-light theme baked into
@@ -196,10 +197,10 @@ export default function Home() {
             Why use a dark mode PDF
           </h3>
           <p className="text-neutral-300 leading-relaxed">
-            People use a dark mode PDF to read at night without eye strain, to
-            extend battery life on OLED phones, to study late-night research
-            papers, and to make code- or text-heavy documents less harsh
-            under bright office lights. Browser extensions can fake a dark
+            People use a dark mode PDF to read at night and reduce eye
+            strain, to extend battery life on OLED phones, to study
+            late-night research papers, and to make code- or text-heavy
+            documents less harsh under bright office lights. Browser extensions can fake a dark
             theme inside the viewer, but the underlying PDF file stays light.
             PDF Dark produces an actual dark-themed PDF you can save, share,
             and reopen anywhere — a real dark PDF, not a viewer trick.
