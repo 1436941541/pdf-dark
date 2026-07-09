@@ -7,6 +7,8 @@ export type Variant = {
   slug: string;
   title: string;
   blurb: string;
+  /** Last real content change, YYYY-MM-DD — feeds sitemap lastModified. Bump when the post's content actually changes. */
+  updatedAt: string;
 };
 
 export const VARIANTS: Variant[] = [
@@ -15,29 +17,34 @@ export const VARIANTS: Variant[] = [
     title: "PDF Dark Mode in Chrome",
     blurb:
       "Chrome's built-in PDF viewer has no dark toggle. Skip the extensions — convert in the browser itself.",
+    updatedAt: "2026-06-26",
   },
   {
     slug: "pdf-dark-mode-firefox",
     title: "PDF Dark Mode in Firefox",
     blurb:
       "Firefox's PDF.js viewer only darkens the toolbar, not the pages. Here's the real fix.",
+    updatedAt: "2026-06-26",
   },
   {
     slug: "convert-pdf-to-dark-mode",
     title: "Convert PDF to Dark Mode",
     blurb:
       "Produce a permanent dark-themed PDF file you can email, sync, and reopen anywhere — not a one-off viewer trick.",
+    updatedAt: "2026-06-26",
   },
   {
     slug: "how-to-darken-a-pdf",
     title: "How to Darken a PDF",
     blurb:
       "A three-step walkthrough: drop, pick a theme, download. No accounts, no extensions, no uploads.",
+    updatedAt: "2026-06-26",
   },
   {
     slug: "darken-scanned-pdf-online",
     title: "Darken a Scanned PDF Online",
     blurb:
       "Free, browser-only tool for scanned PDFs that wash out your screen at night. Pick OLED for the deepest contrast.",
+    updatedAt: "2026-06-26",
   },
 ];
