@@ -138,7 +138,7 @@ export default function FirefoxVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated June 19, 2026</span>
+            <span>Updated June 26, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
