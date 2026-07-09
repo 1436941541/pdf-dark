@@ -139,7 +139,7 @@ export default function Home() {
 
       <main className="flex-1 w-full">
         {/* Hero */}
-        <section className="max-w-4xl mx-auto px-6 pt-16 pb-20 text-center">
+        <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
             Read &amp; Convert PDF to Dark Mode
           </h1>
@@ -167,7 +167,7 @@ export default function Home() {
           </div>
 
           {/* Converter — drop zone + full PDF viewer with themes & download */}
-          <div className="mt-14">
+          <div className="mt-8">
             <Converter />
           </div>
         </section>

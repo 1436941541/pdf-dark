@@ -35,51 +35,40 @@ export function DropZone({ onFile }: Props) {
   );
 
   return (
-    <div className="relative mx-auto max-w-xl">
-      {/* warm glow behind the card */}
-      <div
-        aria-hidden
-        className="absolute inset-0 -z-10 rounded-[2rem] blur-3xl opacity-40"
-        style={{
-          background:
-            "radial-gradient(60% 60% at 50% 40%, rgba(245,196,81,0.35) 0%, transparent 70%)",
-        }}
-      />
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsOver(true);
-        }}
-        onDragLeave={() => setIsOver(false)}
-        onDrop={(e) => {
-          e.preventDefault();
-          setIsOver(false);
-          accept(e.dataTransfer.files?.[0]);
-        }}
-        className={`group rounded-2xl border-2 p-10 transition-all bg-neutral-900/60 backdrop-blur
-          ${
-            isOver
-              ? "border-amber-400 bg-amber-500/5 scale-[1.01]"
-              : "border-dashed border-neutral-700 hover:border-amber-400/60 hover:scale-[1.005]"
-          }
-        `}
-      >
-        <label className="block cursor-pointer text-center">
-          <input
-            type="file"
-            accept="application/pdf"
-            className="sr-only"
-            onChange={(e) => accept(e.target.files?.[0])}
-          />
-          <div className="text-5xl mb-4 transition-transform group-hover:scale-110">📄</div>
-          <div className="text-xl font-semibold text-neutral-50">
-            Drop your PDF here or click to browse
-          </div>
-          <div className="text-sm text-neutral-300 mt-2">
-            Up to 50 MB · Never leaves your browser
-          </div>
-        </label>
-      </div>
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsOver(true);
+      }}
+      onDragLeave={() => setIsOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setIsOver(false);
+        accept(e.dataTransfer.files?.[0]);
+      }}
+      className={`group mx-auto max-w-xl rounded-2xl border-2 p-10 transition-all bg-neutral-900/90
+        ${
+          isOver
+            ? "border-amber-400 bg-amber-500/5 scale-[1.01]"
+            : "border-dashed border-neutral-700 hover:border-amber-400/60 hover:scale-[1.005]"
+        }
+      `}
+    >
+      <label className="block cursor-pointer text-center">
+        <input
+          type="file"
+          accept="application/pdf"
+          className="sr-only"
+          onChange={(e) => accept(e.target.files?.[0])}
+        />
+        <div className="text-5xl mb-4 transition-transform group-hover:scale-110">📄</div>
+        <div className="text-xl font-semibold text-neutral-50">
+          Drop your PDF here or click to browse
+        </div>
+        <div className="text-sm text-neutral-300 mt-2">
+          Up to 50 MB · Never leaves your browser
+        </div>
+      </label>
     </div>
   );
 }
