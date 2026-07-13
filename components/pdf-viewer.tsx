@@ -483,7 +483,7 @@ export function PdfViewer({ file, onReset }: Props) {
                   key={id}
                   onClick={() => setTheme(id)}
                   disabled={isInitialRendering}
-                  className={`px-3 py-1 rounded-full text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
                     active
                       ? "bg-amber-400 text-neutral-950 font-semibold"
                       : "text-neutral-400 hover:text-neutral-100"
@@ -495,6 +495,13 @@ export function PdfViewer({ file, onReset }: Props) {
                       : undefined
                   }
                 >
+                  <span
+                    aria-hidden
+                    className={`w-2.5 h-2.5 rounded-full border ${
+                      active ? "border-neutral-950/30" : "border-neutral-600"
+                    }`}
+                    style={{ background: THEMES[id].swatch }}
+                  />
                   {THEMES[id].label}
                 </button>
               );
