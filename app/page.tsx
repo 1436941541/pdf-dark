@@ -83,6 +83,7 @@ function StructuredData() {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: "PDF Dark",
+    alternateName: ["pdfdark", "pdfdark.org", "PDF Dark Mode Converter"],
     url: site,
     applicationCategory: "UtilityApplication",
     operatingSystem: "Any (browser-based)",

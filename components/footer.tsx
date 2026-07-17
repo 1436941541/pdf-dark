@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer className="w-full border-t border-neutral-900 mt-4">
       <div className="max-w-5xl mx-auto px-6 py-6 text-sm text-neutral-500 flex items-center justify-between">
-        <span>© {new Date().getFullYear()} PDF Dark</span>
+        <span>© {new Date().getFullYear()} PDF Dark · pdfdark.org</span>
         <div className="flex gap-4">
           <Link href="/" className="hover:text-neutral-300">Home</Link>
           <Link href="/about" className="hover:text-neutral-300">About</Link>

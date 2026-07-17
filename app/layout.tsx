@@ -16,11 +16,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: "PDF Dark Mode — Free Online PDF to Night Mode Converter",
+  title: "PDF Dark Mode — Free Online PDF to Night Mode Converter | pdfdark.org",
   description:
     "Convert any PDF to dark mode or night mode in your browser. Free, no upload, no signup. Read it right here or download a permanent dark PDF.",
   keywords: [
     "pdf dark mode",
+    "pdfdark",
     "pdf night mode",
     "dark pdf reader",
     "pdf dark mode converter",
