@@ -4,10 +4,10 @@ import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
 import { getSiteUrl } from "@/lib/site";
 
-const SLUG = "/blog/convert-pdf-to-dark-mode";
-const TITLE = "Convert PDF to Dark Mode — Download as a Permanent File";
+const SLUG = "/blog/invert-pdf-colors-without-inverting-images";
+const TITLE = "Invert PDF Colors — Without Turning Images into Negatives";
 const DESCRIPTION =
-  "Convert any PDF to dark mode and download a reusable file. Unlike viewer toggles or extensions, the dark theme is baked in — email it, sync it, anywhere.";
+  "Invert PDF colors to dark mode while photos keep their original colors. Per-image smart detection — or full manual control. Free, browser-only, no upload.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -28,28 +28,28 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "What's the difference between 'viewing' a PDF in dark mode and 'converting' it?",
-    a: "Viewing applies a theme only while the file is open in one specific app — close it or share it, and the dark mode is gone. Converting produces a new PDF with the dark theme baked into the file itself, so it stays dark in every reader, on every device, forever.",
+    q: "Why do photos turn into negatives when I invert a PDF?",
+    a: "Naive inversion flips every pixel on the page — including the pixels inside photos. Skin turns cyan, skies turn orange, exactly like old film negatives. The fix is to treat images as separate objects: PDF Dark locates every embedded image on the page and pastes the original pixels back after the text and background have been darkened.",
   },
   {
-    q: "What file format do I get back?",
-    a: "A standard PDF — same format as your input, just with dark-themed pages. Works in Preview, Acrobat, Firefox, iPad, Kindle, anything that reads PDFs.",
+    q: "How does the automatic mode decide what to do with each image?",
+    a: "Each image is sampled for brightness and colorfulness. Bright, essentially colorless images (white-background screenshots, tables, diagrams) are inverted together with the page so they blend in. Photos are kept in their original colors. Bright but colorful images get a gentle dim so they don't glare at night.",
   },
   {
-    q: "Can I share the converted file with someone else?",
-    a: "Yes. Email it, AirDrop it, upload it to Google Drive or Dropbox — the recipient sees the dark version automatically. No setup on their end.",
+    q: "Can I force all images to stay exactly as they are?",
+    a: "Yes — switch the Images control to 'Original'. Photos, figures, and even full-page scans then stay pixel-identical to the source file; only text and background are darkened.",
   },
   {
-    q: "Does converting change the file size a lot?",
-    a: "Usually not. On most digital PDFs the conversion rewrites colors inside the original file, so the size stays close to the source. Pages that fall back to image rendering are re-encoded as compressed JPEGs and may grow a little.",
+    q: "Can I invert everything, images included?",
+    a: "Yes — the 'Invert' option runs every image through the same dark mapping as the rest of the page. That's the right choice for scanned documents or when you want the deepest possible dark.",
   },
   {
-    q: "Can I still copy text from the converted PDF?",
-    a: "Yes. On most digital PDFs the text is recolored as real vector text — selectable, searchable, razor-sharp at any zoom. Pages that have to fall back to image rendering get an invisible text layer (the same technique OCR'd scans use), so search and copy still work there too.",
+    q: "Does this work for circular profile photos (like in a resume)?",
+    a: "Yes. Round-cropped images are detected and restored through their circular frame, so the corners around the circle stay dark instead of flashing the original light background.",
   },
   {
-    q: "Is my PDF uploaded during conversion?",
-    a: "No. The entire conversion happens in your browser via the File API and a Web Worker — the file never leaves your device. Check DevTools → Network to verify no upload request is made.",
+    q: "Is my PDF uploaded anywhere?",
+    a: "No. Detection, inversion, and image restoration all run in your browser via a Web Worker. The file never leaves your device.",
   },
 ];
 
@@ -58,7 +58,7 @@ function StructuredData() {
   const webpage = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Convert PDF to Dark Mode",
+    name: "Invert PDF Colors Without Inverting Images",
     url: `${site}${SLUG}`,
     applicationCategory: "UtilityApplication",
     operatingSystem: "Any (browser)",
@@ -88,7 +88,7 @@ function StructuredData() {
   );
 }
 
-export default function ConvertVariantPage() {
+export default function InvertWithoutImagesPage() {
   return (
     <div className="flex flex-col flex-1 w-full">
       <StructuredData />
@@ -108,8 +108,8 @@ export default function ConvertVariantPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <a href="#why" className="hover:text-neutral-100">
-              Viewer vs converter
+            <a href="#how" className="hover:text-neutral-100">
+              How it works
             </a>
             <a href="#faq" className="hover:text-neutral-100">
               FAQ
@@ -125,140 +125,141 @@ export default function ConvertVariantPage() {
             Blog
           </p>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Convert PDF to Dark Mode
+            Invert PDF Colors
             <span className="block text-amber-400 mt-2">
-              Download a Real File
+              Without Ruining Your Images
             </span>
           </h1>
           <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Not a viewer toggle. Not an extension trick.{" "}
+            Every basic inverter turns photos into creepy film negatives.{" "}
             <strong className="text-neutral-100">
-              An actual dark PDF file — dark in every reader, forever.
+              PDF Dark inverts the page and leaves your photos alone.
             </strong>
           </p>
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 16, 2026</span>
+            <span>Updated July 15, 2026</span>
             <span aria-hidden>·</span>
-            <span>8 min read</span>
+            <span>6 min read</span>
           </div>
         </section>
 
-        {/* Viewer vs converter */}
-        <section
-          id="why"
-          className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
-        >
+        {/* The problem */}
+        <section className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]">
           <div className="max-w-3xl mx-auto px-6">
             <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-              Why &ldquo;convert&rdquo; beats &ldquo;view in dark mode&rdquo;
+              The negative-photo problem
             </h2>
             <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              Most dark-mode solutions are session tricks. A conversion gives
-              you an artifact you can keep.
+              Color inversion is a great idea for text — and a terrible one
+              for photos.
             </p>
 
             <div className="grid sm:grid-cols-2 gap-5">
               <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
                 <h3 className="text-sm font-semibold text-neutral-400 mb-3 m-0">
-                  Viewer / extension / OS toggle
+                  What naive inversion does
                 </h3>
                 <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
-                  <li>Dark only while that app/extension is running</li>
-                  <li>Reopen in another reader → white again</li>
-                  <li>Can&apos;t share the dark version with anyone</li>
+                  <li>White page → dark page. Good.</li>
+                  <li>Black text → light text. Good.</li>
                   <li>
-                    OS-level invert often discolors photos, screenshots, and
-                    charts
+                    Faces → <em>cyan</em>. Skies → <em>orange</em>. Every photo
+                    becomes a film negative.
                   </li>
-                  <li>Breaks when you update or switch device</li>
+                  <li>
+                    Charts and diagrams shift into colors the author never
+                    chose — red warnings turn teal, brand colors flip.
+                  </li>
+                  <li>
+                    OS-level &ldquo;Smart Invert&rdquo; tries to skip images,
+                    but only inside that one device&apos;s screen — the file
+                    itself never changes.
+                  </li>
                 </ul>
               </div>
 
               <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
                 <h3 className="text-sm font-semibold text-amber-400 mb-3 m-0">
-                  A converted PDF file
+                  What PDF Dark does instead
                 </h3>
                 <ul className="space-y-2 text-sm text-neutral-300 list-disc pl-5">
                   <li>
-                    <strong className="text-neutral-100">Permanent</strong> —
-                    dark is baked into the file
+                    Reads the PDF&apos;s own structure to find{" "}
+                    <strong className="text-neutral-100">
+                      exactly where every image sits
+                    </strong>{" "}
+                    on the page
                   </li>
                   <li>
-                    Opens dark in <strong className="text-neutral-100">every</strong> PDF
-                    reader, on every device
+                    Darkens text, background, and vector graphics — with hue
+                    preserved, so a dark-blue heading becomes light-blue, not
+                    gray
                   </li>
                   <li>
-                    Shareable — email, AirDrop, Drive, anything; recipient
-                    sees the dark version with zero setup
+                    <strong className="text-neutral-100">
+                      Restores the original image pixels
+                    </strong>{" "}
+                    exactly where they were — photos stay photos
                   </li>
                   <li>
-                    Hue-preserving color mapping — a dark-blue heading becomes
-                    light-blue, not gray; photos keep their original colors
+                    Round-cropped avatars are restored through their circular
+                    frame — no light corners leaking back
                   </li>
-                  <li>
-                    Works offline after download — no internet needed to read
-                  </li>
+                  <li>Downloads as a real PDF file with all of this baked in</li>
                 </ul>
               </div>
             </div>
-
-            <p className="text-xs text-neutral-500 text-center mt-8">
-              Think of it this way: an inverter is lipstick on the PDF.
-              Conversion is a new PDF.
-            </p>
           </div>
         </section>
 
-        {/* Use cases */}
-        <section className="max-w-3xl mx-auto px-6 py-20">
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
-            When a converted dark PDF matters
+        {/* How the auto mode decides */}
+        <section id="how" className="max-w-3xl mx-auto px-6 py-20">
+          <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
+            Not every image should be preserved — so you get three modes
           </h2>
+          <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
+            A white-background screenshot glares at night even if you keep it
+            &ldquo;original&rdquo;. A photo looks alien if you invert it. The
+            right treatment depends on the image — so the default mode decides
+            per image, and you can override globally.
+          </p>
 
           <div className="space-y-6">
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Sending a paper to a collaborator at 11 PM
+                Auto <span className="text-amber-400">(default)</span> — each
+                image gets the best treatment
               </h3>
               <p className="text-sm text-neutral-400">
-                Your colleague is reading in bed. You can forward the original
-                and ask them to enable Smart Invert — or you can send the dark
-                version and save them the friction.
+                Every image is sampled for brightness and colorfulness.
+                White, colorless figures (screenshots, tables, diagrams
+                exported as images) are inverted with the page so they blend
+                into the dark theme. Photos keep their original colors. Bright
+                colorful images get a gentle dim so they don&apos;t glare.
               </p>
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Archiving documents you&apos;ll reread often
+                Original — nothing touches your images
               </h3>
               <p className="text-sm text-neutral-400">
-                Research papers, meeting notes, eBooks — once converted, the
-                dark copy lives in your library permanently. No per-device
-                configuration to redo when you move to a new phone or laptop.
+                Photos, figures, and even full-page scans stay pixel-identical
+                to the source. Only text and background are darkened. Pick
+                this for photo albums, portfolios, and slide decks.
               </p>
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                E-readers and e-ink devices
+                Invert — everything goes dark, images included
               </h3>
               <p className="text-sm text-neutral-400">
-                Kindle, Kobo, Boox — most e-readers have no in-app dark toggle
-                for sideloaded PDFs. A pre-converted dark PDF is the only way
-                to get light-on-dark reading on those devices.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Sharing accessible reading material
-              </h3>
-              <p className="text-sm text-neutral-400">
-                Readers with photosensitivity, migraine issues, or low vision
-                often prefer persistent high-contrast. Sharing a dark copy
-                directly is kinder than asking them to tweak their OS.
+                The classic full inversion, best for scanned documents where
+                the &ldquo;image&rdquo; <em>is</em> the text. Deepest possible
+                dark on OLED screens.
               </p>
             </div>
           </div>
@@ -267,14 +268,15 @@ export default function ConvertVariantPage() {
         {/* CTA — back to the tool */}
         <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
           <h2 className="text-xl font-semibold text-neutral-50 mb-2">
-            Ready to convert a PDF to permanent dark mode?
+            Invert your PDF — keep your photos
           </h2>
           <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
-            3 steps, a real dark PDF file, opens dark in every reader
+            Drop a file, watch the images survive, download the dark PDF
           </h3>
           <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop a PDF on the PDF Dark home page, pick a theme, and download
-            the file — email it, sync it, open it anywhere.
+            Free and browser-only: the file never leaves your device. Check
+            the Images toggle in the toolbar to switch between Auto, Original,
+            and Invert.
           </p>
           <Link
             href="/"
@@ -284,7 +286,7 @@ export default function ConvertVariantPage() {
           </Link>
         </section>
 
-        <RelatedVariants currentSlug="convert-pdf-to-dark-mode" />
+        <RelatedVariants currentSlug="invert-pdf-colors-without-inverting-images" />
 
         {/* FAQ */}
         <section
@@ -292,7 +294,7 @@ export default function ConvertVariantPage() {
           className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
         >
           <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
-            Convert PDF to dark mode FAQ
+            Inverting PDF colors FAQ
           </h2>
           <div className="space-y-3">
             {FAQ.map((f) => (

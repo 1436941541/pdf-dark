@@ -37,11 +37,11 @@ const FAQ = [
   },
   {
     q: "Do Firefox dark-mode extensions help?",
-    a: "Barely. Most Firefox extensions apply a CSS filter over the rendered PDF, which inverts images the same way it inverts text — you get photos as negatives and charts become unreadable. Dark Reader (the popular one) explicitly notes PDF support is limited.",
+    a: "Barely. Most Firefox extensions apply a CSS filter over the rendered PDF, which inverts images the same way it inverts text — you get photos as negatives and charts become unreadable. Dark Reader (the popular one) explicitly notes PDF support is limited. PDF Dark handles images separately from text, so photos keep their original colors.",
   },
   {
     q: "Why is this page using PDF.js too?",
-    a: "Yes — we also use Mozilla's PDF.js for rendering. The difference is we render each page to a canvas, then brightness-map every pixel into your chosen theme color before reassembling the PDF. Same rendering library, very different post-processing — and the result is a downloadable file, not just a viewer toggle.",
+    a: "Yes — we also use Mozilla's PDF.js under the hood. The difference is what happens next: text and background are recolored into your theme (keeping text selectable on most PDFs), images are detected and handled separately so photos keep their colors, and the result is saved as a downloadable file — not just a viewer toggle.",
   },
   {
     q: "Does this work on Firefox for Android?",
@@ -138,7 +138,7 @@ export default function FirefoxVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated June 26, 2026</span>
+            <span>Updated July 10, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -213,9 +213,9 @@ export default function FirefoxVariantPage() {
                     identical to Firefox
                   </li>
                   <li>
-                    Post-processes each rendered page pixel by pixel,
-                    brightness-mapping into your chosen theme — one consistent
-                    rule for the whole document
+                    Recolors text and background into your chosen theme while
+                    photos keep their original colors — one consistent look
+                    for the whole document
                   </li>
                   <li>
                     Produces a downloadable dark PDF — no about:config, no

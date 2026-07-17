@@ -41,7 +41,7 @@ const FAQ = [
   },
   {
     q: "What happens to images in my PDF?",
-    a: "Every pixel is brightness-mapped into your theme: text and backgrounds invert as expected, photos desaturate into theme-tinted shades. There's no hue flipping — no orange skies or blue skin like channel-wise invert produces — but colored photos won't keep their original hue either. If image color fidelity matters, keep the original file alongside the dark copy.",
+    a: "Photos keep their original colors — they are detected and restored after the page is darkened, so there are no film negatives and no theme-tinted faces. White screenshots and diagrams are inverted so they blend into the dark page, and an Images toggle lets you force everything Original or everything Inverted.",
   },
   {
     q: "Does it work on Chrome for Android?",
@@ -138,7 +138,7 @@ export default function ChromeVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated June 26, 2026</span>
+            <span>Updated July 8, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>

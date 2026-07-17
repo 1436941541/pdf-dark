@@ -37,7 +37,7 @@ const FAQ = [
   },
   {
     q: "Does the scan need to be OCR'd first?",
-    a: "No. PDF Dark treats every page as an image, which is exactly what a scan is. You get the same darkening whether the PDF has hidden text or not. (You also won't gain selectable text — keep your original file for that.)",
+    a: "No. PDF Dark treats a scanned page as an image, which is exactly what it is, and darkens it uniformly. Tip: the Images toggle controls scans too — Auto and Invert darken them, while Original leaves scanned pages exactly as they came.",
   },
   {
     q: "Is my scanned PDF uploaded anywhere?",
@@ -141,7 +141,7 @@ export default function DarkenScannedPdfPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated June 26, 2026</span>
+            <span>Updated July 14, 2026</span>
             <span aria-hidden>·</span>
             <span>5 min read</span>
           </div>

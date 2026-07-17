@@ -45,11 +45,11 @@ const FAQ = [
   },
   {
     q: "Can I still select text in the darkened PDF?",
-    a: "No. The output is image-based (one JPEG page per PDF page). Keep your original file if you need selectable text or OCR — use the darkened file just for comfortable reading.",
+    a: "Yes — on most digital PDFs the darkened output keeps real, selectable text, and image-rendered pages carry an invisible text layer, so search and copy work either way. Photos and figures keep their original colors unless you switch the Images toggle to Invert.",
   },
   {
     q: "What about photos and color charts inside the PDF?",
-    a: "Every pixel is brightness-mapped the same way: bright pixels move toward your theme color, dark pixels move toward white. Photos and color charts stay readable, but their colors will shift — for serious image fidelity, keep the original file.",
+    a: "Photos keep their original colors — each image is detected and restored after the page is darkened. White screenshots and diagrams are inverted so they blend into the dark page. The Images toggle in the toolbar lets you override this: Original keeps every image untouched, Invert darkens everything.",
   },
   {
     q: "What's the largest PDF I can darken?",
@@ -88,7 +88,7 @@ function StructuredData() {
         "@type": "HowToStep",
         position: 2,
         name: "Pick a dark theme",
-        text: "Switch between Midnight, Sepia, Solarized, and OLED to preview the darkened pages instantly.",
+        text: "Switch between Midnight, Sepia, Solarized, and OLED to preview the darkened pages instantly. The Images toggle next to the themes controls how photos and figures are treated.",
       },
       {
         "@type": "HowToStep",
@@ -175,7 +175,7 @@ export default function HowToDarkenPdfPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated June 26, 2026</span>
+            <span>Updated July 12, 2026</span>
             <span aria-hidden>·</span>
             <span>4 min read</span>
           </div>
@@ -237,6 +237,9 @@ export default function HowToDarkenPdfPage() {
                       <strong>OLED</strong> (pure black, battery-friendly).
                       Switching is instant — the preview re-renders every page
                       using the same algorithm that goes into the download.
+                      Next to the themes sits an <strong>Images</strong> toggle:
+                      Auto (smart per-image handling), Original (photos and
+                      figures untouched), or Invert (everything goes dark).
                     </p>
                   </div>
                 </div>
