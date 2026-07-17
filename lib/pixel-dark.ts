@@ -1,10 +1,30 @@
 import { THEMES, type ThemeId } from "./themes";
+import type { ImageRect } from "./image-regions";
 
 /**
- * Pixel algorithm mirrored on the main thread for non-worker callers. Kept
- * byte-for-byte identical to lib/dark-worker.ts and to
- * https://github.com/Chizkiyahu/pdf-dark-mode-converter.
+ * Pixel algorithm mirrored on the main thread for non-worker callers. Keep
+ * byte-for-byte identical to lib/dark-worker.ts.
+ *
+ * - Near-grayscale pixels are pulled toward the theme background by
+ *   luminance (the original Chizkiyahu-style mapping).
+ * - Chromatic pixels keep their hue and get their lightness flipped, so
+ *   colored headings/chart lines survive instead of going monochrome.
  */
+
+/** Below this saturation a pixel counts as grayscale (fast path). */
+const CHROMA_LO = 0.08;
+/** Above this saturation the hue-preserving path fully takes over. */
+const CHROMA_HI = 0.3;
+
+function hueToRgb(p: number, q: number, t: number): number {
+  if (t < 0) t += 1;
+  if (t > 1) t -= 1;
+  if (t < 1 / 6) return p + (q - p) * 6 * t;
+  if (t < 1 / 2) return q;
+  if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+  return p;
+}
+
 export function applyDark(imageData: ImageData, theme: ThemeId): void {
   const { r: bgR, g: bgG, b: bgB } = THEMES[theme];
   const data = imageData.data;
@@ -18,9 +38,50 @@ export function applyDark(imageData: ImageData, theme: ThemeId): void {
     const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
     const factor = 1 - brightness / 255;
 
-    data[j] = bgR + (255 - bgR) * factor;
-    data[j + 1] = bgG + (255 - bgG) * factor;
-    data[j + 2] = bgB + (255 - bgB) * factor;
+    // Grayscale mapping: white → theme bg, black → white.
+    const aR = bgR + (255 - bgR) * factor;
+    const aG = bgG + (255 - bgG) * factor;
+    const aB = bgB + (255 - bgB) * factor;
+
+    const mx = Math.max(r, g, b);
+    const mn = Math.min(r, g, b);
+    const sat = (mx - mn) / 255;
+
+    if (sat <= CHROMA_LO) {
+      data[j] = aR;
+      data[j + 1] = aG;
+      data[j + 2] = aB;
+      continue;
+    }
+
+    // Hue-preserving flip: same hue/saturation, lightness remapped into a
+    // range that reads well on all (dark) theme backgrounds. Dark saturated
+    // colors become light; light ones settle in the middle.
+    const l = (mx + mn) / 510;
+    const d = (mx - mn) / 255;
+    const s = d / (1 - Math.abs(2 * l - 1) || 1);
+    let h: number;
+    const rn = r / 255;
+    const gn = g / 255;
+    const bn = b / 255;
+    if (mx === r) h = (((gn - bn) / d) % 6) / 6;
+    else if (mx === g) h = ((bn - rn) / d + 2) / 6;
+    else h = ((rn - gn) / d + 4) / 6;
+    if (h < 0) h += 1;
+
+    const l2 = 0.92 - 0.42 * l;
+    const q = l2 < 0.5 ? l2 * (1 + s) : l2 + s - l2 * s;
+    const p = 2 * l2 - q;
+    const hR = hueToRgb(p, q, h + 1 / 3) * 255;
+    const hG = hueToRgb(p, q, h) * 255;
+    const hB = hueToRgb(p, q, h - 1 / 3) * 255;
+
+    // Blend the two paths across the chroma band so anti-aliased edges of
+    // colored text don't get a hard seam.
+    const w = Math.min(1, Math.max(0, (sat - CHROMA_LO) / (CHROMA_HI - CHROMA_LO)));
+    data[j] = aR + (hR - aR) * w;
+    data[j + 1] = aG + (hG - aG) * w;
+    data[j + 2] = aB + (hB - aB) * w;
   }
 }
 
@@ -29,6 +90,8 @@ export async function darkifyDataUrl(
   width: number,
   height: number,
   theme: ThemeId,
+  imageRects?: ImageRect[],
+  imageDims?: number[],
 ): Promise<string> {
   const img = await loadImage(originalDataUrl);
   const canvas =
@@ -44,6 +107,47 @@ export async function darkifyDataUrl(
   const imageData = ctx.getImageData(0, 0, width, height);
   applyDark(imageData, theme);
   ctx.putImageData(imageData, 0, 0);
+
+  // Paste the original image regions back, then veil them. Circular /
+  // rounded avatars (r.rounded) paste through an inscribed ellipse so the
+  // clipped-away corners don't resurrect the light page background.
+  // Rect pastes sharing an opacity are veiled through one combined path so
+  // overlaps are only dimmed once.
+  if (imageRects && imageRects.length > 0) {
+    for (const r of imageRects) {
+      if (r.rounded) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(r.x + r.w / 2, r.y + r.h / 2, r.w / 2, r.h / 2, 0, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, r.x, r.y, r.w, r.h, r.x, r.y, r.w, r.h);
+        ctx.restore();
+      } else {
+        ctx.drawImage(img, r.x, r.y, r.w, r.h, r.x, r.y, r.w, r.h);
+      }
+    }
+    const byAlpha = new Map<number, ImageRect[]>();
+    imageRects.forEach((r, idx) => {
+      const a = Math.round((imageDims?.[idx] ?? 0.16) * 100) / 100;
+      if (a > 0.005) {
+        const group = byAlpha.get(a);
+        if (group) group.push(r);
+        else byAlpha.set(a, [r]);
+      }
+    });
+    for (const [a, group] of byAlpha) {
+      ctx.fillStyle = `rgba(0, 0, 0, ${a})`;
+      ctx.beginPath();
+      for (const r of group) {
+        if (r.rounded) {
+          ctx.ellipse(r.x + r.w / 2, r.y + r.h / 2, r.w / 2, r.h / 2, 0, 0, Math.PI * 2);
+        } else {
+          ctx.rect(r.x, r.y, r.w, r.h);
+        }
+      }
+      ctx.fill();
+    }
+  }
 
   if (canvas instanceof HTMLCanvasElement) {
     return canvas.toDataURL("image/jpeg", 0.88);

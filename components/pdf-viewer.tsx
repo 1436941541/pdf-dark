@@ -7,6 +7,15 @@ import type {
   DarkifyRequest,
   DarkifyResponse,
 } from "@/lib/dark-worker";
+import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
+import {
+  buildDarkPdf,
+  imageTreatment,
+  RENDER_SCALE,
+  type ImageMode,
+} from "@/lib/build-dark-pdf";
+import { imageDimAlpha } from "@/lib/dark-color";
+import type { PDFDocumentProxy } from "pdfjs-dist";
 
 type PageImage = {
   /** Full-color rendered PDF page (source of truth, never modified). */
@@ -15,8 +24,18 @@ type PageImage = {
   height: number;
   /** Current dark-themed version shown to the user. */
   displayDataUrl: string;
-  /** Per-theme cache of already-darkified dataUrls — lets re-applying a theme skip the worker. */
-  byTheme: Partial<Record<ThemeId, string>>;
+  /** Cache of already-darkified dataUrls keyed by `${theme}:${imageMode}` —
+   *  lets re-applying a known combination skip the worker. */
+  byTheme: Partial<Record<string, string>>;
+  /**
+   * Canvas-space rects of raster images on this page (photos, figures). The
+   * worker restores these from the original after darkening so they don't
+   * turn into negatives. Empty for scanned-looking pages.
+   */
+  imageRects: ImageRect[];
+  /** True when the page is one full-page image (a scan) — such pages must
+   *  take the raster download path, not the object-recolor one. */
+  scannedPage: boolean;
 };
 
 type Props = {
@@ -24,9 +43,14 @@ type Props = {
   onReset: () => void;
 };
 
+/** Cache key for one theme + image-mode combination. */
+const variantKey = (t: ThemeId, m: ImageMode) => `${t}:${m}`;
+
 export function PdfViewer({ file, onReset }: Props) {
   const [pages, setPages] = useState<PageImage[]>([]);
   const [theme, setTheme] = useState<ThemeId>("midnight");
+  // How preserved images are shown: smart auto-dim (default) or untouched.
+  const [imageMode, setImageMode] = useState<ImageMode>("smart");
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [progress, setProgress] = useState<{ done: number; total: number }>({
     done: 0,
@@ -47,7 +71,10 @@ export function PdfViewer({ file, onReset }: Props) {
   const [pageInput, setPageInput] = useState("1");
   const themeVersionRef = useRef(0);
   const cancelledRef = useRef(false);
-  const lastAppliedThemeRef = useRef<ThemeId | null>(null);
+  // Live pdf.js document — the download path reads native-resolution images
+  // out of its object pool (see lib/native-image.ts).
+  const pdfDocRef = useRef<PDFDocumentProxy | null>(null);
+  const lastAppliedThemeRef = useRef<string | null>(null);
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
 
@@ -181,13 +208,26 @@ export function PdfViewer({ file, onReset }: Props) {
 
   /** Convert an original dataUrl → worker-processed themed dataUrl. */
   const darkifyViaWorker = useCallback(
-    async (p: PageImage, nextTheme: ThemeId): Promise<string> => {
+    async (
+      p: PageImage,
+      nextTheme: ThemeId,
+      nextMode: ImageMode,
+    ): Promise<string> => {
+      // "Original" mode treats a scanned page (page == one big image) as an
+      // image: the page stays exactly as in the source, no darkening at all.
+      if (nextMode === "original" && p.scannedPage) return p.originalDataUrl;
+
       const w = workerRef.current;
       if (!w) throw new Error("worker not ready");
       const res = await fetch(p.originalDataUrl);
       const srcBlob = await res.blob();
       const bitmap = await createImageBitmap(srcBlob);
 
+      // Per-image treatment (keep / dim / invert) — images slated for
+      // inversion simply aren't pasted back, the dark mapping handles them.
+      const rects = p.imageRects.filter(
+        (r) => imageTreatment(nextMode, r) !== "invert",
+      );
       const id = ++msgIdRef.current;
       const outBlob = await new Promise<Blob>((resolve) => {
         pendingRef.current.set(id, resolve);
@@ -197,6 +237,12 @@ export function PdfViewer({ file, onReset }: Props) {
           width: p.width,
           height: p.height,
           theme: nextTheme,
+          imageRects: rects,
+          imageDims: rects.map((r) =>
+            imageTreatment(nextMode, r) === "dim"
+              ? imageDimAlpha(r.brightness)
+              : 0,
+          ),
         };
         w.postMessage(req, [bitmap]);
       });
@@ -260,25 +306,72 @@ export function PdfViewer({ file, onReset }: Props) {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
         if (cancelledRef.current) return;
+        pdfDocRef.current = pdf;
         setProgress({ done: 0, total: pdf.numPages });
 
         // Stream pages to React as soon as each finishes. The user can start
         // reading after page 1 — they don't have to wait for the whole PDF.
         const rendered: PageImage[] = [];
-        // Lock the theme for the entire initial pass to avoid racing with the
-        // theme-switch effect (which is disabled in UI while
-        // isInitialRendering is true).
-        lastAppliedThemeRef.current = theme;
+        // Lock the theme/mode combo for the entire initial pass to avoid
+        // racing with the variant-switch effect (which is disabled in UI
+        // while isInitialRendering is true).
+        lastAppliedThemeRef.current = variantKey(theme, imageMode);
+        // Small scratch canvas for per-image brightness sampling.
+        const scratch = document.createElement("canvas");
+        scratch.width = 32;
+        scratch.height = 32;
+        const scratchCtx = scratch.getContext("2d", { willReadFrequently: true });
         for (let i = 1; i <= pdf.numPages; i++) {
           if (cancelledRef.current) return;
           const page = await pdf.getPage(i);
-          const viewport = page.getViewport({ scale: 1.5 });
+          const viewport = page.getViewport({ scale: RENDER_SCALE });
+
+          // Locate raster images so the worker can keep them full-color.
+          // MUST run before page.render(): rendering converts the operator
+          // list's path payloads to Path2D in place, and the scan needs the
+          // raw path data to recognize circular clips. Non-fatal: on any
+          // hiccup we fall back to darkening everything (the old behavior).
+          let imageRects: ImageRect[] = [];
+          let scannedPage = false;
+          try {
+            const scan = await getPageImageRects(page, viewport);
+            imageRects = scan.rects;
+            scannedPage = scan.scanned;
+          } catch (err) {
+            console.warn("[pdf-dark] image-region scan failed", err);
+          }
+
           const canvas = document.createElement("canvas");
           canvas.width = viewport.width;
           canvas.height = viewport.height;
           const ctx = canvas.getContext("2d");
           if (!ctx) throw new Error("2D canvas not supported");
           await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+
+          // Average luminance + saturation per image (drives the Auto
+          // classifier): squash the region into the 32×32 scratch canvas
+          // and read that.
+          if (scratchCtx) {
+            for (const r of imageRects) {
+              try {
+                scratchCtx.drawImage(canvas, r.x, r.y, r.w, r.h, 0, 0, 32, 32);
+                const d = scratchCtx.getImageData(0, 0, 32, 32).data;
+                let lumSum = 0;
+                let satSum = 0;
+                for (let j = 0; j < d.length; j += 4) {
+                  lumSum += 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
+                  const mx = Math.max(d[j], d[j + 1], d[j + 2]);
+                  const mn = Math.min(d[j], d[j + 1], d[j + 2]);
+                  satSum += (mx - mn) / 255;
+                }
+                const n = d.length / 4;
+                r.brightness = lumSum / n;
+                r.saturation = satSum / n;
+              } catch {
+                // leave features undefined → classifier falls back to a mild veil
+              }
+            }
+          }
 
           const originalDataUrl = canvas.toDataURL("image/jpeg", 0.88);
           const stub: PageImage = {
@@ -287,14 +380,16 @@ export function PdfViewer({ file, onReset }: Props) {
             height: canvas.height,
             displayDataUrl: "",
             byTheme: {},
+            imageRects,
+            scannedPage,
           };
-          const display = await darkifyViaWorker(stub, theme);
+          const display = await darkifyViaWorker(stub, theme, imageMode);
           if (cancelledRef.current) return;
 
           rendered.push({
             ...stub,
             displayDataUrl: display,
-            byTheme: { [theme]: display },
+            byTheme: { [variantKey(theme, imageMode)]: display },
           });
           setPages([...rendered]);
           setProgress({ done: i, total: pdf.numPages });
@@ -314,22 +409,24 @@ export function PdfViewer({ file, onReset }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file, darkifyViaWorker]);
 
-  // Theme switch: re-darkify pages, starting from whatever the user is looking at.
-  // Fast path: if every page already has this theme cached, swap dataUrls instantly.
+  // Variant switch (theme or image mode): re-darkify pages, starting from
+  // whatever the user is looking at. Fast path: if every page already has
+  // this combination cached, swap dataUrls instantly.
   useEffect(() => {
     if (status !== "ready" || pages.length === 0) return;
+    const vk = variantKey(theme, imageMode);
 
     // Bump version up-front — aborts any in-flight worker loop from a previous switch.
     themeVersionRef.current += 1;
     const version = themeVersionRef.current;
 
-    // User toggled back to the already-applied theme (often mid-flight, when
-    // they cancel a switch). Recover any pages that were partially committed
-    // to the canceled theme, then reset the applying-state so Download unlocks.
-    if (lastAppliedThemeRef.current === theme) {
+    // User toggled back to the already-applied variant (often mid-flight,
+    // when they cancel a switch). Recover any pages that were partially
+    // committed to the canceled one, then reset so Download unlocks.
+    if (lastAppliedThemeRef.current === vk) {
       setPages((cur) =>
         cur.map((p) => {
-          const cached = p.byTheme[theme];
+          const cached = p.byTheme[vk];
           return cached && p.displayDataUrl !== cached
             ? { ...p, displayDataUrl: cached }
             : p;
@@ -340,12 +437,12 @@ export function PdfViewer({ file, onReset }: Props) {
       return;
     }
 
-    const allCached = pages.every((p) => p.byTheme[theme] !== undefined);
+    const allCached = pages.every((p) => p.byTheme[vk] !== undefined);
     if (allCached) {
       setPages((cur) =>
-        cur.map((p) => ({ ...p, displayDataUrl: p.byTheme[theme]! })),
+        cur.map((p) => ({ ...p, displayDataUrl: p.byTheme[vk]! })),
       );
-      lastAppliedThemeRef.current = theme;
+      lastAppliedThemeRef.current = vk;
       setThemeApplying(false);
       setThemeProgress({ current: 0, total: 0 });
       return;
@@ -359,8 +456,9 @@ export function PdfViewer({ file, onReset }: Props) {
       const focused = focusedPageIndex();
       const order = expandingOrder(focused, next.length);
       const VISIBLE_COMMIT = 6; // commit per page for the first N (around user's view)
+      const vk2 = variantKey(theme, imageMode);
       const toCompute = order.filter(
-        (idx) => next[idx].byTheme[theme] === undefined,
+        (idx) => next[idx].byTheme[vk2] === undefined,
       ).length;
       setThemeProgress({ current: 0, total: toCompute });
       let computed = 0;
@@ -370,17 +468,17 @@ export function PdfViewer({ file, onReset }: Props) {
         const idx = order[k];
         const p = next[idx];
 
-        const cached = p.byTheme[theme];
+        const cached = p.byTheme[vk2];
         if (cached !== undefined) {
           next[idx] = { ...p, displayDataUrl: cached };
         } else {
           try {
-            const display = await darkifyViaWorker(p, theme);
+            const display = await darkifyViaWorker(p, theme, imageMode);
             if (aborted || themeVersionRef.current !== version) return;
             next[idx] = {
               ...p,
               displayDataUrl: display,
-              byTheme: { ...p.byTheme, [theme]: display },
+              byTheme: { ...p.byTheme, [vk2]: display },
             };
             computed++;
             setThemeProgress({ current: computed, total: toCompute });
@@ -397,7 +495,7 @@ export function PdfViewer({ file, onReset }: Props) {
 
       if (!aborted && themeVersionRef.current === version) {
         setPages(next);
-        lastAppliedThemeRef.current = theme;
+        lastAppliedThemeRef.current = variantKey(theme, imageMode);
         setThemeApplying(false);
         setThemeProgress({ current: 0, total: 0 });
       }
@@ -407,27 +505,25 @@ export function PdfViewer({ file, onReset }: Props) {
       aborted = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme, status]);
+  }, [theme, imageMode, status]);
 
   const handleDownload = useCallback(async () => {
     if (!pages.length) return;
     setDownloading(true);
     try {
-      const { PDFDocument } = await import("pdf-lib");
-      const doc = await PDFDocument.create();
-      for (const p of pages) {
-        const res = await fetch(p.displayDataUrl);
-        const bytes = new Uint8Array(await res.arrayBuffer());
-        const embedded = await doc.embedJpg(bytes);
-        const pdfPage = doc.addPage([p.width, p.height]);
-        pdfPage.drawImage(embedded, {
-          x: 0,
-          y: 0,
-          width: p.width,
-          height: p.height,
-        });
-      }
-      const outBytes = await doc.save();
+      // Object-recolor where possible, raster fallback per page — see
+      // lib/build-dark-pdf.ts for the full mode-selection story.
+      const srcBytes = await file.arrayBuffer();
+      const { bytes: outBytes, objectPages, rasterPages } = await buildDarkPdf(
+        srcBytes,
+        pages,
+        theme,
+        imageMode,
+        pdfDocRef.current,
+      );
+      console.info(
+        `[pdf-dark] download built: ${objectPages} vector page(s), ${rasterPages} raster page(s)`,
+      );
       const copy = new Uint8Array(outBytes.byteLength);
       copy.set(outBytes);
       const blob = new Blob([copy.buffer], { type: "application/pdf" });
@@ -444,7 +540,7 @@ export function PdfViewer({ file, onReset }: Props) {
     } finally {
       setDownloading(false);
     }
-  }, [pages, theme, file.name]);
+  }, [pages, theme, imageMode, file]);
 
   const themeBg = THEMES[theme].swatch;
   // While the initial render is still streaming pages in, we know the final
@@ -503,6 +599,53 @@ export function PdfViewer({ file, onReset }: Props) {
                     style={{ background: THEMES[id].swatch }}
                   />
                   {THEMES[id].label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Image handling: three explicit treatments, scans included */}
+          <div
+            className="flex items-center gap-1 rounded-full border border-neutral-800 p-1"
+            title="How photos, figures and scanned pages are treated"
+          >
+            <span className="pl-2 pr-1 text-[11px] uppercase tracking-wide text-neutral-500">
+              Images
+            </span>
+            {(
+              [
+                [
+                  "original",
+                  "Original",
+                  "Photos, figures and scanned pages stay exactly as in the source — only text and background are darkened",
+                ],
+                [
+                  "smart",
+                  "Auto",
+                  "Recommended: each image gets the best treatment — white screenshots/diagrams are inverted with the page, photos stay original, bright colorful images are gently dimmed",
+                ],
+                [
+                  "invert",
+                  "Invert",
+                  "Invert everything, images included — deepest dark, best for scanned documents",
+                ],
+              ] as [ImageMode, string, string][]
+            ).map(([mode, label, tip]) => {
+              const active = imageMode === mode;
+              return (
+                <button
+                  key={mode}
+                  onClick={() => setImageMode(mode)}
+                  disabled={isInitialRendering}
+                  className={`px-3 py-1 rounded-full text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                    active
+                      ? "bg-amber-400 text-neutral-950 font-semibold"
+                      : "text-neutral-400 hover:text-neutral-100"
+                  }`}
+                  aria-pressed={active}
+                  title={tip}
+                >
+                  {label}
                 </button>
               );
             })}
