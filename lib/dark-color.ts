@@ -22,20 +22,36 @@ export const THEME_RGB: Record<ThemeId, { r: number; g: number; b: number }> = {
 export const DARKNESS_MIN = 0.5;
 
 /**
- * Theme background lifted toward white as darkness drops below 1. This is
- * what the Darkness slider controls: 1 = the theme as designed, lower =
- * a softer, lighter page for users who find full dark too harsh.
+ * Warmth slider target: a candle-light warm black. At warmth 1 the theme
+ * background lands here; Sepia (already warm) barely moves, cold themes
+ * (Midnight, Solarized) lose their blue cast progressively.
+ */
+export const WARM_ANCHOR = { r: 48, g: 34, b: 16 };
+
+/**
+ * The background the sliders produce for a theme, applied in this order:
+ * 1. Warmth (0–1, default 0): pull the theme color toward WARM_ANCHOR —
+ *    a color-temperature shift, like a screen's night mode.
+ * 2. Darkness (0.5–1, default 1): lift the result toward white for users
+ *    who find full dark too harsh.
+ * Warmth runs first so darkness always means "toward white" regardless of
+ * how warm the base is.
  */
 export function effectiveThemeBg(
   theme: ThemeId,
   darkness = 1,
+  warmth = 0,
 ): { r: number; g: number; b: number } {
   const { r, g, b } = THEME_RGB[theme];
+  const w = Math.min(1, Math.max(0, warmth));
+  const wr = r + (WARM_ANCHOR.r - r) * w;
+  const wg = g + (WARM_ANCHOR.g - g) * w;
+  const wb = b + (WARM_ANCHOR.b - b) * w;
   const lift = 1 - Math.min(1, Math.max(DARKNESS_MIN, darkness));
   return {
-    r: r + (255 - r) * lift,
-    g: g + (255 - g) * lift,
-    b: b + (255 - b) * lift,
+    r: wr + (255 - wr) * lift,
+    g: wg + (255 - wg) * lift,
+    b: wb + (255 - wb) * lift,
   };
 }
 
@@ -60,8 +76,9 @@ export function mapColor(
   b: number,
   theme: ThemeId,
   darkness = 1,
+  warmth = 0,
 ): [number, number, number] {
-  const { r: bgR, g: bgG, b: bgB } = effectiveThemeBg(theme, darkness);
+  const { r: bgR, g: bgG, b: bgB } = effectiveThemeBg(theme, darkness, warmth);
 
   const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
   const factor = 1 - brightness / 255;

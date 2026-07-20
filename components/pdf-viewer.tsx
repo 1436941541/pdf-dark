@@ -43,8 +43,9 @@ type Props = {
   onReset: () => void;
 };
 
-/** Cache key for one theme + image-mode + darkness combination. */
-const variantKey = (t: ThemeId, m: ImageMode, d: number) => `${t}:${m}:${d}`;
+/** Cache key for one theme + image-mode + darkness + warmth combination. */
+const variantKey = (t: ThemeId, m: ImageMode, d: number, w: number) =>
+  `${t}:${m}:${d}:${w}`;
 
 export function PdfViewer({ file, onReset }: Props) {
   const [pages, setPages] = useState<PageImage[]>([]);
@@ -56,12 +57,19 @@ export function PdfViewer({ file, onReset }: Props) {
   // with, so dragging doesn't re-darkify the whole document at every step.
   const [darkness, setDarkness] = useState(100);
   const [appliedDarkness, setAppliedDarkness] = useState(100);
+  // Warmth slider, in percent (0–100): color-temperature shift of the
+  // background toward candle-light. Same live/debounced split as darkness.
+  const [warmth, setWarmth] = useState(0);
+  const [appliedWarmth, setAppliedWarmth] = useState(0);
 
   useEffect(() => {
-    if (darkness === appliedDarkness) return;
-    const t = setTimeout(() => setAppliedDarkness(darkness), 250);
+    if (darkness === appliedDarkness && warmth === appliedWarmth) return;
+    const t = setTimeout(() => {
+      setAppliedDarkness(darkness);
+      setAppliedWarmth(warmth);
+    }, 250);
     return () => clearTimeout(t);
-  }, [darkness, appliedDarkness]);
+  }, [darkness, appliedDarkness, warmth, appliedWarmth]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [progress, setProgress] = useState<{ done: number; total: number }>({
     done: 0,
@@ -224,6 +232,7 @@ export function PdfViewer({ file, onReset }: Props) {
       nextTheme: ThemeId,
       nextMode: ImageMode,
       nextDarkness: number,
+      nextWarmth: number,
     ): Promise<string> => {
       // "Original" mode treats a scanned page (page == one big image) as an
       // image: the page stays exactly as in the source, no darkening at all.
@@ -250,6 +259,7 @@ export function PdfViewer({ file, onReset }: Props) {
           height: p.height,
           theme: nextTheme,
           darkness: nextDarkness / 100,
+          warmth: nextWarmth / 100,
           imageRects: rects,
           imageDims: rects.map((r) =>
             imageTreatment(nextMode, r) === "dim"
@@ -328,7 +338,12 @@ export function PdfViewer({ file, onReset }: Props) {
         // Lock the theme/mode combo for the entire initial pass to avoid
         // racing with the variant-switch effect (which is disabled in UI
         // while isInitialRendering is true).
-        lastAppliedThemeRef.current = variantKey(theme, imageMode, appliedDarkness);
+        lastAppliedThemeRef.current = variantKey(
+          theme,
+          imageMode,
+          appliedDarkness,
+          appliedWarmth,
+        );
         // Small scratch canvas for per-image brightness sampling.
         const scratch = document.createElement("canvas");
         scratch.width = 32;
@@ -401,13 +416,17 @@ export function PdfViewer({ file, onReset }: Props) {
             theme,
             imageMode,
             appliedDarkness,
+            appliedWarmth,
           );
           if (cancelledRef.current) return;
 
           rendered.push({
             ...stub,
             displayDataUrl: display,
-            byTheme: { [variantKey(theme, imageMode, appliedDarkness)]: display },
+            byTheme: {
+              [variantKey(theme, imageMode, appliedDarkness, appliedWarmth)]:
+                display,
+            },
           });
           setPages([...rendered]);
           setProgress({ done: i, total: pdf.numPages });
@@ -432,7 +451,7 @@ export function PdfViewer({ file, onReset }: Props) {
   // this combination cached, swap dataUrls instantly.
   useEffect(() => {
     if (status !== "ready" || pages.length === 0) return;
-    const vk = variantKey(theme, imageMode, appliedDarkness);
+    const vk = variantKey(theme, imageMode, appliedDarkness, appliedWarmth);
 
     // Bump version up-front — aborts any in-flight worker loop from a previous switch.
     themeVersionRef.current += 1;
@@ -474,7 +493,7 @@ export function PdfViewer({ file, onReset }: Props) {
       const focused = focusedPageIndex();
       const order = expandingOrder(focused, next.length);
       const VISIBLE_COMMIT = 6; // commit per page for the first N (around user's view)
-      const vk2 = variantKey(theme, imageMode, appliedDarkness);
+      const vk2 = variantKey(theme, imageMode, appliedDarkness, appliedWarmth);
       const toCompute = order.filter(
         (idx) => next[idx].byTheme[vk2] === undefined,
       ).length;
@@ -496,6 +515,7 @@ export function PdfViewer({ file, onReset }: Props) {
               theme,
               imageMode,
               appliedDarkness,
+              appliedWarmth,
             );
             if (aborted || themeVersionRef.current !== version) return;
             next[idx] = {
@@ -518,7 +538,12 @@ export function PdfViewer({ file, onReset }: Props) {
 
       if (!aborted && themeVersionRef.current === version) {
         setPages(next);
-        lastAppliedThemeRef.current = variantKey(theme, imageMode, appliedDarkness);
+        lastAppliedThemeRef.current = variantKey(
+          theme,
+          imageMode,
+          appliedDarkness,
+          appliedWarmth,
+        );
         setThemeApplying(false);
         setThemeProgress({ current: 0, total: 0 });
       }
@@ -528,7 +553,7 @@ export function PdfViewer({ file, onReset }: Props) {
       aborted = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme, imageMode, appliedDarkness, status]);
+  }, [theme, imageMode, appliedDarkness, appliedWarmth, status]);
 
   const handleDownload = useCallback(async () => {
     if (!pages.length) return;
@@ -544,6 +569,7 @@ export function PdfViewer({ file, onReset }: Props) {
         imageMode,
         pdfDocRef.current,
         appliedDarkness / 100,
+        appliedWarmth / 100,
       );
       console.info(
         `[pdf-dark] download built: ${objectPages} vector page(s), ${rasterPages} raster page(s)`,
@@ -564,11 +590,11 @@ export function PdfViewer({ file, onReset }: Props) {
     } finally {
       setDownloading(false);
     }
-  }, [pages, theme, imageMode, appliedDarkness, file]);
+  }, [pages, theme, imageMode, appliedDarkness, appliedWarmth, file]);
 
-  // Page-frame background follows the slider so the frame never mismatches
+  // Page-frame background follows the sliders so the frame never mismatches
   // the darkened bitmaps it surrounds.
-  const effBg = effectiveThemeBg(theme, appliedDarkness / 100);
+  const effBg = effectiveThemeBg(theme, appliedDarkness / 100, appliedWarmth / 100);
   const themeBg = `rgb(${Math.round(effBg.r)}, ${Math.round(effBg.g)}, ${Math.round(effBg.b)})`;
   // While the initial render is still streaming pages in, we know the final
   // page count from `progress.total` but `pages.length` is still catching up.
@@ -699,6 +725,30 @@ export function PdfViewer({ file, onReset }: Props) {
             />
             <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
               {darkness}%
+            </span>
+          </div>
+
+          {/* Warmth slider — color-temperature shift for night reading */}
+          <div
+            className="flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5"
+            title="Background color temperature — drag right for a warmer, candle-light tint that's easier on the eyes at night"
+          >
+            <span className="text-[11px] uppercase tracking-wide text-neutral-500">
+              Warmth
+            </span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              value={warmth}
+              onChange={(e) => setWarmth(Number(e.target.value))}
+              disabled={isInitialRendering}
+              className="w-24 accent-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
+              aria-label="Warmth"
+            />
+            <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
+              {warmth}%
             </span>
           </div>
 

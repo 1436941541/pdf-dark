@@ -66,6 +66,7 @@ export async function buildDarkPdf(
   imageMode: ImageMode,
   pdfProxy: PDFDocumentProxy | null,
   darkness = 1,
+  warmth = 0,
 ): Promise<{ bytes: Uint8Array; objectPages: number; rasterPages: number }> {
   const pdfLib = await import("pdf-lib");
 
@@ -89,7 +90,14 @@ export async function buildDarkPdf(
       if (pages[i].scannedPage) continue;
       if (pages[i].imageRects.some((r) => imageTreatment(imageMode, r) === "invert"))
         continue;
-      objectOk[i] = await recolorPageInPlace(doc, i, theme, formsDone, darkness);
+      objectOk[i] = await recolorPageInPlace(
+        doc,
+        i,
+        theme,
+        formsDone,
+        darkness,
+        warmth,
+      );
     }
   }
 

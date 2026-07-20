@@ -29,14 +29,19 @@ export function applyDark(
   imageData: ImageData,
   theme: ThemeId,
   darkness = 1,
+  warmth = 0,
 ): void {
-  // Darkness slider: lift the theme background toward white (keep in sync
+  // Warmth then darkness sliders reshape the theme background (keep in sync
   // with effectiveThemeBg in lib/dark-color.ts).
   const bg = THEMES[theme];
+  const w = Math.min(1, Math.max(0, warmth));
+  const wr = bg.r + (48 - bg.r) * w;
+  const wg = bg.g + (34 - bg.g) * w;
+  const wb = bg.b + (16 - bg.b) * w;
   const lift = 1 - Math.min(1, Math.max(0.5, darkness));
-  const bgR = bg.r + (255 - bg.r) * lift;
-  const bgG = bg.g + (255 - bg.g) * lift;
-  const bgB = bg.b + (255 - bg.b) * lift;
+  const bgR = wr + (255 - wr) * lift;
+  const bgG = wg + (255 - wg) * lift;
+  const bgB = wb + (255 - wb) * lift;
   const data = imageData.data;
   const len = data.length;
 
@@ -103,6 +108,7 @@ export async function darkifyDataUrl(
   imageRects?: ImageRect[],
   imageDims?: number[],
   darkness = 1,
+  warmth = 0,
 ): Promise<string> {
   const img = await loadImage(originalDataUrl);
   const canvas =
@@ -116,7 +122,7 @@ export async function darkifyDataUrl(
 
   ctx.drawImage(img, 0, 0, width, height);
   const imageData = ctx.getImageData(0, 0, width, height);
-  applyDark(imageData, theme, darkness);
+  applyDark(imageData, theme, darkness, warmth);
   ctx.putImageData(imageData, 0, 0);
 
   // Paste the original image regions back, then veil them. Circular /

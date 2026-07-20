@@ -37,14 +37,23 @@ function hueToRgb(p: number, q: number, t: number): number {
   return p;
 }
 
-function applyDark(data: Uint8ClampedArray, theme: ThemeId, darkness = 1): void {
-  // Darkness slider: lift the theme background toward white (keep in sync
+function applyDark(
+  data: Uint8ClampedArray,
+  theme: ThemeId,
+  darkness = 1,
+  warmth = 0,
+): void {
+  // Warmth then darkness sliders reshape the theme background (keep in sync
   // with effectiveThemeBg in lib/dark-color.ts).
   const bg = THEME_RGB[theme];
+  const w = Math.min(1, Math.max(0, warmth));
+  const wr = bg.r + (48 - bg.r) * w;
+  const wg = bg.g + (34 - bg.g) * w;
+  const wb = bg.b + (16 - bg.b) * w;
   const lift = 1 - Math.min(1, Math.max(0.5, darkness));
-  const bgR = bg.r + (255 - bg.r) * lift;
-  const bgG = bg.g + (255 - bg.g) * lift;
-  const bgB = bg.b + (255 - bg.b) * lift;
+  const bgR = wr + (255 - wr) * lift;
+  const bgG = wg + (255 - wg) * lift;
+  const bgB = wb + (255 - wb) * lift;
   const len = data.length;
   for (let j = 0; j < len; j += 4) {
     const r = data[j];
@@ -109,6 +118,8 @@ export type DarkifyRequest = {
   theme: ThemeId;
   /** Darkness slider value 0.5–1; 1 (default) = the theme as designed. */
   darkness?: number;
+  /** Warmth slider value 0–1; 0 (default) = no color-temperature shift. */
+  warmth?: number;
   /** Canvas-space rects of raster images to restore from the original bitmap. */
   imageRects?: ImageRect[];
   /** Per-rect veil opacity (parallel to imageRects); 0 = keep the image
@@ -125,8 +136,17 @@ export type DarkifyResponse = {
 const ctx = self as unknown as DedicatedWorkerGlobalScope;
 
 ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
-  const { id, bitmap, width, height, theme, darkness, imageRects, imageDims } =
-    e.data;
+  const {
+    id,
+    bitmap,
+    width,
+    height,
+    theme,
+    darkness,
+    warmth,
+    imageRects,
+    imageDims,
+  } = e.data;
   try {
     const canvas = new OffscreenCanvas(width, height);
     const c2d = canvas.getContext("2d");
@@ -135,7 +155,7 @@ ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
     c2d.drawImage(bitmap, 0, 0, width, height);
 
     const img = c2d.getImageData(0, 0, width, height);
-    applyDark(img.data, theme, darkness ?? 1);
+    applyDark(img.data, theme, darkness ?? 1, warmth ?? 0);
     c2d.putImageData(img, 0, 0);
 
     // Paste the original image regions back, then veil them. Circular /
