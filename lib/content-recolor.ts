@@ -28,7 +28,7 @@ import type {
   PDFContext,
   PDFRawStream as PDFRawStreamType,
 } from "pdf-lib";
-import { mapColor, THEME_RGB } from "./dark-color";
+import { effectiveThemeBg, mapColor } from "./dark-color";
 import type { ThemeId } from "./themes";
 
 /** Ops whose operands are colors we rewrite. value = operand count. */
@@ -225,6 +225,8 @@ type PdfLibNs = typeof import("pdf-lib");
 
 type RewriteCtx = {
   theme: ThemeId;
+  /** Darkness slider value 0.5–1; 1 = the theme as designed. */
+  darkness: number;
   ctx: PDFContext;
   pdfLib: PdfLibNs;
   /** form ref tag → rewrite succeeded (memo; a failed form fails its pages) */
@@ -256,7 +258,7 @@ function rewriteStream(src: string, resources: PDFDict | null, rc: RewriteCtx): 
     });
   };
   const emitMapped = (rgb255: [number, number, number], stroke: boolean) => {
-    out.push(` ${rgbOperands(mapColor(rgb255[0], rgb255[1], rgb255[2], rc.theme))} ${stroke ? "RG" : "rg"}\n`);
+    out.push(` ${rgbOperands(mapColor(rgb255[0], rgb255[1], rgb255[2], rc.theme, rc.darkness))} ${stroke ? "RG" : "rg"}\n`);
   };
 
   let i = 0;
@@ -385,6 +387,7 @@ export async function recolorPageInPlace(
   pageIndex: number,
   theme: ThemeId,
   formsDone: Map<string, boolean>,
+  darkness = 1,
 ): Promise<boolean> {
   const pdfLib = await import("pdf-lib");
   const { PDFName, PDFArray, PDFDict: Dict, PDFRawStream, decodePDFRawStream } = pdfLib;
@@ -412,6 +415,7 @@ export async function recolorPageInPlace(
     const resources = ctx.lookupMaybe(page.node.get(PDFName.of("Resources")), Dict) ?? null;
     const rewritten = rewriteStream(src, resources, {
       theme,
+      darkness,
       ctx,
       pdfLib,
       formsDone,
@@ -420,9 +424,9 @@ export async function recolorPageInPlace(
 
     // Dark page background + remapped defaults (streams that never set a
     // color rely on the spec default of black — which now must render white).
-    const bg = THEME_RGB[theme];
+    const bg = effectiveThemeBg(theme, darkness);
     const mb = page.getMediaBox();
-    const white = rgbOperands(mapColor(0, 0, 0, theme));
+    const white = rgbOperands(mapColor(0, 0, 0, theme, darkness));
     const head =
       `q ${fmt(bg.r / 255)} ${fmt(bg.g / 255)} ${fmt(bg.b / 255)} rg ` +
       `${fmt(mb.x)} ${fmt(mb.y)} ${fmt(mb.width)} ${fmt(mb.height)} re f Q\n` +

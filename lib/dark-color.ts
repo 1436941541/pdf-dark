@@ -18,6 +18,27 @@ export const THEME_RGB: Record<ThemeId, { r: number; g: number; b: number }> = {
   oled: { r: 0, g: 0, b: 0 },
 };
 
+/** Darkness slider floor — below ~50% the page stops reading as dark mode. */
+export const DARKNESS_MIN = 0.5;
+
+/**
+ * Theme background lifted toward white as darkness drops below 1. This is
+ * what the Darkness slider controls: 1 = the theme as designed, lower =
+ * a softer, lighter page for users who find full dark too harsh.
+ */
+export function effectiveThemeBg(
+  theme: ThemeId,
+  darkness = 1,
+): { r: number; g: number; b: number } {
+  const { r, g, b } = THEME_RGB[theme];
+  const lift = 1 - Math.min(1, Math.max(DARKNESS_MIN, darkness));
+  return {
+    r: r + (255 - r) * lift,
+    g: g + (255 - g) * lift,
+    b: b + (255 - b) * lift,
+  };
+}
+
 /** Below this saturation a color counts as grayscale. */
 const CHROMA_LO = 0.08;
 /** Above this saturation the hue-preserving path fully takes over. */
@@ -38,8 +59,9 @@ export function mapColor(
   g: number,
   b: number,
   theme: ThemeId,
+  darkness = 1,
 ): [number, number, number] {
-  const { r: bgR, g: bgG, b: bgB } = THEME_RGB[theme];
+  const { r: bgR, g: bgG, b: bgB } = effectiveThemeBg(theme, darkness);
 
   const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
   const factor = 1 - brightness / 255;
