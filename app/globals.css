@@ -4,3 +4,37 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
+
+/* Slider whose track is a live color-preview gradient (set via inline
+   style); the thumb is a ring so the track color shows through it —
+   "the color under the thumb is the color you get". */
+input[type="range"].slider-preview {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 10px;
+  border-radius: 9999px;
+  border: 1px solid rgb(64 64 64);
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"].slider-preview:disabled {
+  cursor: not-allowed;
+}
+input[type="range"].slider-preview::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 3px solid rgb(251 191 36);
+  box-shadow: 0 0 0 1px rgb(23 23 23);
+}
+input[type="range"].slider-preview::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 3px solid rgb(251 191 36);
+  box-shadow: 0 0 0 1px rgb(23 23 23);
+}

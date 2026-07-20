@@ -47,6 +47,10 @@ type Props = {
 const variantKey = (t: ThemeId, m: ImageMode, d: number, w: number) =>
   `${t}:${m}:${d}:${w}`;
 
+/** effectiveThemeBg result → CSS color. */
+const bgCss = (c: { r: number; g: number; b: number }) =>
+  `rgb(${Math.round(c.r)}, ${Math.round(c.g)}, ${Math.round(c.b)})`;
+
 export function PdfViewer({ file, onReset }: Props) {
   const [pages, setPages] = useState<PageImage[]>([]);
   const [theme, setTheme] = useState<ThemeId>("midnight");
@@ -594,8 +598,19 @@ export function PdfViewer({ file, onReset }: Props) {
 
   // Page-frame background follows the sliders so the frame never mismatches
   // the darkened bitmaps it surrounds.
-  const effBg = effectiveThemeBg(theme, appliedDarkness / 100, appliedWarmth / 100);
-  const themeBg = `rgb(${Math.round(effBg.r)}, ${Math.round(effBg.g)}, ${Math.round(effBg.b)})`;
+  const themeBg = bgCss(
+    effectiveThemeBg(theme, appliedDarkness / 100, appliedWarmth / 100),
+  );
+
+  // Slider tracks are painted with the actual background colors each end of
+  // the range would produce (live values, so the tracks respond while
+  // dragging): the color under the thumb is the color the page gets.
+  const darknessTrack = `linear-gradient(to right, ${bgCss(
+    effectiveThemeBg(theme, 0.5, warmth / 100),
+  )}, ${bgCss(effectiveThemeBg(theme, 1, warmth / 100))})`;
+  const warmthTrack = `linear-gradient(to right, ${bgCss(
+    effectiveThemeBg(theme, darkness / 100, 0),
+  )}, ${bgCss(effectiveThemeBg(theme, darkness / 100, 1))})`;
   // While the initial render is still streaming pages in, we know the final
   // page count from `progress.total` but `pages.length` is still catching up.
   const isInitialRendering =
@@ -720,7 +735,8 @@ export function PdfViewer({ file, onReset }: Props) {
               value={darkness}
               onChange={(e) => setDarkness(Number(e.target.value))}
               disabled={isInitialRendering}
-              className="w-24 accent-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="slider-preview w-24 disabled:opacity-40"
+              style={{ background: darknessTrack }}
               aria-label="Darkness"
             />
             <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
@@ -744,7 +760,8 @@ export function PdfViewer({ file, onReset }: Props) {
               value={warmth}
               onChange={(e) => setWarmth(Number(e.target.value))}
               disabled={isInitialRendering}
-              className="w-24 accent-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="slider-preview w-24 disabled:opacity-40"
+              style={{ background: warmthTrack }}
               aria-label="Warmth"
             />
             <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
