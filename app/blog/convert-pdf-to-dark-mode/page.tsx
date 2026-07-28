@@ -139,7 +139,7 @@ export default function ConvertVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 16, 2026</span>
+            <span>Updated July 26, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -273,11 +273,12 @@ export default function ConvertVariantPage() {
             3 steps, a real dark PDF file, opens dark in every reader
           </h3>
           <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop a PDF on the PDF Dark home page, pick a theme, and download
-            the file — email it, sync it, open it anywhere.
+            Pick a theme on the PDF Dark converter, drop your PDF, and the
+            darkened file downloads itself — email it, sync it, open it
+            anywhere.
           </p>
           <Link
-            href="/"
+            href="/converter"
             className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
             Try PDF Dark →

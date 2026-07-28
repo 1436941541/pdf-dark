@@ -139,7 +139,7 @@ export default function InvertWithoutImagesPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 15, 2026</span>
+            <span>Updated July 24, 2026</span>
             <span aria-hidden>·</span>
             <span>6 min read</span>
           </div>
@@ -274,12 +274,12 @@ export default function InvertWithoutImagesPage() {
             Drop a file, watch the images survive, download the dark PDF
           </h3>
           <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Free and browser-only: the file never leaves your device. Check
-            the Images toggle in the toolbar to switch between Auto, Original,
-            and Invert.
+            Free and browser-only: the file never leaves your device. Use the
+            Images setting on the converter to switch between Auto, Original,
+            and Invert before you drop the file.
           </p>
           <Link
-            href="/"
+            href="/converter"
             className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
             Try PDF Dark →

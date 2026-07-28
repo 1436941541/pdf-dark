@@ -141,7 +141,7 @@ export default function DarkenScannedPdfPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 14, 2026</span>
+            <span>Updated July 23, 2026</span>
             <span aria-hidden>·</span>
             <span>5 min read</span>
           </div>
@@ -273,16 +273,23 @@ export default function DarkenScannedPdfPage() {
             Try it on one of your scans
           </h2>
           <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop the file on the home page and switch between OLED, Midnight,
-            and the others to see what looks right on your screen. The download
-            is a regular PDF you can email or sync like any other.
+            Pick OLED, Midnight, or another theme on the converter, drop your
+            scan, and the darkened copy downloads itself. The download is a
+            regular PDF you can email or sync like any other.
           </p>
           <Link
-            href="/"
+            href="/converter"
             className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
             Open PDF Dark →
           </Link>
+          <p className="mt-4 text-sm text-neutral-500">
+            Reading an old scan in bed tonight?{" "}
+            <Link href="/" className="text-amber-400 hover:underline">
+              Read it in dark mode
+            </Link>{" "}
+            without saving anything.
+          </p>
         </section>
 
         <RelatedVariants currentSlug="darken-scanned-pdf-online" />

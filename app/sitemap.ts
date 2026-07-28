@@ -3,10 +3,11 @@ import { getSiteUrl } from "@/lib/site";
 import { VARIANTS } from "@/lib/variants";
 
 // Last real content change per static route, YYYY-MM-DD. Bump when that page's content actually changes.
-const HOME_UPDATED_AT = "2026-07-09";
+const HOME_UPDATED_AT = "2026-07-28";
+const CONVERTER_UPDATED_AT = "2026-07-28";
 const ABOUT_UPDATED_AT = "2026-06-26";
-const PRIVACY_UPDATED_AT = "2026-06-19";
-const TERMS_UPDATED_AT = "2026-04-28";
+const PRIVACY_UPDATED_AT = "2026-07-25";
+const TERMS_UPDATED_AT = "2026-07-21";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteUrl();
@@ -16,6 +17,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: HOME_UPDATED_AT,
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: `${base}/converter`,
+      lastModified: CONVERTER_UPDATED_AT,
+      changeFrequency: "monthly",
+      priority: 0.9,
     },
     ...VARIANTS.map((v) => ({
       url: `${base}/blog/${v.slug}`,

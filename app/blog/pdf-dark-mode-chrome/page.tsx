@@ -138,7 +138,7 @@ export default function ChromeVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 8, 2026</span>
+            <span>Updated July 19, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -250,12 +250,12 @@ export default function ChromeVariantPage() {
                 Step 1
               </div>
               <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
-                You drop a PDF on the home page
+                You drop a PDF on the converter
               </h3>
               <p className="text-neutral-300 leading-relaxed">
                 From the{" "}
-                <Link href="/" className="text-amber-400 hover:underline">
-                  PDF Dark home page
+                <Link href="/converter" className="text-amber-400 hover:underline">
+                  PDF Dark converter
                 </Link>
                 , drag a PDF from your desktop or click to pick from File
                 Explorer / Finder / Downloads. Chrome hands the file to the
@@ -310,7 +310,12 @@ export default function ChromeVariantPage() {
                 and Chrome saves the dark version to your usual Downloads
                 folder. Reopen it anywhere — Acrobat, Preview, your phone,
                 an e-reader — it stays dark forever, no per-app toggle
-                needed.
+                needed. Don&apos;t need a file at all? You can also{" "}
+                <Link href="/" className="text-amber-400 hover:underline">
+                  read PDFs in dark mode right in Chrome
+                </Link>{" "}
+                — drop the file on the reader and page through it, nothing
+                saved.
               </p>
             </div>
           </div>
@@ -331,15 +336,22 @@ export default function ChromeVariantPage() {
             3 steps, no Chrome extension, no permissions
           </h3>
           <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop a PDF on the PDF Dark home page and download the dark
-            version — runs right in Chrome.
+            Drop a PDF on the reader and it renders dark right in your Chrome
+            tab — no file saved, nothing installed.
           </p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
-            Try PDF Dark →
+            Read a PDF in dark mode →
           </Link>
+          <p className="mt-4 text-sm text-neutral-500">
+            Want to keep the file?{" "}
+            <Link href="/converter" className="text-amber-400 hover:underline">
+              Convert &amp; download it instead
+            </Link>
+            .
+          </p>
         </section>
 
         <RelatedVariants currentSlug="pdf-dark-mode-chrome" />

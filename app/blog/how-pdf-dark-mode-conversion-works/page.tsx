@@ -63,7 +63,7 @@ function StructuredData() {
     description: DESCRIPTION,
     author: { "@type": "Organization", name: "PDF Dark" },
     datePublished: "2026-07-17",
-    dateModified: "2026-07-17",
+    dateModified: "2026-07-27",
   };
   const faq = {
     "@context": "https://schema.org",
@@ -144,7 +144,7 @@ export default function HowItWorksPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 17, 2026</span>
+            <span>Updated July 27, 2026</span>
             <span aria-hidden>·</span>
             <span>9 min read</span>
           </div>
@@ -370,11 +370,11 @@ export default function HowItWorksPage() {
             All of the above happens in your browser, in seconds
           </h3>
           <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop a file on the home page and watch: vector text, preserved
+            Drop a file on the converter and watch: vector text, preserved
             photos, and a theme of your choice — nothing uploaded anywhere.
           </p>
           <Link
-            href="/"
+            href="/converter"
             className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
             Try PDF Dark →

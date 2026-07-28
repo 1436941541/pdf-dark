@@ -138,7 +138,7 @@ export default function FirefoxVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 10, 2026</span>
+            <span>Updated July 20, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -242,12 +242,12 @@ export default function FirefoxVariantPage() {
                 Step 1
               </div>
               <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
-                You drop a PDF on the home page
+                You drop a PDF on the converter
               </h3>
               <p className="text-neutral-300 leading-relaxed">
                 From the{" "}
-                <Link href="/" className="text-amber-400 hover:underline">
-                  PDF Dark home page
+                <Link href="/converter" className="text-amber-400 hover:underline">
+                  PDF Dark converter
                 </Link>
                 , drag a PDF from your desktop, Downloads folder, or any
                 Firefox file picker. Firefox hands the file to the page via
@@ -299,7 +299,12 @@ export default function FirefoxVariantPage() {
                 Click <strong className="text-neutral-100">Download</strong>{" "}
                 and Firefox saves the dark version to your Downloads folder.
                 Open it in Firefox again or hand it off to another reader —
-                it stays dark, no per-viewer toggle needed.
+                it stays dark, no per-viewer toggle needed. Just reading
+                tonight? Skip the download and open the{" "}
+                <Link href="/" className="text-amber-400 hover:underline">
+                  dark mode PDF reader
+                </Link>{" "}
+                instead — same themes, nothing saved to disk.
               </p>
             </div>
           </div>
@@ -319,15 +324,22 @@ export default function FirefoxVariantPage() {
             3 steps, no about:config, no extensions
           </h3>
           <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop a PDF on the PDF Dark home page and download the dark
-            version — runs right in Firefox.
+            Drop a PDF on the reader and it renders dark right in Firefox —
+            no file saved, no about:config.
           </p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
-            Try PDF Dark →
+            Open the dark mode reader →
           </Link>
+          <p className="mt-4 text-sm text-neutral-500">
+            Want to keep the file?{" "}
+            <Link href="/converter" className="text-amber-400 hover:underline">
+              Convert &amp; download it instead
+            </Link>
+            .
+          </p>
         </section>
 
         <RelatedVariants currentSlug="pdf-dark-mode-firefox" />

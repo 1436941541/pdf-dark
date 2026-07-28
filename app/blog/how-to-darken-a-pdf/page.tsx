@@ -175,7 +175,7 @@ export default function HowToDarkenPdfPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 12, 2026</span>
+            <span>Updated July 22, 2026</span>
             <span aria-hidden>·</span>
             <span>4 min read</span>
           </div>
@@ -208,10 +208,10 @@ export default function HowToDarkenPdfPage() {
                     <p className="text-sm text-neutral-400 mt-2">
                       Open the{" "}
                       <Link
-                        href="/"
+                        href="/converter"
                         className="text-amber-400 hover:text-amber-300"
                       >
-                        PDF Dark home page
+                        PDF Dark converter
                       </Link>{" "}
                       and drag the file onto the drop zone, or click to pick a
                       file from disk. The file is parsed in-browser with PDF.js
@@ -317,12 +317,16 @@ export default function HowToDarkenPdfPage() {
             Try it on a PDF you&apos;ve been meaning to read
           </h2>
           <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop a file on the home page and switch between the themes — the
-            preview re-renders right away so you can see which one feels right
-            for that document before you save it.
+            Pick a theme on the converter and drop the file — the darkened
+            copy downloads right away. Not sure which theme? Read it first on
+            the{" "}
+            <Link href="/" className="text-amber-400 hover:underline">
+              dark mode PDF reader
+            </Link>{" "}
+            and switch themes live.
           </p>
           <Link
-            href="/"
+            href="/converter"
             className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
           >
             Open PDF Dark →

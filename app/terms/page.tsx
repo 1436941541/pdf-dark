@@ -14,7 +14,7 @@ export default function TermsPage() {
       <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
         <h1 className="text-3xl font-bold text-neutral-50 mb-2">Terms</h1>
         <p className="text-sm text-neutral-500 mb-10">
-          Last updated: April 24, 2026
+          Last updated: July 21, 2026
         </p>
 
         <p className="text-lg mb-8">
