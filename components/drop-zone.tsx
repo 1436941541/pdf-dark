@@ -6,8 +6,6 @@ type Props = {
   onFile: (file: File) => void;
 };
 
-const SOFT_SIZE_LIMIT = 50 * 1024 * 1024; // 50 MB — advisory, not hard
-
 export function DropZone({ onFile }: Props) {
   const [isOver, setIsOver] = useState(false);
 
@@ -20,14 +18,6 @@ export function DropZone({ onFile }: Props) {
       ) {
         alert("Please drop a PDF file.");
         return;
-      }
-      if (file.size > SOFT_SIZE_LIMIT) {
-        const mb = (file.size / 1024 / 1024).toFixed(0);
-        const proceed = confirm(
-          `This file is ${mb} MB — larger than we've tested (50 MB). ` +
-            `It may be slow or crash your browser tab. Continue anyway?`,
-        );
-        if (!proceed) return;
       }
       onFile(file);
     },
@@ -66,7 +56,7 @@ export function DropZone({ onFile }: Props) {
           Drop your PDF here or click to browse
         </div>
         <div className="text-sm text-neutral-300 mt-2">
-          Up to 50 MB · Never leaves your browser
+          No size limit · Never leaves your browser
         </div>
       </label>
     </div>

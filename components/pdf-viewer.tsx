@@ -9,13 +9,11 @@ import type {
 } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
 import {
-  buildDarkPdf,
   imageTreatment,
   RENDER_SCALE,
   type ImageMode,
 } from "@/lib/build-dark-pdf";
 import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
-import type { PDFDocumentProxy } from "pdfjs-dist";
 
 type PageImage = {
   /** Full-color rendered PDF page (source of truth, never modified). */
@@ -84,7 +82,9 @@ export function PdfViewer({ file, onReset }: Props) {
     current: number;
     total: number;
   }>({ current: 0, total: 0 });
-  const [downloading, setDownloading] = useState(false);
+  // Theme/image/slider controls live in a slide-in sidebar so the sticky top
+  // bar stays slim and never covers the page while reading.
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Reader controls — current page tracked from scroll, zoom factor applied
   // to each page's display width, pageInput is the controlled value of the
@@ -94,9 +94,6 @@ export function PdfViewer({ file, onReset }: Props) {
   const [pageInput, setPageInput] = useState("1");
   const themeVersionRef = useRef(0);
   const cancelledRef = useRef(false);
-  // Live pdf.js document — the download path reads native-resolution images
-  // out of its object pool (see lib/native-image.ts).
-  const pdfDocRef = useRef<PDFDocumentProxy | null>(null);
   const lastAppliedThemeRef = useRef<string | null>(null);
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
@@ -217,6 +214,9 @@ export function PdfViewer({ file, onReset }: Props) {
           e.preventDefault();
           setZoom(1);
           break;
+        case "Escape":
+          setSettingsOpen(false);
+          break;
       }
     };
     window.addEventListener("keydown", onKey);
@@ -333,7 +333,6 @@ export function PdfViewer({ file, onReset }: Props) {
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
         if (cancelledRef.current) return;
-        pdfDocRef.current = pdf;
         setProgress({ done: 0, total: pdf.numPages });
 
         // Stream pages to React as soon as each finishes. The user can start
@@ -559,43 +558,6 @@ export function PdfViewer({ file, onReset }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme, imageMode, appliedDarkness, appliedWarmth, status]);
 
-  const handleDownload = useCallback(async () => {
-    if (!pages.length) return;
-    setDownloading(true);
-    try {
-      // Object-recolor where possible, raster fallback per page — see
-      // lib/build-dark-pdf.ts for the full mode-selection story.
-      const srcBytes = await file.arrayBuffer();
-      const { bytes: outBytes, objectPages, rasterPages } = await buildDarkPdf(
-        srcBytes,
-        pages,
-        theme,
-        imageMode,
-        pdfDocRef.current,
-        appliedDarkness / 100,
-        appliedWarmth / 100,
-      );
-      console.info(
-        `[pdf-dark] download built: ${objectPages} vector page(s), ${rasterPages} raster page(s)`,
-      );
-      const copy = new Uint8Array(outBytes.byteLength);
-      copy.set(outBytes);
-      const blob = new Blob([copy.buffer], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = file.name.replace(/\.pdf$/i, "") + `-${theme}.pdf`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error("[pdf-dark] download failed", e);
-      Sentry.captureException(e, { tags: { stage: "download" } });
-      alert("Something went wrong while building the PDF. See console for details.");
-    } finally {
-      setDownloading(false);
-    }
-  }, [pages, theme, imageMode, appliedDarkness, appliedWarmth, file]);
-
   // Page-frame background follows the sliders so the frame never mismatches
   // the darkened bitmaps it surrounds.
   const themeBg = bgCss(
@@ -619,273 +581,315 @@ export function PdfViewer({ file, onReset }: Props) {
 
   return (
     <div className="w-full max-w-5xl mx-auto">
-      {/* Toolbar */}
-      <div className="sticky top-0 z-10 rounded-2xl border border-neutral-800 bg-neutral-900/80 backdrop-blur px-4 py-3 mb-6 space-y-2">
-        {/* Row 1 — file, themes, download, reset */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex-1 min-w-0 text-sm text-neutral-300 truncate">
-            {file.name}
-            {isInitialRendering && (
-              <span className="ml-2 text-xs text-amber-400">
-                Rendering {progress.done} / {progress.total} pages — you can
-                start reading now
-              </span>
-            )}
-            {!isInitialRendering && themeApplying && (
-              <span className="ml-2 text-xs text-amber-400">
-                Applying {THEMES[theme].label} · {themeProgress.current} /{" "}
-                {themeProgress.total} pages
-              </span>
-            )}
-          </div>
+      {/* Floating controls — the reading surface stays fully unobstructed.
+          A round button opens the settings sidebar, a bottom pill handles
+          paging; zoom and everything else live in the sidebar. */}
+      <button
+        onClick={() => setSettingsOpen(true)}
+        className="fixed top-16 right-4 z-20 w-11 h-11 rounded-full border border-neutral-700 bg-neutral-900/90 backdrop-blur text-neutral-200 hover:text-neutral-50 hover:border-neutral-500 transition-colors flex items-center justify-center shadow-lg"
+        aria-haspopup="dialog"
+        aria-expanded={settingsOpen}
+        aria-label="Reader settings"
+        title="Settings"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          aria-hidden
+        >
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+        </svg>
+      </button>
 
-          <div className="flex items-center gap-1 rounded-full border border-neutral-800 p-1">
-            {THEME_IDS.map((id) => {
-              const active = theme === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => setTheme(id)}
-                  disabled={isInitialRendering}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                    active
-                      ? "bg-amber-400 text-neutral-950 font-semibold"
-                      : "text-neutral-400 hover:text-neutral-100"
-                  }`}
-                  aria-pressed={active}
-                  title={
-                    isInitialRendering
-                      ? "Wait until the first pass finishes"
-                      : undefined
-                  }
-                >
-                  <span
-                    aria-hidden
-                    className={`w-2.5 h-2.5 rounded-full border ${
-                      active ? "border-neutral-950/30" : "border-neutral-600"
-                    }`}
-                    style={{ background: THEMES[id].swatch }}
-                  />
-                  {THEMES[id].label}
-                </button>
-              );
-            })}
-          </div>
+      {/* Progress toast — only while the engine is busy */}
+      {(isInitialRendering || (status === "ready" && themeApplying)) && (
+        <div className="fixed top-16 left-4 z-20 max-w-[60vw] rounded-full border border-neutral-700 bg-neutral-900/90 backdrop-blur px-3 py-1.5 text-xs text-amber-400 truncate shadow-lg">
+          {isInitialRendering
+            ? `Rendering ${progress.done} / ${progress.total} pages`
+            : `Applying ${THEMES[theme].label} · ${themeProgress.current} / ${themeProgress.total}`}
+        </div>
+      )}
 
-          {/* Image handling: three explicit treatments, scans included */}
-          <div
-            className="flex items-center gap-1 rounded-full border border-neutral-800 p-1"
-            title="How photos, figures and scanned pages are treated"
+      {/* Floating page pill */}
+      {status === "ready" && totalPages > 0 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 rounded-full border border-neutral-700 bg-neutral-900/90 backdrop-blur px-1.5 py-1 shadow-lg">
+          <button
+            onClick={() => scrollToPage(currentPage - 1)}
+            disabled={currentPage <= 1}
+            className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            aria-label="Previous page"
+            title="Previous page (←)"
           >
-            <span className="pl-2 pr-1 text-[11px] uppercase tracking-wide text-neutral-500">
-              Images
-            </span>
-            {(
+            ‹
+          </button>
+          <div className="flex items-center gap-1 text-sm text-neutral-300">
+            <input
+              type="text"
+              inputMode="numeric"
+              value={pageInput}
+              onChange={(e) =>
+                setPageInput(e.target.value.replace(/[^0-9]/g, ""))
+              }
+              onBlur={submitJumpInput}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  submitJumpInput();
+                  (e.target as HTMLInputElement).blur();
+                }
+              }}
+              className="w-12 px-2 py-1 rounded bg-neutral-800 text-center text-neutral-100 focus:outline-none focus:ring-1 focus:ring-amber-400"
+              aria-label="Jump to page"
+            />
+            <span className="text-neutral-500">/ {totalPages}</span>
+          </div>
+          <button
+            onClick={() => scrollToPage(currentPage + 1)}
+            disabled={currentPage >= totalPages}
+            className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+            aria-label="Next page"
+            title="Next page (→)"
+          >
+            ›
+          </button>
+        </div>
+      )}
+
+      {/* Settings sidebar — theme, images, sliders, convert link. Slides in
+          from the right so it never sits on top of the text while reading. */}
+      {settingsOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/60"
+          onClick={() => setSettingsOpen(false)}
+          aria-hidden
+        />
+      )}
+      <aside
+        className={`fixed top-0 right-0 z-40 h-full w-80 max-w-[85vw] bg-neutral-900 border-l border-neutral-800 p-5 overflow-y-auto transition-transform duration-200 text-left ${
+          settingsOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+        role="dialog"
+        aria-label="Reader settings"
+        aria-hidden={!settingsOpen}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-semibold text-neutral-100 uppercase tracking-wide">
+            Settings
+          </span>
+          <button
+            onClick={() => setSettingsOpen(false)}
+            className="w-8 h-8 rounded-full text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800 transition-colors"
+            aria-label="Close settings"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="text-xs text-neutral-500 truncate mb-6">{file.name}</div>
+
+        {/* Theme */}
+        <div className="text-[11px] uppercase tracking-wide text-neutral-500 mb-2">
+          Theme
+        </div>
+        <div className="grid grid-cols-2 gap-2 mb-6">
+          {THEME_IDS.map((id) => {
+            const active = theme === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setTheme(id)}
+                disabled={isInitialRendering}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                  active
+                    ? "border-amber-400 text-amber-400 bg-amber-400/10 font-semibold"
+                    : "border-neutral-800 text-neutral-300 hover:border-neutral-600"
+                }`}
+                aria-pressed={active}
+                title={
+                  isInitialRendering
+                    ? "Wait until the first pass finishes"
+                    : undefined
+                }
+              >
+                <span
+                  aria-hidden
+                  className={`w-3.5 h-3.5 rounded-full border ${
+                    active ? "border-amber-400/50" : "border-neutral-600"
+                  }`}
+                  style={{ background: THEMES[id].swatch }}
+                />
+                {THEMES[id].label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Image handling: three explicit treatments, scans included */}
+        <div
+          className="text-[11px] uppercase tracking-wide text-neutral-500 mb-2"
+          title="How photos, figures and scanned pages are treated"
+        >
+          Images
+        </div>
+        <div className="grid grid-cols-3 gap-2 mb-6">
+          {(
+            [
               [
-                [
-                  "original",
-                  "Original",
-                  "Photos, figures and scanned pages stay exactly as in the source — only text and background are darkened",
-                ],
-                [
-                  "smart",
-                  "Auto",
-                  "Recommended: each image gets the best treatment — white screenshots/diagrams are inverted with the page, photos stay original, bright colorful images are gently dimmed",
-                ],
-                [
-                  "invert",
-                  "Invert",
-                  "Invert everything, images included — deepest dark, best for scanned documents",
-                ],
-              ] as [ImageMode, string, string][]
-            ).map(([mode, label, tip]) => {
-              const active = imageMode === mode;
-              return (
-                <button
-                  key={mode}
-                  onClick={() => setImageMode(mode)}
-                  disabled={isInitialRendering}
-                  className={`px-3 py-1 rounded-full text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                    active
-                      ? "bg-amber-400 text-neutral-950 font-semibold"
-                      : "text-neutral-400 hover:text-neutral-100"
-                  }`}
-                  aria-pressed={active}
-                  title={tip}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
+                "original",
+                "Original",
+                "Photos, figures and scanned pages stay exactly as in the source — only text and background are darkened",
+              ],
+              [
+                "smart",
+                "Auto",
+                "Recommended: each image gets the best treatment — white screenshots/diagrams are inverted with the page, photos stay original, bright colorful images are gently dimmed",
+              ],
+              [
+                "invert",
+                "Invert",
+                "Invert everything, images included — deepest dark, best for scanned documents",
+              ],
+            ] as [ImageMode, string, string][]
+          ).map(([m, label, tip]) => {
+            const active = imageMode === m;
+            return (
+              <button
+                key={m}
+                onClick={() => setImageMode(m)}
+                disabled={isInitialRendering}
+                className={`px-2 py-2 rounded-lg border text-xs transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                  active
+                    ? "border-amber-400 text-amber-400 bg-amber-400/10 font-semibold"
+                    : "border-neutral-800 text-neutral-300 hover:border-neutral-600"
+                }`}
+                aria-pressed={active}
+                title={tip}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
 
-          {/* Darkness slider — drag left if full dark feels too black */}
-          <div
-            className="flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5"
-            title="How dark the page gets — drag left for a softer, lighter background"
-          >
+        {/* Darkness slider — drag left if full dark feels too black */}
+        <div
+          className="mb-5"
+          title="How dark the page gets — drag left for a softer, lighter background"
+        >
+          <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] uppercase tracking-wide text-neutral-500">
               Darkness
             </span>
-            <input
-              type="range"
-              min={50}
-              max={100}
-              step={5}
-              value={darkness}
-              onChange={(e) => setDarkness(Number(e.target.value))}
-              disabled={isInitialRendering}
-              className="slider-preview w-24 disabled:opacity-40"
-              style={{ background: darknessTrack }}
-              aria-label="Darkness"
-            />
-            <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
+            <span className="text-xs tabular-nums text-neutral-300">
               {darkness}%
             </span>
           </div>
+          <input
+            type="range"
+            min={50}
+            max={100}
+            step={5}
+            value={darkness}
+            onChange={(e) => setDarkness(Number(e.target.value))}
+            disabled={isInitialRendering}
+            className="slider-preview w-full disabled:opacity-40"
+            style={{ background: darknessTrack }}
+            aria-label="Darkness"
+          />
+        </div>
 
-          {/* Warmth slider — color-temperature shift for night reading */}
-          <div
-            className="flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5"
-            title="Background color temperature — drag right for a warmer, candle-light tint that's easier on the eyes at night"
-          >
+        {/* Warmth slider — color-temperature shift for night reading */}
+        <div
+          className="mb-6"
+          title="Background color temperature — drag right for a warmer, candle-light tint that's easier on the eyes at night"
+        >
+          <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] uppercase tracking-wide text-neutral-500">
               Warmth
             </span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={5}
-              value={warmth}
-              onChange={(e) => setWarmth(Number(e.target.value))}
-              disabled={isInitialRendering}
-              className="slider-preview w-24 disabled:opacity-40"
-              style={{ background: warmthTrack }}
-              aria-label="Warmth"
-            />
-            <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
+            <span className="text-xs tabular-nums text-neutral-300">
               {warmth}%
             </span>
           </div>
-
-          <button
-            onClick={handleDownload}
-            disabled={
-              status !== "ready" ||
-              downloading ||
-              themeApplying ||
-              isInitialRendering
-            }
-            className="px-4 py-1.5 rounded-full text-sm font-semibold bg-amber-400 text-neutral-950 hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            title={
-              isInitialRendering
-                ? "Wait until all pages finish rendering"
-                : undefined
-            }
-          >
-            {downloading
-              ? "Building..."
-              : themeApplying
-                ? "Applying…"
-                : isInitialRendering
-                  ? `Rendering ${progress.done}/${progress.total}`
-                  : "Download"}
-          </button>
-
-          <button
-            onClick={onReset}
-            className="px-3 py-1.5 rounded-full text-sm text-neutral-400 hover:text-neutral-100 border border-neutral-800"
-          >
-            New file
-          </button>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={5}
+            value={warmth}
+            onChange={(e) => setWarmth(Number(e.target.value))}
+            disabled={isInitialRendering}
+            className="slider-preview w-full disabled:opacity-40"
+            style={{ background: warmthTrack }}
+            aria-label="Warmth"
+          />
         </div>
 
-        {/* Row 2 — reader controls (page nav, zoom) */}
-        {status === "ready" && totalPages > 0 && (
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-neutral-800/60">
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => scrollToPage(currentPage - 1)}
-                disabled={currentPage <= 1}
-                className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-                aria-label="Previous page"
-                title="Previous page (←)"
-              >
-                ‹
-              </button>
-              <div className="flex items-center gap-1 text-sm text-neutral-300">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={pageInput}
-                  onChange={(e) =>
-                    setPageInput(e.target.value.replace(/[^0-9]/g, ""))
-                  }
-                  onBlur={submitJumpInput}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      submitJumpInput();
-                      (e.target as HTMLInputElement).blur();
-                    }
-                  }}
-                  className="w-12 px-2 py-1 rounded bg-neutral-800 text-center text-neutral-100 focus:outline-none focus:ring-1 focus:ring-amber-400"
-                  aria-label="Jump to page"
-                />
-                <span className="text-neutral-500">/ {totalPages}</span>
-              </div>
-              <button
-                onClick={() => scrollToPage(currentPage + 1)}
-                disabled={currentPage >= totalPages}
-                className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-                aria-label="Next page"
-                title="Next page (→)"
-              >
-                ›
-              </button>
-            </div>
-
-            <div className="flex-1" />
-
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() =>
-                  setZoom((z) =>
-                    Math.max(0.5, Math.round((z - 0.25) * 100) / 100),
-                  )
-                }
-                disabled={zoom <= 0.5}
-                className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-                aria-label="Zoom out"
-                title="Zoom out (−)"
-              >
-                −
-              </button>
-              <button
-                onClick={() => setZoom(1)}
-                className="px-2 py-1 text-xs text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 rounded transition-colors min-w-[3.5rem]"
-                title="Reset zoom (0)"
-              >
-                {Math.round(zoom * 100)}%
-              </button>
-              <button
-                onClick={() =>
-                  setZoom((z) =>
-                    Math.min(2, Math.round((z + 0.25) * 100) / 100),
-                  )
-                }
-                disabled={zoom >= 2}
-                className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-                aria-label="Zoom in"
-                title="Zoom in (+)"
-              >
-                +
-              </button>
-            </div>
+        {/* Zoom — display width of the pages; also on +/−/0 keys */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] uppercase tracking-wide text-neutral-500">
+              Zoom
+            </span>
+            <span className="text-xs tabular-nums text-neutral-300">
+              {Math.round(zoom * 100)}%
+            </span>
           </div>
-        )}
-      </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() =>
+                setZoom((z) => Math.max(0.5, Math.round((z - 0.25) * 100) / 100))
+              }
+              disabled={zoom <= 0.5}
+              className="w-9 h-9 rounded-lg border border-neutral-800 text-neutral-300 hover:text-neutral-50 hover:border-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+              aria-label="Zoom out"
+              title="Zoom out (−)"
+            >
+              −
+            </button>
+            <button
+              onClick={() => setZoom(1)}
+              className="flex-1 h-9 rounded-lg border border-neutral-800 text-xs text-neutral-300 hover:text-neutral-50 hover:border-neutral-600 transition-colors"
+              title="Reset zoom (0)"
+            >
+              Reset
+            </button>
+            <button
+              onClick={() =>
+                setZoom((z) => Math.min(2, Math.round((z + 0.25) * 100) / 100))
+              }
+              disabled={zoom >= 2}
+              className="w-9 h-9 rounded-lg border border-neutral-800 text-neutral-300 hover:text-neutral-50 hover:border-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+              aria-label="Zoom in"
+              title="Zoom in (+)"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <div className="border-t border-neutral-800 my-6" />
+
+        <a
+          href="/converter"
+          className="block text-center px-4 py-2 rounded-full text-sm text-neutral-300 hover:text-neutral-100 border border-neutral-800 hover:border-neutral-600 transition-colors"
+          title="Open the converter to save a dark-themed copy of your PDF"
+        >
+          Convert &amp; download →
+        </a>
+        <button
+          onClick={onReset}
+          className="mt-3 w-full px-4 py-2 rounded-full text-sm text-neutral-400 hover:text-neutral-100 border border-neutral-800 hover:border-neutral-600 transition-colors"
+        >
+          New file
+        </button>
+      </aside>
 
       {status === "loading" && (
         <div className="text-center py-16 text-neutral-400">

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
-import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/components/icons";
+import { IconLock, IconPalette, IconSmartphone } from "@/components/icons";
 import { getSiteUrl } from "@/lib/site";
 import { VARIANTS } from "@/lib/variants";
 
@@ -29,7 +29,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "How can I print a PDF in dark mode?",
-    a: "Click download after conversion, then print the downloaded dark PDF from any reader. Because the dark theme is baked into the file itself, the print output is dark too — not just the on-screen view.",
+    a: "Use the converter page to download a dark-themed copy, then print it from any reader. Because the dark theme is baked into the file itself, the print output is dark too — not just the on-screen view.",
     link: { href: "/blog/convert-pdf-to-dark-mode", text: "Convert PDF to Dark Mode" },
   },
   {
@@ -63,7 +63,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "Can I change a PDF background to black?",
-    a: "Yes. The OLED theme renders the background as pure black (#000) and text as light gray, which is the most aggressive dark mode for PDFs. Saving downloads the PDF with that black background baked in.",
+    a: "Yes. The OLED theme renders the background as pure black (#000) and text as light gray, which is the most aggressive dark mode for PDFs. On the converter page you can also download the PDF with that black background baked in.",
   },
   {
     q: "Is this a dark mode for Adobe Acrobat?",
@@ -145,6 +145,7 @@ export default function Home() {
             <span className="text-lg font-semibold hidden sm:inline">PDF Dark</span>
           </div>
           <nav className="text-sm text-neutral-400 flex gap-5">
+            <Link href="/converter" className="hover:text-neutral-100">Converter</Link>
             <a href="#how" className="hover:text-neutral-100">How it works</a>
             <a href="#tools" className="hover:text-neutral-100">Blog</a>
             <a href="#faq" className="hover:text-neutral-100">FAQ</a>
@@ -156,13 +157,13 @@ export default function Home() {
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Read &amp; Convert PDF to Dark Mode
+            Read PDFs in Dark Mode
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Drop a PDF and read it on a dark background right here for
-            comfortable reading, or download the darkened file to keep. The
-            whole thing runs in your browser — no upload, no signup, no
-            install.
+            Drop a PDF and read it on a dark background right here — pick a
+            theme, tune darkness and warmth, and page through comfortably at
+            night. The whole thing runs in your browser: no upload, no signup,
+            no install.
           </p>
 
           {/* Trust badges — outline pill + stroke icon */}
@@ -174,17 +175,22 @@ export default function Home() {
               <IconPalette className="text-neutral-500" /> 4 Themes
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconDownload className="text-neutral-500" /> Download Dark PDF
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
               <IconSmartphone className="text-neutral-500" /> Works on Mobile
             </span>
           </div>
 
-          {/* Converter — drop zone + full PDF viewer with themes & download */}
+          {/* Reader — drop zone + full PDF viewer, reading only */}
           <div className="mt-8">
             <Converter />
           </div>
+
+          <p className="mt-6 text-sm text-neutral-500">
+            Want to keep the dark version?{" "}
+            <Link href="/converter" className="text-amber-400 hover:underline">
+              Convert &amp; download it on the converter page
+            </Link>
+            .
+          </p>
         </section>
 
         {/* What & why — semantic primer for keyword variants */}
@@ -243,18 +249,18 @@ export default function Home() {
           className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900"
         >
           <h2 className="text-2xl font-bold mb-3 text-center">
-            How to read or convert a PDF in dark mode
+            How to read a PDF in dark mode
           </h2>
           <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
             Text and background are inverted into a low-light theme while
             images get smart per-image handling — photos keep their colors.
-            You can start reading immediately, then download the new PDF.
+            You can start reading as soon as the first page renders.
           </p>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
               { n: "1", t: "Drop your PDF", d: "Drag & drop or click to browse. Never leaves your browser.", offset: "sm:translate-y-0" },
-              { n: "2", t: "Pick a theme", d: "Midnight, Sepia, Solarized, or OLED pure black.", offset: "sm:-translate-y-2" },
-              { n: "3", t: "Read or save", d: "Page through the darkened version right here, or download the new PDF.", offset: "sm:translate-y-0" },
+              { n: "2", t: "Pick a theme", d: "Midnight, Sepia, Solarized, or OLED pure black — plus darkness and warmth sliders.", offset: "sm:-translate-y-2" },
+              { n: "3", t: "Read", d: "Page through with keyboard, touch, or the page controls. Need a file to keep? Use the converter.", offset: "sm:translate-y-0" },
             ].map((s) => (
               <div
                 key={s.n}
