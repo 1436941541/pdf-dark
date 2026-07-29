@@ -140,7 +140,7 @@ export default function SumatraVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated August 1, 2026</span>
+            <span>Updated July 21, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>

@@ -140,7 +140,7 @@ export default function MacVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated August 2, 2026</span>
+            <span>Updated July 18, 2026</span>
             <span aria-hidden>·</span>
             <span>7 min read</span>
           </div>
