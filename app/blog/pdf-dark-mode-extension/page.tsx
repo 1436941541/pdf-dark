@@ -7,7 +7,7 @@ import { getSiteUrl } from "@/lib/site";
 const SLUG = "/blog/pdf-dark-mode-extension";
 const TITLE = "PDF Dark Mode Extensions: What's Available, and What to Check First";
 const DESCRIPTION =
-  "An honest map of the PDF dark mode extensions in the Chrome and Edge stores — how they darken the page, what happens to your images and local files, a 4-point checklist before installing one, and a no-install alternative.";
+  "An honest map of PDF dark mode extensions in the Chrome and Edge stores — how they darken pages, what breaks, and a checklist before you install one.";
 
 export const metadata: Metadata = {
   title: TITLE,

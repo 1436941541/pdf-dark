@@ -7,7 +7,7 @@ import { getSiteUrl } from "@/lib/site";
 const SLUG = "/blog/sumatra-pdf-dark-mode";
 const TITLE = "PDF Dark Mode in Sumatra PDF — the i Key vs. Editing settings.txt";
 const DESCRIPTION =
-  "Sumatra PDF already has two built-in ways to darken a page — the i shortcut and a settings.txt edit. Here's exactly how both work, why they fall short, and a fix that stays dark everywhere.";
+  "Sumatra PDF has two built-in ways to darken a page — the i shortcut and a settings.txt edit. How both work, why they fall short, and a fix that sticks.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -138,7 +138,7 @@ export default function SumatraVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 21, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>

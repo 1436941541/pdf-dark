@@ -7,7 +7,7 @@ import { getSiteUrl } from "@/lib/site";
 const SLUG = "/blog/pdf-dark-mode-mac";
 const TITLE = "PDF Dark Mode on Mac — Beyond Preview's New Toggle";
 const DESCRIPTION =
-  "macOS Tahoe finally added a dark mode switch for PDFs in Preview. Here's exactly what it does, where it falls short, and how to get a PDF that's dark everywhere — not just in Preview.";
+  "macOS Tahoe added a dark mode switch for PDFs in Preview. Here's what it does, where it falls short, and how to get a PDF that's dark everywhere.";
 
 export const metadata: Metadata = {
   title: TITLE,

@@ -89,7 +89,7 @@ export const VARIANTS: Variant[] = [
     title: "PDF Dark Mode in Sumatra PDF",
     blurb:
       "Sumatra already has two built-in tricks — the i key and a settings.txt edit. Here's why they fall short, and what stays dark everywhere instead.",
-    updatedAt: "2026-07-21",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "pdf-dark-mode-android",

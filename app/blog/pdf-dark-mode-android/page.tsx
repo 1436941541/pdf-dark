@@ -7,7 +7,7 @@ import { getSiteUrl } from "@/lib/site";
 const SLUG = "/blog/pdf-dark-mode-android";
 const TITLE = "PDF Dark Mode on Android — No Root, No System Hack";
 const DESCRIPTION =
-  "Android's default PDF viewers still don't have a real dark mode, and Accessibility color inversion flips your whole screen negative. Convert the file once and every app opens it dark.";
+  "Android's default PDF viewers have no real dark mode, and system color inversion flips your screen negative. Convert the file once — it opens dark in every app.";
 
 export const metadata: Metadata = {
   title: TITLE,
