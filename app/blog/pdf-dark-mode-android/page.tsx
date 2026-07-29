@@ -33,7 +33,7 @@ const FAQ = [
   },
   {
     q: "What about the 'Dark theme' setting inside Files by Google or Drive?",
-    a: "That toggle changes the app chrome — toolbars, menus, file lists — around the PDF. The page content itself, once you open a PDF to read it, still renders white-on-black text on a white page.",
+    a: "That toggle changes the app chrome — toolbars, menus, file lists — around the PDF. The page content itself, once you open a PDF to read it, still renders as black text on a white page.",
   },
   {
     q: "Can I use Android's Color Inversion accessibility setting instead?",
@@ -57,13 +57,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "PDF Dark Mode for Android",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Android",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",

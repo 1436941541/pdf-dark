@@ -30,7 +30,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     q: "How can I print a PDF in dark mode?",
     a: "Use the converter page to download a dark-themed copy, then print it from any reader. Because the dark theme is baked into the file itself, the print output is dark too — not just the on-screen view.",
-    link: { href: "/blog/convert-pdf-to-dark-mode", text: "Convert PDF to Dark Mode" },
+    link: { href: "/converter", text: "Convert PDF to Dark Mode" },
   },
   {
     q: "Does this work on iPhone or iPad?",
@@ -68,7 +68,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     q: "Is this a dark mode for Adobe Acrobat?",
     a: "Not exactly. Acrobat has its own in-app dark mode, but it only affects how you see the PDF inside Acrobat—the file itself stays light. PDF Dark produces a real dark-mode PDF file you can open in any reader (Acrobat, Preview, browser) and it stays dark.",
-    link: { href: "/blog/convert-pdf-to-dark-mode", text: "Convert PDF to Dark Mode" },
+    link: { href: "/blog/pdf-dark-mode-adobe-acrobat", text: "PDF Dark Mode in Adobe Acrobat" },
   },
   {
     q: "Does PDF dark mode work in Firefox?",

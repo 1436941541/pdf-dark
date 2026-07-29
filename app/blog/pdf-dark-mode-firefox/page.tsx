@@ -40,7 +40,7 @@ const FAQ = [
     a: "Barely. Most Firefox extensions apply a CSS filter over the rendered PDF, which inverts images the same way it inverts text — you get photos as negatives and charts become unreadable. Dark Reader (the popular one) explicitly notes PDF support is limited. PDF Dark handles images separately from text, so photos keep their original colors.",
   },
   {
-    q: "Why is this page using PDF.js too?",
+    q: "Aren't you just using PDF.js like Firefox does?",
     a: "Yes — we also use Mozilla's PDF.js under the hood. The difference is what happens next: text and background are recolored into your theme (keeping text selectable on most PDFs), images are detected and handled separately so photos keep their colors, and the result is saved as a downloadable file — not just a viewer toggle.",
   },
   {
@@ -57,13 +57,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "PDF Dark Mode for Firefox",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Firefox 90+ (desktop and Android)",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",
@@ -138,7 +136,7 @@ export default function FirefoxVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 20, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -179,14 +177,43 @@ export default function FirefoxVariantPage() {
                     about:config → pdfjs.viewerCssTheme
                   </code>
                 </h3>
+                <p className="text-sm text-neutral-400 mb-3">
+                  This one comes up on every forum. If you want to try it, the
+                  full sequence is:
+                </p>
+                <ol className="text-sm text-neutral-400 list-decimal pl-5 space-y-1.5 mb-3">
+                  <li>
+                    Type{" "}
+                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
+                      about:config
+                    </code>{" "}
+                    in the address bar and click{" "}
+                    <em>Accept the Risk and Continue</em>.
+                  </li>
+                  <li>
+                    Search for{" "}
+                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
+                      pdfjs.viewerCssTheme
+                    </code>
+                    .
+                  </li>
+                  <li>
+                    Set the value to{" "}
+                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
+                      2
+                    </code>{" "}
+                    and reopen your PDF tab.
+                  </li>
+                </ol>
                 <p className="text-sm text-neutral-400">
-                  This one comes up on every forum. Setting it to{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    2
-                  </code>{" "}
-                  darkens the <em>chrome</em> around the PDF — the toolbar,
-                  the sidebar, the page border. The page canvas itself stays
-                  white. It&apos;s a cosmetic fix dressed up as a feature.
+                  Two catches. First, it darkens the <em>chrome</em> around
+                  the PDF — toolbar, sidebar, page border — while the page
+                  canvas itself stays white; it&apos;s a cosmetic fix dressed
+                  up as a feature. Second, recent Firefox versions have been
+                  moving the viewer to simply follow your browser/system
+                  theme, so if the pref is missing in your about:config,
+                  that&apos;s why — and the page still renders white either
+                  way.
                 </p>
               </div>
 
@@ -310,8 +337,8 @@ export default function FirefoxVariantPage() {
           </div>
 
           <p className="mt-10 text-sm text-neutral-500">
-            Works on Firefox for Windows, macOS, Linux, and Android. Needs
-            Firefox 90+ (Web Workers + OffscreenCanvas support).
+            Works on Firefox for Windows, macOS, Linux, and Android — any
+            release from the last few years is fine.
           </p>
         </section>
 

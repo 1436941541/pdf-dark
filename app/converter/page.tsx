@@ -52,6 +52,14 @@ const FAQ = [
     q: "Is my PDF uploaded to a server?",
     a: "No. Rendering, recoloring, and rebuilding the PDF all happen inside your browser tab. The downloaded file is assembled locally — there's no server that ever sees your document.",
   },
+  {
+    q: "Can I share the converted file with someone else?",
+    a: "Yes. Email it, AirDrop it, upload it to Google Drive or Dropbox — the recipient sees the dark version automatically. No setup on their end.",
+  },
+  {
+    q: "Does converting change the file size a lot?",
+    a: "Usually not. On most digital PDFs the conversion rewrites colors inside the original file, so the size stays close to the source. Pages that fall back to image rendering are re-encoded as compressed JPEGs and may grow a little.",
+  },
 ];
 
 function StructuredData() {
@@ -221,6 +229,110 @@ export default function ConverterPage() {
             opens your PDF on a dark background instantly, with the same
             themes and privacy model.
           </p>
+
+          <div className="grid sm:grid-cols-2 gap-5 mt-10">
+            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
+              <h3 className="text-sm font-semibold text-neutral-400 mb-3 m-0">
+                Viewer / extension / OS toggle
+              </h3>
+              <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
+                <li>Dark only while that app/extension is running</li>
+                <li>Reopen in another reader → white again</li>
+                <li>Can&apos;t share the dark version with anyone</li>
+                <li>
+                  OS-level invert often discolors photos, screenshots, and
+                  charts
+                </li>
+                <li>Breaks when you update or switch device</li>
+              </ul>
+            </div>
+
+            <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
+              <h3 className="text-sm font-semibold text-amber-400 mb-3 m-0">
+                A converted PDF file
+              </h3>
+              <ul className="space-y-2 text-sm text-neutral-300 list-disc pl-5">
+                <li>
+                  <strong className="text-neutral-100">Permanent</strong> —
+                  dark is baked into the file
+                </li>
+                <li>
+                  Opens dark in <strong className="text-neutral-100">every</strong> PDF
+                  reader, on every device
+                </li>
+                <li>
+                  Shareable — email, AirDrop, Drive, anything; recipient
+                  sees the dark version with zero setup
+                </li>
+                <li>
+                  Hue-preserving color mapping — a dark-blue heading becomes
+                  light-blue, not gray; photos keep their original colors
+                </li>
+                <li>
+                  Works offline after download — no internet needed to read
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <p className="text-xs text-neutral-500 text-center mt-8">
+            Think of it this way: an inverter is lipstick on the PDF.
+            Conversion is a new PDF.
+          </p>
+        </section>
+
+        {/* Use cases */}
+        <section className="max-w-3xl mx-auto px-6 pb-16">
+          <h2 className="text-2xl font-bold mb-10 text-center">
+            When a converted dark PDF matters
+          </h2>
+
+          <div className="space-y-6">
+            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
+                Sending a paper to a collaborator at 11 PM
+              </h3>
+              <p className="text-sm text-neutral-400">
+                Your colleague is reading in bed. You can forward the original
+                and ask them to enable Smart Invert — or you can send the dark
+                version and save them the friction.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
+                Archiving documents you&apos;ll reread often
+              </h3>
+              <p className="text-sm text-neutral-400">
+                Research papers, meeting notes, eBooks — once converted, the
+                dark copy lives in your library permanently. No per-device
+                configuration to redo when you move to a new phone or laptop.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
+                Tablets and e-readers without a dark toggle
+              </h3>
+              <p className="text-sm text-neutral-400">
+                Many reading apps and e-reader devices have no dark mode for
+                sideloaded PDFs. A pre-converted dark file is the way to get
+                light-on-dark reading there — best on backlit screens; on
+                e-ink, the classic white page usually still wins.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
+                Sharing accessible reading material
+              </h3>
+              <p className="text-sm text-neutral-400">
+                Readers with photosensitivity, migraine issues, or low vision
+                often prefer persistent high-contrast. Sharing a dark copy
+                directly is kinder than asking them to tweak their OS.
+              </p>
+            </div>
+          </div>
         </section>
 
         {/* FAQ */}

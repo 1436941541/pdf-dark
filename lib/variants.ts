@@ -19,42 +19,35 @@ export const VARIANTS: Variant[] = [
     title: "PDF Dark Mode in Chrome",
     blurb:
       "Chrome's built-in PDF viewer has no dark toggle. Skip the extensions — convert in the browser itself.",
-    updatedAt: "2026-07-19",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "pdf-dark-mode-firefox",
     title: "PDF Dark Mode in Firefox",
     blurb:
       "Firefox's PDF.js viewer only darkens the toolbar, not the pages. Here's the real fix.",
-    updatedAt: "2026-07-20",
-  },
-  {
-    slug: "convert-pdf-to-dark-mode",
-    title: "Convert PDF to Dark Mode",
-    blurb:
-      "Produce a permanent dark-themed PDF file you can email, sync, and reopen anywhere — not a one-off viewer trick.",
-    updatedAt: "2026-07-26",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "how-to-darken-a-pdf",
     title: "How to Darken a PDF",
     blurb:
       "A three-step walkthrough: drop, pick a theme, download. No accounts, no extensions, no uploads.",
-    updatedAt: "2026-07-22",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "darken-scanned-pdf-online",
     title: "Darken a Scanned PDF Online",
     blurb:
       "Free, browser-only tool for scanned PDFs that wash out your screen at night. Pick OLED for the deepest contrast.",
-    updatedAt: "2026-07-23",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "invert-pdf-colors-without-inverting-images",
     title: "Invert PDF Colors, Keep Your Images",
     blurb:
       "Basic inverters turn photos into negatives. Here photos keep their colors — automatically, or under your control.",
-    updatedAt: "2026-07-24",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "how-pdf-dark-mode-conversion-works",
@@ -68,28 +61,28 @@ export const VARIANTS: Variant[] = [
     title: "PDF Dark Mode in Microsoft Edge",
     blurb:
       "Edge's dark theme skips your PDFs entirely. There's a flags-page hack that forces it — at the cost of every image in the document.",
-    updatedAt: "2026-07-14",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "pdf-dark-mode-adobe-acrobat",
     title: "PDF Dark Mode in Adobe Acrobat",
     blurb:
       "The 'Dark Gray' theme only skins the toolbar. The real page-darkening setting is buried in Accessibility preferences — and it's per-install, not per-file.",
-    updatedAt: "2026-07-15",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "pdf-dark-mode-extension",
-    title: "Do You Need a PDF Dark Mode Extension?",
+    title: "PDF Dark Mode Extensions, Mapped",
     blurb:
-      "They invert your images, need file-access permission enabled by hand, and ask for broad browsing access. Probably not — here's why.",
-    updatedAt: "2026-07-16",
+      "What the Chrome and Edge stores actually offer, what breaks (images, local files, permissions), and a 4-point checklist before you install.",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "pdf-dark-mode-mac",
     title: "PDF Dark Mode on Mac",
     blurb:
       "macOS Tahoe added a dark toggle to Preview. It's Preview-only and needs the latest macOS — here's what actually travels with the file.",
-    updatedAt: "2026-07-18",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "sumatra-pdf-dark-mode",
@@ -110,7 +103,7 @@ export const VARIANTS: Variant[] = [
     title: "PDF Dark Mode on iPad & iPhone",
     blurb:
       "iOS 26 finally added a Dark Background toggle for PDFs in Files and Books. Here's what it fixes — and what it still doesn't.",
-    updatedAt: "2026-07-28",
+    updatedAt: "2026-07-29",
   },
   {
     slug: "pdf-reader-dark-mode-comparison",

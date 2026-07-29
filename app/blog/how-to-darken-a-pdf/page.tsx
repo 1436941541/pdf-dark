@@ -41,7 +41,7 @@ const FAQ = [
   },
   {
     q: "Which theme should I pick?",
-    a: "Midnight (dark blue) is the most neutral choice for general reading. OLED (pure black) is best on OLED screens for battery savings and the deepest contrast. Sepia is warm and easy on the eyes for long sessions. Solarized is a popular developer color scheme — try them and switch instantly without re-uploading.",
+    a: "Midnight (dark blue) is the most neutral choice for general reading. OLED (pure black) is best on OLED screens for battery savings and the deepest contrast. Sepia is warm and easy on the eyes for long sessions. Solarized is a popular developer color scheme. To compare them on your own document first, open it in the reader on the homepage and flip through the themes live, then convert with the one you like.",
   },
   {
     q: "Can I still select text in the darkened PDF?",
@@ -61,13 +61,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "How to Darken a PDF",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Any (browser)",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const howTo = {
     "@context": "https://schema.org",
@@ -145,6 +143,9 @@ export default function HowToDarkenPdfPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
+            <Link href="/converter" className="hover:text-neutral-100">
+              Converter
+            </Link>
             <a href="#steps" className="hover:text-neutral-100">
               Steps
             </a>
@@ -172,10 +173,18 @@ export default function HowToDarkenPdfPage() {
             the file, pick a theme, save the result. The whole flow stays in
             the browser tab, so the PDF doesn&apos;t get uploaded anywhere.
           </p>
+          <div className="mt-7">
+            <Link
+              href="/converter"
+              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Darken a PDF now — free, no install
+            </Link>
+          </div>
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 22, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>4 min read</span>
           </div>
@@ -235,8 +244,9 @@ export default function HowToDarkenPdfPage() {
                       <strong>Sepia</strong> (warm amber),{" "}
                       <strong>Solarized</strong> (developer-popular teal), and{" "}
                       <strong>OLED</strong> (pure black, battery-friendly).
-                      Switching is instant — the preview re-renders every page
-                      using the same algorithm that goes into the download.
+                      The theme cards preview each color scheme instantly — you
+                      pick your settings before dropping the file, and the
+                      download uses exactly what you chose.
                       Next to the themes sits an <strong>Images</strong> toggle:
                       Auto (smart per-image handling), Original (photos and
                       figures untouched), or Invert (everything goes dark).
@@ -255,10 +265,13 @@ export default function HowToDarkenPdfPage() {
                       Download the darkened PDF
                     </h3>
                     <p className="text-sm text-neutral-400 mt-2">
-                      Click Download. You get a standard PDF file with each page
-                      stored as a darkened JPEG — opens dark in Acrobat,
-                      Preview, Firefox, iPad, Kindle, anywhere. The dark theme
-                      is part of the file now, not a viewer setting.
+                      You get a standard PDF. On text-based pages the colors
+                      are rewritten in place, so the text stays real and
+                      selectable; pages with unusual color setups fall back to
+                      a darkened image with an invisible text layer. Either way
+                      it opens dark in Acrobat, Preview, Firefox, on an iPad —
+                      anywhere. The dark theme is part of the file now, not a
+                      viewer setting.
                     </p>
                   </div>
                 </div>

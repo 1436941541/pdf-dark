@@ -57,13 +57,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "PDF Dark Mode for Microsoft Edge",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Any Chromium-based Edge browser",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",
@@ -139,7 +137,7 @@ export default function EdgeVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 14, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>7 min read</span>
           </div>
@@ -184,13 +182,38 @@ export default function EdgeVariantPage() {
                   The <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">edge://flags</code> workaround
                 </h3>
                 <p className="text-sm text-neutral-400 mb-3">
-                  Edge does have an experimental switch —{" "}
+                  Edge inherits an experimental Chromium switch —{" "}
                   <strong className="text-neutral-200">
                     Force Dark Mode for Web Contents
                   </strong>{" "}
-                  — that most Chrome users don&apos;t get. Turn it on and Edge
-                  will force-darken page content, PDFs included. It comes
-                  with real caveats:
+                  — the same flag Chrome keeps behind{" "}
+                  <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">
+                    chrome://flags
+                  </code>
+                  . Turn it on and Edge will force-darken page content, PDFs
+                  included. To try it:
+                </p>
+                <ol className="text-sm text-neutral-400 list-decimal pl-5 space-y-1.5 mb-3">
+                  <li>
+                    Type{" "}
+                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
+                      edge://flags
+                    </code>{" "}
+                    into the address bar.
+                  </li>
+                  <li>
+                    Search for{" "}
+                    <em>Force Dark Mode for Web Contents</em> (sometimes
+                    labeled <em>Auto Dark Mode for Web Contents</em>).
+                  </li>
+                  <li>
+                    Switch it from <em>Default</em> to <em>Enabled</em>, then
+                    relaunch Edge. To undo it later, set it back to{" "}
+                    <em>Default</em>.
+                  </li>
+                </ol>
+                <p className="text-sm text-neutral-400 mb-3">
+                  It works — with real caveats:
                 </p>
                 <ul className="text-sm text-neutral-400 list-disc pl-5 space-y-1.5">
                   <li>

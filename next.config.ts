@@ -27,9 +27,18 @@ const nextConfig: NextConfig = {
         destination: "/blog/pdf-dark-mode-firefox",
         permanent: true,
       },
+      // The convert-pdf-to-dark-mode blog post was merged into /converter
+      // (July 2026) — same H1, same target query, and the tool page is the
+      // better answer. Both the legacy top-level URL and the blog URL land
+      // there directly (no chains).
       {
         source: "/convert-pdf-to-dark-mode",
-        destination: "/blog/convert-pdf-to-dark-mode",
+        destination: "/converter",
+        permanent: true,
+      },
+      {
+        source: "/blog/convert-pdf-to-dark-mode",
+        destination: "/converter",
         permanent: true,
       },
     ];

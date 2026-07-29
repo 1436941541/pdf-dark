@@ -58,13 +58,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "PDF Dark Mode for iPad and iPhone",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "iOS and iPadOS (Safari)",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",
@@ -142,9 +140,41 @@ export default function IpadVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 28, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
+          </div>
+        </section>
+
+        {/* Quick answer */}
+        <section className="max-w-3xl mx-auto px-6 pb-12">
+          <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5 text-left">
+            <h2 className="text-base font-semibold text-amber-400 m-0 mb-3">
+              The quick answer
+            </h2>
+            <p className="text-sm text-neutral-300 m-0">
+              <strong className="text-neutral-100">On iOS 26 / iPadOS 26 or later:</strong>{" "}
+              open the PDF in the <strong className="text-neutral-100">Files</strong>{" "}
+              or <strong className="text-neutral-100">Books</strong> app, tap the{" "}
+              <strong className="text-neutral-100">•••</strong> overflow menu, and
+              switch on <strong className="text-neutral-100">Dark Background</strong>.
+            </p>
+            <p className="text-sm text-neutral-300 mt-3 m-0">
+              <strong className="text-neutral-100">On iOS 25 or earlier:</strong>{" "}
+              there&apos;s no per-document toggle. The built-in workaround is{" "}
+              Settings → Accessibility → Display &amp; Text Size →{" "}
+              <strong className="text-neutral-100">Smart Invert</strong> — it darkens
+              the PDF page but also affects the rest of the system while it&apos;s on.
+            </p>
+            <p className="text-sm text-neutral-400 mt-3 mb-0">
+              Both are viewer settings that reset per app and never travel with
+              the file. To make the PDF itself dark — in any app, on any iOS
+              version —{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                convert it once
+              </Link>
+              .
+            </p>
           </div>
         </section>
 

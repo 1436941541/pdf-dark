@@ -176,8 +176,8 @@ function StructuredData() {
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
     author: { "@type": "Organization", name: "PDF Dark" },
-    datePublished: "2026-08-11",
-    dateModified: "2026-08-11",
+    datePublished: "2026-07-29",
+    dateModified: "2026-07-29",
   };
   const faq = {
     "@context": "https://schema.org",
@@ -290,8 +290,9 @@ export default function ComparisonPage() {
             The comparison
           </h2>
           <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-            12 readers and viewers, checked for native dark-mode support, how
-            permanent the effect is, and what happens to embedded images.
+            12 third-party readers and viewers — plus our own converter —
+            checked for native dark-mode support, how permanent the effect is,
+            and what happens to embedded images.
           </p>
 
           <div className="overflow-x-auto rounded-xl border border-neutral-800">

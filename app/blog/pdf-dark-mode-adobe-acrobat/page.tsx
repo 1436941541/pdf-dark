@@ -29,11 +29,11 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "I turned on Dark Gray in Acrobat but my PDF pages are still white — why?",
-    a: "Because Dark Gray is an interface theme, not a page setting. Go to View → Theme (or Edit → Preferences → General → Application Theme, depending on your Acrobat version) and Dark Gray only recolors the toolbar, side panels, and menus. The document canvas — the actual page you're reading — keeps rendering with whatever background color is baked into the PDF, almost always white.",
+    a: "Because Dark Gray is an interface theme, not a page setting. It lives under View → Display Theme, and it only recolors the toolbar, side panels, and menus. The document canvas — the actual page you're reading — keeps rendering with whatever background color is baked into the PDF, almost always white.",
   },
   {
     q: "So how do you actually make the page content dark in Acrobat?",
-    a: "Open Edit → Preferences → Accessibility. Check 'Replace Document Colors,' then choose 'Use Custom Color' and set Page Background to a dark color and Document Text to a light color (or pick one of Acrobat's built-in high-contrast presets from the same dropdown). This is the setting that actually repaints the page — Dark Gray never touches it.",
+    a: "Open Edit → Preferences on Windows (Acrobat → Preferences on Mac), pick the Accessibility category, and check 'Replace Document Colors.' Then choose 'Use Custom Color' and set Page Background to a dark color and Document Text to a light color (or pick one of Acrobat's built-in high-contrast presets from the same dropdown). This is the setting that actually repaints the page — Dark Gray never touches it.",
   },
   {
     q: "Why is this setting under Accessibility instead of somewhere more obvious?",
@@ -57,13 +57,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "PDF Dark Mode for Adobe Acrobat",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Any modern browser",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",
@@ -140,9 +138,55 @@ export default function AdobeAcrobatVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 15, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
+          </div>
+        </section>
+
+        {/* Quick answer */}
+        <section className="max-w-3xl mx-auto px-6 pb-12">
+          <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5 text-left">
+            <h2 className="text-base font-semibold text-amber-400 m-0 mb-3">
+              The quick answer: darken the page in Acrobat
+            </h2>
+            <ol className="text-sm text-neutral-300 list-decimal pl-5 space-y-1.5 m-0">
+              <li>
+                Open Preferences:{" "}
+                <strong className="text-neutral-100">
+                  Edit → Preferences
+                </strong>{" "}
+                (Ctrl+K) on Windows, or{" "}
+                <strong className="text-neutral-100">
+                  Acrobat → Preferences
+                </strong>{" "}
+                (⌘K) on Mac.
+              </li>
+              <li>
+                Select the{" "}
+                <strong className="text-neutral-100">Accessibility</strong>{" "}
+                category.
+              </li>
+              <li>
+                Check{" "}
+                <strong className="text-neutral-100">
+                  Replace Document Colors
+                </strong>
+                .
+              </li>
+              <li>
+                Choose{" "}
+                <strong className="text-neutral-100">Use Custom Color</strong>{" "}
+                — set Page Background to a dark color and Document Text to a
+                light one (or pick a built-in high-contrast combination).
+              </li>
+              <li>Click OK — every PDF you open now renders dark.</li>
+            </ol>
+            <p className="text-sm text-neutral-400 mt-4 mb-0">
+              This is a viewer preference on your machine — it never changes
+              the file itself. The Dark Gray theme under View → Display Theme
+              only recolors the toolbar, never the page.
+            </p>
           </div>
         </section>
 

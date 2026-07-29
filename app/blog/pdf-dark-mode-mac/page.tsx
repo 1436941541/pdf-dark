@@ -57,13 +57,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "PDF Dark Mode for Mac",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "macOS (any version, any browser)",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",
@@ -140,9 +138,47 @@ export default function MacVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 18, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>7 min read</span>
+          </div>
+        </section>
+
+        {/* Quick answer */}
+        <section className="max-w-3xl mx-auto px-6 pb-12">
+          <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5 text-left">
+            <h2 className="text-base font-semibold text-amber-400 m-0 mb-3">
+              The quick answer
+            </h2>
+            <ol className="text-sm text-neutral-300 list-decimal pl-5 space-y-1.5 m-0">
+              <li>
+                Open the PDF in <strong className="text-neutral-100">Preview</strong>{" "}
+                (requires macOS Tahoe — macOS 26 — or later).
+              </li>
+              <li>
+                In the menu bar, click{" "}
+                <strong className="text-neutral-100">View</strong> →{" "}
+                <strong className="text-neutral-100">
+                  Use Dark Appearance for PDF
+                </strong>
+                .
+              </li>
+              <li>
+                The page background turns dark; photos keep their original
+                colors.
+              </li>
+            </ol>
+            <p className="text-sm text-neutral-400 mt-4 mb-0">
+              On Sequoia or earlier that menu item doesn&apos;t exist. The only
+              built-in fallback is inverting the whole display (System
+              Settings → Accessibility → Display → Invert Colors, or
+              ⌃⌥⌘8) — which also flips photos and every other app on screen.
+              To make the PDF itself dark on any macOS version,{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                convert it once
+              </Link>{" "}
+              and it opens dark everywhere.
+            </p>
           </div>
         </section>
 

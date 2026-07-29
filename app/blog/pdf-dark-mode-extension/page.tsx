@@ -5,9 +5,9 @@ import { RelatedVariants } from "@/components/related-variants";
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-extension";
-const TITLE = "Do You Need a PDF Dark Mode Extension? (Probably Not)";
+const TITLE = "PDF Dark Mode Extensions: What's Available, and What to Check First";
 const DESCRIPTION =
-  "PDF dark mode extensions are real, but they invert your images, block local files by default, and ask for broad browsing permissions. Here's what to check before installing one — and a browser-based alternative that skips all of it.";
+  "An honest map of the PDF dark mode extensions in the Chrome and Edge stores — how they darken the page, what happens to your images and local files, a 4-point checklist before installing one, and a no-install alternative.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -33,11 +33,11 @@ const FAQ = [
   },
   {
     q: "Why do images turn into negatives with these extensions?",
-    a: "The common technique is a CSS filter: invert() applied over the whole rendered page. That filter doesn't know the difference between a paragraph of text and a photo — it flips every pixel's brightness and hue. Text becomes readable light-on-dark, but skies turn orange, skin turns blue-violet, and charts lose their original colors. A handful of extensions attempt image detection to undo the flip, but it's inconsistent and often misses screenshots or diagrams.",
+    a: "The common technique is a CSS filter: invert() applied over the whole rendered page. That filter doesn't know the difference between a paragraph of text and a photo — it flips every pixel's brightness and hue. Text becomes readable light-on-dark, but skies turn orange, skin turns blue-violet, and charts lose their original colors.",
   },
   {
     q: "Why won't the extension work on a local PDF file?",
-    a: "Chrome and Edge block extensions from accessing file:// URLs by default, as a security measure. You have to go to chrome://extensions (or edge://extensions), find the extension, and manually flip on \"Allow access to file URLs.\" It's not enabled automatically, and it's not obvious — this single step is probably the most common reason people install one of these extensions and then conclude it \"doesn't work.\"",
+    a: "Chrome and Edge block extensions from accessing file:// URLs by default, as a security measure. The fix: go to chrome://extensions (or edge://extensions), open the extension's Details, and switch on \"Allow access to file URLs.\" Until you do, the extension silently does nothing on downloaded PDFs.",
   },
   {
     q: "Do I need to install the extension on every device?",
@@ -57,13 +57,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "PDF Dark Mode Extension Alternative",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Any modern browser",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",
@@ -108,6 +106,9 @@ export default function ExtensionVariantPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
+            <a href="#options" className="hover:text-neutral-100">
+              Your options
+            </a>
             <a href="#the-catch" className="hover:text-neutral-100">
               The catch
             </a>
@@ -125,18 +126,18 @@ export default function ExtensionVariantPage() {
             Blog
           </p>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Do You Need a PDF Dark
+            PDF Dark Mode Extensions
             <span className="block text-amber-400 mt-2">
-              Mode Extension?
+              What Works, What Breaks
             </span>
           </h1>
           <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Search &ldquo;pdf dark mode extension&rdquo; and you&apos;ll find
-            real results. Before you install one,{" "}
+            The Chrome Web Store and Edge Add-ons both carry a handful of
+            these.{" "}
             <strong className="text-neutral-100">
-              here&apos;s what it actually costs you
-            </strong>
-            .
+              Here&apos;s an honest map of your options
+            </strong>{" "}
+            — including the problems no listing page mentions.
           </p>
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
@@ -147,27 +148,136 @@ export default function ExtensionVariantPage() {
           </div>
         </section>
 
-        {/* Yes, they exist */}
-        <section className="max-w-3xl mx-auto px-6 pb-16">
+        {/* Your options at a glance */}
+        <section id="options" className="max-w-3xl mx-auto px-6 pb-16">
+          <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
+            Your options at a glance
+          </h2>
+          <p className="text-neutral-400 text-center mb-8 max-w-xl mx-auto text-sm">
+            Searching the stores turns up two kinds of extensions — plus two
+            routes that skip the store entirely.
+          </p>
+          <div className="overflow-x-auto rounded-xl border border-neutral-800 mb-6">
+            <table className="w-full min-w-[760px] border-collapse text-sm">
+              <thead>
+                <tr className="bg-neutral-900/60 text-left">
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    Option
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    How it darkens
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    Images
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    Local files
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-neutral-900">
+                  <td className="px-4 py-4 align-top font-semibold text-neutral-100">
+                    Dedicated &ldquo;PDF dark mode&rdquo; extensions
+                    <div className="font-normal text-neutral-500 text-xs mt-1">
+                      Chrome Web Store / Edge Add-ons
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-300">
+                    CSS{" "}
+                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
+                      invert()
+                    </code>{" "}
+                    filter over the built-in viewer
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-400">
+                    Inverted — photos come out as negatives
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-400">
+                    Blocked until you enable &ldquo;Allow access to file
+                    URLs&rdquo;
+                  </td>
+                </tr>
+                <tr className="border-b border-neutral-900">
+                  <td className="px-4 py-4 align-top font-semibold text-neutral-100">
+                    General dark-mode extensions
+                    <div className="font-normal text-neutral-500 text-xs mt-1">
+                      Dark Reader and similar
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-300">
+                    Restyles regular web pages; PDF support is limited —
+                    Dark Reader&apos;s own docs say so
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-400">
+                    Varies; PDFs often simply stay white
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-400">
+                    Same file:// restriction
+                  </td>
+                </tr>
+                <tr className="border-b border-neutral-900">
+                  <td className="px-4 py-4 align-top font-semibold text-neutral-100">
+                    Browser-native tweaks
+                    <div className="font-normal text-neutral-500 text-xs mt-1">
+                      No extension at all
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-300">
+                    <Link
+                      href="/blog/pdf-dark-mode-firefox"
+                      className="text-amber-400 hover:underline"
+                    >
+                      Firefox&apos;s about:config
+                    </Link>{" "}
+                    darkens only the viewer chrome;{" "}
+                    <Link
+                      href="/blog/pdf-dark-mode-edge"
+                      className="text-amber-400 hover:underline"
+                    >
+                      the Chromium force-dark flag
+                    </Link>{" "}
+                    darkens everything
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-400">
+                    Flag inverts them; about:config leaves the page white
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-400">
+                    Works
+                  </td>
+                </tr>
+                <tr className="bg-amber-400/5">
+                  <td className="px-4 py-4 align-top font-semibold text-amber-400">
+                    PDF Dark
+                    <div className="font-normal text-neutral-500 text-xs mt-1">
+                      No install — runs in the tab
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-300">
+                    Rewrites the file&apos;s colors once — read inline or
+                    download the dark copy
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-300">
+                    Photos keep their original colors
+                  </td>
+                  <td className="px-4 py-4 align-top text-neutral-300">
+                    Works — the file opens locally, never uploaded
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <p className="text-neutral-300 leading-relaxed">
-            They&apos;re not imaginary. Search the Chrome Web Store for
-            &ldquo;Dark Reader for PDF&rdquo; and a few options come up.
-            Search the Edge Add-ons store and you&apos;ll find one literally
-            named &ldquo;PDF Dark Mode.&rdquo; Both work on the same idea:
-            once the PDF is open in the browser&apos;s built-in viewer, the
-            extension paints a CSS{" "}
+            The store extensions all work on the same idea: once the PDF is
+            open in the browser&apos;s built-in viewer, the extension paints a
+            CSS{" "}
             <code className="text-amber-400 text-xs bg-neutral-950 px-1.5 py-0.5 rounded">
               filter: invert()
             </code>{" "}
-            over the rendered page. Dark pixels become light, light pixels
-            become dark, done.
-          </p>
-          <p className="text-neutral-300 leading-relaxed mt-4">
-            That&apos;s a legitimate first instinct — it&apos;s the same
-            trick sites like Dark Reader use to force-darken regular web
-            pages, and it takes about ten seconds to install. But a PDF
-            isn&apos;t a web page, and treating it like one has some
-            side effects worth knowing about before you commit to it.
+            over the rendered page. It takes ten seconds to install and it
+            genuinely makes text readable in the dark. But a PDF isn&apos;t a
+            web page, and treating it like one has side effects worth knowing
+            about before you commit.
           </p>
         </section>
 
@@ -181,8 +291,8 @@ export default function ExtensionVariantPage() {
               5 things extensions don&apos;t tell you upfront
             </h2>
             <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              Every one of these comes from how a whole-page invert filter
-              works, not from any single extension being poorly built.
+              These all follow from the CSS-invert technique itself, which is
+              why they show up across the whole category.
             </p>
 
             <div className="space-y-5">
@@ -276,8 +386,46 @@ export default function ExtensionVariantPage() {
           </div>
         </section>
 
+        {/* Checklist */}
+        <section className="max-w-3xl mx-auto px-6 py-16">
+          <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
+            If you do install one: a 4-point checklist
+          </h2>
+          <p className="text-neutral-400 text-center mb-8 max-w-xl mx-auto text-sm">
+            Two minutes on the store listing tells you most of what you need
+            to know.
+          </p>
+          <ol className="space-y-4 text-sm text-neutral-300 list-decimal pl-5 max-w-2xl mx-auto">
+            <li>
+              <strong className="text-neutral-100">Permissions.</strong>{" "}
+              Prefer extensions that run on demand (&ldquo;when you click the
+              extension&rdquo;) over ones demanding &ldquo;read and change all
+              your data on the websites you visit&rdquo; as a standing grant.
+            </li>
+            <li>
+              <strong className="text-neutral-100">
+                Developer and privacy policy.
+              </strong>{" "}
+              The listing should name an actual developer and link a privacy
+              policy. Be wary of anonymous listings with few reviews.
+            </li>
+            <li>
+              <strong className="text-neutral-100">Last updated.</strong>{" "}
+              A filter extension that hasn&apos;t shipped an update in years
+              tends to break quietly as the browser&apos;s PDF viewer changes.
+            </li>
+            <li>
+              <strong className="text-neutral-100">Local-file support.</strong>{" "}
+              Whatever you pick, downloaded PDFs won&apos;t darken until you
+              open <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">chrome://extensions</code>{" "}
+              and switch on &ldquo;Allow access to file URLs&rdquo; yourself —
+              no extension can do this step for you.
+            </li>
+          </ol>
+        </section>
+
         {/* Alternative */}
-        <section className="max-w-3xl mx-auto px-6 py-20">
+        <section className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900">
           <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
             The alternative: skip the install entirely
           </h2>

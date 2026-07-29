@@ -37,7 +37,7 @@ const FAQ = [
   },
   {
     q: "Is this faster than installing an extension?",
-    a: "Yes. There's nothing to install — drop a PDF on this page and it converts in seconds. You also get a downloadable dark-themed PDF that you can reopen in any viewer later, not just Chrome.",
+    a: "Yes. There's nothing to install — open the converter, drop your PDF, and it converts in seconds. You also get a downloadable dark-themed PDF that you can reopen in any viewer later, not just Chrome.",
   },
   {
     q: "What happens to images in my PDF?",
@@ -57,13 +57,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "PDF Dark Mode for Chrome",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Any Chrome-compatible browser",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",
@@ -138,7 +136,7 @@ export default function ChromeVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 19, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -166,12 +164,20 @@ export default function ChromeVariantPage() {
                 <p className="text-sm text-neutral-400">
                   Despite Chrome respecting your OS dark theme for the browser
                   UI, the embedded PDF viewer always renders pages on a white
-                  background. There&apos;s no toggle in{" "}
+                  background, and there&apos;s no PDF-specific toggle in{" "}
                   <code className="text-amber-400 text-xs bg-neutral-950 px-1.5 py-0.5 rounded">
                     chrome://settings
                   </code>
-                  , no command-line flag, no user pref. It&apos;s been an open
-                  issue in the Chromium bug tracker for years.
+                  . The closest thing is the experimental{" "}
+                  <code className="text-amber-400 text-xs bg-neutral-950 px-1.5 py-0.5 rounded">
+                    chrome://flags/#enable-force-dark
+                  </code>{" "}
+                  flag (&ldquo;Auto Dark Mode for Web Contents&rdquo;) — but it
+                  was built for websites, not PDFs: it force-darkens every page
+                  you visit, inverts images along the way, and whether it
+                  reaches PDF content at all varies by Chrome version. A real
+                  PDF dark mode has been an open request in the Chromium bug
+                  tracker for years.
                 </p>
               </div>
 
@@ -272,8 +278,8 @@ export default function ChromeVariantPage() {
                 Pages render in your Chrome tab
               </h3>
               <p className="text-neutral-300 leading-relaxed">
-                PDF.js (Mozilla&apos;s JavaScript PDF renderer, which Chrome
-                also relies on internally) parses the file and paints each
+                PDF.js (Mozilla&apos;s open-source PDF renderer, the same
+                engine Firefox ships with) parses the file and paints each
                 page onto a canvas inside your browser tab. The full document
                 stays in memory locally.
               </p>
@@ -321,9 +327,8 @@ export default function ChromeVariantPage() {
           </div>
 
           <p className="mt-10 text-sm text-neutral-500">
-            Works on Chrome on Windows, Mac, Linux, ChromeOS, and Android.
-            Needs modern Chrome (v90+), which covers the last 4 years of
-            releases.
+            Works on Chrome on Windows, Mac, Linux, ChromeOS, and Android —
+            any release from the last few years is fine.
           </p>
         </section>
 

@@ -57,13 +57,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "Invert PDF Colors Without Inverting Images",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Any (browser)",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",
@@ -108,6 +106,9 @@ export default function InvertWithoutImagesPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
+            <Link href="/converter" className="hover:text-neutral-100">
+              Converter
+            </Link>
             <a href="#how" className="hover:text-neutral-100">
               How it works
             </a>
@@ -131,15 +132,25 @@ export default function InvertWithoutImagesPage() {
             </span>
           </h1>
           <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Every basic inverter turns photos into creepy film negatives.{" "}
+            Most one-click inverters turn photos into creepy film negatives —
+            and the ones that skip images only fix your screen, never the
+            file.{" "}
             <strong className="text-neutral-100">
               PDF Dark inverts the page and leaves your photos alone.
             </strong>
           </p>
+          <div className="mt-7">
+            <Link
+              href="/converter"
+              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Invert my PDF — photos stay photos →
+            </Link>
+          </div>
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 24, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>6 min read</span>
           </div>

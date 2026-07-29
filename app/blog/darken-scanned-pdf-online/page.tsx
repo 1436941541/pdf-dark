@@ -61,13 +61,11 @@ function StructuredData() {
   const site = getSiteUrl();
   const webpage = {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "Darken Scanned PDF Online",
+    "@type": "TechArticle",
+    headline: TITLE,
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Any (browser)",
     description: DESCRIPTION,
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    author: { "@type": "Organization", name: "PDF Dark" },
   };
   const faq = {
     "@context": "https://schema.org",
@@ -112,6 +110,9 @@ export default function DarkenScannedPdfPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
+            <Link href="/converter" className="hover:text-neutral-100">
+              Converter
+            </Link>
             <a href="#scans" className="hover:text-neutral-100">
               Why scans hurt
             </a>
@@ -138,10 +139,18 @@ export default function DarkenScannedPdfPage() {
             a dark color you pick, the text becomes near-white, and you get a
             new PDF you can keep.
           </p>
+          <div className="mt-7">
+            <Link
+              href="/converter"
+              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Darken my scanned PDF →
+            </Link>
+          </div>
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 23, 2026</span>
+            <span>Updated July 29, 2026</span>
             <span aria-hidden>·</span>
             <span>5 min read</span>
           </div>
