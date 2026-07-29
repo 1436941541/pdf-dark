@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Downloader } from "@/components/downloader";
 import { Footer } from "@/components/footer";
@@ -240,6 +241,68 @@ export default function ConverterPage() {
                   <div className="mt-1 text-sm text-neutral-400">{s.d}</div>
                 </div>
               ))}
+            </div>
+
+            {/* What the output looks like — same real assets as the home page */}
+            <div className="mt-14">
+              <h3 className="text-lg font-semibold text-neutral-50 text-center m-0">
+                What the output looks like
+              </h3>
+              <p className="mt-2 mb-6 text-sm text-neutral-400 text-center max-w-xl mx-auto">
+                Page colors are inverted into a dark theme — and images are
+                your call: by default photos keep their original colors while
+                only text and background flip, or switch Images to Invert to
+                darken everything.
+              </p>
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-neutral-800">
+                    <Image
+                      src="/compare/original.png"
+                      alt="PDF page before conversion: black text on a white background with a full-color sunset photo"
+                      width={720}
+                      height={933}
+                      sizes="33vw"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                    Your PDF now
+                  </figcaption>
+                </figure>
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-neutral-800">
+                    <Image
+                      src="/compare/naive-invert.png"
+                      alt="The same page after a naive pixel inversion — the sunset photo becomes a false-color negative"
+                      width={720}
+                      height={933}
+                      sizes="33vw"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                    What basic inverters produce
+                  </figcaption>
+                </figure>
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                    <Image
+                      src="/compare/pdf-dark.png"
+                      alt="The same page converted to dark mode by PDF Dark — dark background, light text, photo keeps its original colors"
+                      width={720}
+                      height={933}
+                      sizes="33vw"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-amber-400">
+                    What you download here
+                  </figcaption>
+                </figure>
+              </div>
+              <p className="mt-3 text-xs text-neutral-600 text-center">
+                Real output, not a mockup: left is the source page, middle a
+                raw RGB inversion, right this converter&apos;s Auto mode
+                (Midnight theme).
+              </p>
             </div>
           </div>
         </section>
