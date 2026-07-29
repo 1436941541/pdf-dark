@@ -930,7 +930,7 @@ export function PdfViewer({ file, onReset }: Props) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={p.displayDataUrl}
-                alt={`Page ${i + 1}`}
+                alt={`Page ${i + 1} of your PDF, rendered in dark mode`}
                 width={p.width}
                 height={p.height}
                 className="block w-full h-auto"

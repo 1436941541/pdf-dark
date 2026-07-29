@@ -58,7 +58,24 @@ const FAQ = [
   },
   {
     q: "Does converting change the file size a lot?",
-    a: "Usually not. On most digital PDFs the conversion rewrites colors inside the original file, so the size stays close to the source. Pages that fall back to image rendering are re-encoded as compressed JPEGs and may grow a little.",
+    a: "Usually not. On most digital PDFs the conversion rewrites colors inside the original file, so the size stays close to the source. Pages that fall back to image rendering are re-encoded as compressed JPEGs and may grow in size.",
+  },
+];
+
+/** Conversion steps — single source of truth for the visible "How it works"
+ *  cards and the HowTo JSON-LD, so the two can never drift apart. */
+const STEPS = [
+  {
+    t: "Pick your settings",
+    d: "Choose a theme — Midnight, Sepia, Solarized, or OLED pure black — plus image handling, darkness, and warmth.",
+  },
+  {
+    t: "Drop your PDF",
+    d: "Drag & drop or click to browse. Never leaves your browser.",
+  },
+  {
+    t: "Get the dark PDF",
+    d: "Conversion starts immediately and the new file downloads itself — theme baked in, ready to share, print, or read anywhere.",
   },
 ];
 
@@ -71,8 +88,22 @@ function StructuredData() {
     url: `${site}${SLUG}`,
     applicationCategory: "UtilityApplication",
     operatingSystem: "Any (browser-based)",
+    screenshot: `${site}/compare/pdf-dark.png`,
     description: DESCRIPTION,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  };
+  const howTo = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: "How to convert a PDF to dark mode",
+    totalTime: "PT1M",
+    estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: 0 },
+    step: STEPS.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      name: s.t,
+      text: s.d,
+    })),
   };
   const faq = {
     "@context": "https://schema.org",
@@ -92,6 +123,10 @@ function StructuredData() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }}
       />
     </>
   );
@@ -184,19 +219,23 @@ export default function ConverterPage() {
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
               Text and background are rewritten into a low-light theme while
               images get smart per-image handling — photos keep their colors,
-              white diagrams blend into the dark page.
+              white diagrams blend into the dark page. Curious how the
+              per-image detection decides?{" "}
+              <Link
+                href="/blog/how-pdf-dark-mode-conversion-works"
+                className="text-amber-400 hover:underline"
+              >
+                Here&apos;s how the conversion works
+              </Link>
+              .
             </p>
             <div className="grid sm:grid-cols-3 gap-6">
-              {[
-                { n: "1", t: "Pick your settings", d: "Choose a theme — Midnight, Sepia, Solarized, or OLED pure black — plus image handling, darkness, and warmth." },
-                { n: "2", t: "Drop your PDF", d: "Drag & drop or click to browse. Never leaves your browser." },
-                { n: "3", t: "Get the dark PDF", d: "Conversion starts immediately and the new file downloads itself — theme baked in, ready to share, print, or read anywhere." },
-              ].map((s) => (
+              {STEPS.map((s, i) => (
                 <div
-                  key={s.n}
+                  key={s.t}
                   className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30"
                 >
-                  <div className="text-2xl font-bold text-amber-400">{s.n}</div>
+                  <div className="text-2xl font-bold text-amber-400">{i + 1}</div>
                   <h3 className="mt-2 font-semibold text-neutral-50">{s.t}</h3>
                   <div className="mt-1 text-sm text-neutral-400">{s.d}</div>
                 </div>

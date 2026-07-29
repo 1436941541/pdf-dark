@@ -3,7 +3,7 @@ import { getSiteUrl } from "@/lib/site";
 import { VARIANTS } from "@/lib/variants";
 
 // Last real content change per static route, YYYY-MM-DD. Bump when that page's content actually changes.
-const HOME_UPDATED_AT = "2026-07-28";
+const HOME_UPDATED_AT = "2026-07-29";
 const CONVERTER_UPDATED_AT = "2026-07-29";
 const ABOUT_UPDATED_AT = "2026-06-26";
 const PRIVACY_UPDATED_AT = "2026-07-25";

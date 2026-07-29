@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
@@ -7,11 +8,12 @@ import { VARIANTS } from "@/lib/variants";
 
 const COMPARISON_ROWS: [string, string, string, string][] = [
   ["No install needed", "yes", "no", "yes"],
-  ["Read in-browser before downloading", "yes", "no", "no"],
-  ["Save as new PDF file", "yes", "no", "no"],
+  ["Read in-browser before downloading", "yes", "no", "Varies"],
+  ["Save as new PDF file", "yes", "no", "yes"],
   ["Photos keep original colors (not negatives)", "yes", "no", "no"],
   ["Text stays selectable & searchable", "yes", "no", "no"],
   ["Image control: Original / Auto / Invert", "yes", "no", "no"],
+  ["Darkness & warmth sliders, saved into the file", "yes", "no", "no"],
   ["Works on iOS Safari", "yes", "no", "yes"],
   ["100% local (no upload)", "yes", "yes", "no"],
 ];
@@ -24,6 +26,10 @@ type FaqItem = {
 
 const FAQ_ITEMS: FaqItem[] = [
   {
+    q: "Can I turn a PDF into dark mode?",
+    a: "Yes — free and without installing anything. Drop the PDF on this page to read it on a dark background right away, or use the converter page to download a copy with the dark theme baked into the file.",
+  },
+  {
     q: "Is my PDF uploaded to your server?",
     a: "No. PDF Dark runs 100% in your browser. We literally don't have a server that receives your file.",
   },
@@ -34,7 +40,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "Does this work on iPhone or iPad?",
-    a: "Yes. Safari on iOS can drop/upload PDFs directly to this page—no app install needed.",
+    a: "Yes. Safari on iOS can open PDFs directly on this page—no app install needed, and the file still never leaves your device.",
   },
   {
     q: "How is this different from a browser dark-mode extension?",
@@ -63,7 +69,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "Can I change a PDF background to black?",
-    a: "Yes. The OLED theme renders the background as pure black (#000) and text as light gray, which is the most aggressive dark mode for PDFs. On the converter page you can also download the PDF with that black background baked in.",
+    a: "Yes. The OLED theme renders the background as pure black (#000) and text in light tones — near-white for regular body text — which is the most aggressive dark mode for PDFs. On the converter page you can also download the PDF with that black background baked in.",
   },
   {
     q: "Is this a dark mode for Adobe Acrobat?",
@@ -87,6 +93,7 @@ function StructuredData() {
     url: site,
     applicationCategory: "UtilityApplication",
     operatingSystem: "Any (browser-based)",
+    screenshot: `${site}/compare/pdf-dark.png`,
     description:
       "Free, browser-side PDF dark mode and night mode converter. Read PDFs on a dark background right in your browser or download the themed file. Runs 100% locally — built for reading PDFs at night.",
     offers: {
@@ -193,85 +200,91 @@ export default function Home() {
           </p>
         </section>
 
-        {/* What & why — semantic primer for keyword variants */}
+        {/* Visual proof — original vs naive inversion vs PDF Dark */}
         <section
-          id="what"
-          className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900"
-        >
-          <h2 className="text-2xl font-bold mb-8 text-center">
-            What is PDF dark mode?
-          </h2>
-
-          <h3 className="text-lg font-semibold text-neutral-100 mt-2 mb-3">
-            The short version
-          </h3>
-          <p className="text-neutral-300 leading-relaxed">
-            It&apos;s a way to read PDF documents with a dark background and
-            light text instead of the default white page. You may also see it
-            called PDF night mode, a dark PDF reader, or an inverted PDF —
-            different names for the same thing: a low-light theme baked into
-            the file so it stays dark in every viewer, not just the one you
-            opened it in.
-          </p>
-
-          <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
-            Why use a dark mode PDF
-          </h3>
-          <p className="text-neutral-300 leading-relaxed">
-            People use a dark mode PDF to read at night and reduce eye
-            strain, to extend battery life on OLED phones, to study
-            late-night research papers, and to make code- or text-heavy
-            documents less harsh under bright office lights. Browser extensions can fake a dark
-            theme inside the viewer, but the underlying PDF file stays light.
-            PDF Dark produces an actual dark-themed PDF you can save, share,
-            and reopen anywhere — a real dark PDF, not a viewer trick.
-          </p>
-
-          <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
-            Conversion, not just a viewer hack
-          </h3>
-          <p className="text-neutral-300 leading-relaxed">
-            A good dark mode reader for PDFs does more than paint the screen
-            dark — it rewrites the file with inverted colors so the PDF stays
-            in dark mode wherever you open it. With PDF Dark you can read PDFs
-            in dark mode on Chrome, Firefox, Safari, or Edge, and then carry
-            that dark mode PDF to your phone or e-reader. Files never leave
-            your device: the entire conversion runs in your browser via a Web
-            Worker, so you can read PDFs at night without ever uploading the
-            document. That&apos;s how to read PDFs in dark mode without
-            handing your file to anyone.
-          </p>
-        </section>
-
-        {/* How it works */}
-        <section
-          id="how"
-          className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900"
+          id="compare"
+          className="max-w-5xl mx-auto px-6 py-16 border-t border-neutral-900"
         >
           <h2 className="text-2xl font-bold mb-3 text-center">
-            How to read a PDF in dark mode
+            Dark mode shouldn&apos;t ruin your photos
           </h2>
-          <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-            Text and background are inverted into a low-light theme while
-            images get smart per-image handling — photos keep their colors.
-            You can start reading as soon as the first page renders.
+          <p className="text-sm text-neutral-400 text-center mb-10 max-w-2xl mx-auto">
+            The same page, three ways. A basic inverter flips every pixel, so
+            photos come out as film negatives. PDF Dark darkens text and
+            background but detects photos and keeps their colors.
           </p>
           <div className="grid sm:grid-cols-3 gap-6">
-            {[
-              { n: "1", t: "Drop your PDF", d: "Drag & drop or click to browse. Never leaves your browser.", offset: "sm:translate-y-0" },
-              { n: "2", t: "Pick a theme", d: "Midnight, Sepia, Solarized, or OLED pure black — plus darkness and warmth sliders.", offset: "sm:-translate-y-2" },
-              { n: "3", t: "Read", d: "Page through with keyboard, touch, or the page controls. Need a file to keep? Use the converter.", offset: "sm:translate-y-0" },
-            ].map((s) => (
-              <div
-                key={s.n}
-                className={`p-6 rounded-xl border border-neutral-800 bg-neutral-900/30 transition-transform ${s.offset}`}
-              >
-                <div className="text-2xl font-bold text-amber-400">{s.n}</div>
-                <h3 className="mt-2 font-semibold text-neutral-50">{s.t}</h3>
-                <div className="mt-1 text-sm text-neutral-400">{s.d}</div>
+            <figure className="m-0">
+              <div className="rounded-xl overflow-hidden border border-neutral-800">
+                <Image
+                  src="/compare/original.png"
+                  alt="Original PDF page before dark mode conversion: black text on a bright white background with a full-color sunset photo"
+                  width={720}
+                  height={933}
+                  sizes="(min-width: 640px) 33vw, 100vw"
+                />
               </div>
-            ))}
+              <figcaption className="mt-3 text-center">
+                <div className="font-semibold text-neutral-100 text-sm">
+                  Original PDF
+                </div>
+                <div className="mt-1 text-xs text-neutral-500">
+                  A bright white page — fine by day, harsh at night.
+                </div>
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-xl overflow-hidden border border-neutral-800">
+                <Image
+                  src="/compare/naive-invert.png"
+                  alt="The same PDF page darkened by a naive pixel inverter: the background goes black but the sunset photo turns into a false-color film negative"
+                  width={720}
+                  height={933}
+                  sizes="(min-width: 640px) 33vw, 100vw"
+                />
+              </div>
+              <figcaption className="mt-3 text-center">
+                <div className="font-semibold text-neutral-100 text-sm">
+                  Basic inverter
+                </div>
+                <div className="mt-1 text-xs text-neutral-500">
+                  Every pixel flipped — the sunset becomes a false-color
+                  negative.
+                </div>
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-xl overflow-hidden border border-amber-400/40">
+                <Image
+                  src="/compare/pdf-dark.png"
+                  alt="The same PDF page converted to dark mode with PDF Dark: dark background, light text, and the sunset photo keeps its original colors"
+                  width={720}
+                  height={933}
+                  sizes="(min-width: 640px) 33vw, 100vw"
+                />
+              </div>
+              <figcaption className="mt-3 text-center">
+                <div className="font-semibold text-amber-400 text-sm">
+                  PDF Dark — Auto
+                </div>
+                <div className="mt-1 text-xs text-neutral-500">
+                  Text and background go dark; the photo keeps its original
+                  colors.
+                </div>
+              </figcaption>
+            </figure>
           </div>
+          <p className="mt-8 text-xs text-neutral-600 text-center max-w-2xl mx-auto">
+            Left: the original page as rendered. Middle: the same page after
+            a raw RGB pixel inversion — the method most basic tools use.
+            Right: real output from this converter (Midnight theme, Auto
+            image mode).
+          </p>
+          <p className="mt-4 text-sm text-center">
+            <Link href="/converter" className="text-amber-400 hover:underline">
+              Convert your own PDF to dark mode →
+            </Link>
+          </p>
         </section>
 
         {/* Why us — separated by subtle background band */}
@@ -326,7 +339,7 @@ export default function Home() {
                   key={feat}
                   className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/40"
                 >
-                  <h3 className="font-medium text-base text-neutral-100 m-0 mb-3">{feat}</h3>
+                  <p className="font-medium text-base text-neutral-100 m-0 mb-3">{feat}</p>
                   <div className="grid grid-cols-3 gap-2 text-xs">
                     <div className="flex flex-col items-center">
                       <span className="text-amber-400 text-base"><Mark v={a} /></span>
@@ -344,6 +357,85 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* What & why — semantic primer for keyword variants */}
+        <section
+          id="what"
+          className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900"
+        >
+          <h2 className="text-2xl font-bold mb-8 text-center">
+            What is PDF dark mode?
+          </h2>
+
+          <h3 className="text-lg font-semibold text-neutral-100 mt-2 mb-3">
+            The short version
+          </h3>
+          <p className="text-neutral-300 leading-relaxed">
+            It&apos;s a way to read PDF documents with a dark background and
+            light text instead of the default white page. You may also see it
+            called PDF night mode, a dark PDF reader, or an inverted PDF —
+            different names for the same thing: a low-light theme baked into
+            the file so it stays dark in every viewer, not just the one you
+            opened it in.
+          </p>
+
+          <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
+            Why use a dark mode PDF
+          </h3>
+          <p className="text-neutral-300 leading-relaxed">
+            People use a dark mode PDF to read at night and reduce eye
+            strain, to extend battery life on OLED phones, to study
+            late-night research papers, and to make code- or text-heavy
+            documents less harsh under bright office lights. Browser extensions can fake a dark
+            theme inside the viewer, but the underlying PDF file stays light.
+            PDF Dark produces an actual dark-themed PDF you can save, share,
+            and reopen anywhere — a real dark PDF, not a viewer trick.
+          </p>
+
+          <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
+            Conversion, not just a viewer hack
+          </h3>
+          <p className="text-neutral-300 leading-relaxed">
+            A good dark mode reader for PDFs does more than paint the screen
+            dark — it rewrites the file with inverted colors so the document
+            stays dark wherever you open it. With PDF Dark you can read in
+            Chrome, Firefox, Safari, or Edge, then carry the converted file to
+            your phone or e-reader. It never leaves your device: the entire
+            conversion runs in your browser via a Web Worker, so nothing is
+            ever uploaded.
+          </p>
+        </section>
+
+        {/* How it works */}
+        <section
+          id="how"
+          className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900"
+        >
+          <h2 className="text-2xl font-bold mb-3 text-center">
+            How to read a PDF in dark mode
+          </h2>
+          <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
+            Text and background are inverted into a low-light theme while
+            images get smart per-image handling — photos keep their colors.
+            You can start reading as soon as the first page renders.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {[
+              { n: "1", t: "Drop your PDF", d: "Drag & drop or click to browse. Never leaves your browser.", offset: "sm:translate-y-0" },
+              { n: "2", t: "Pick a theme", d: "Midnight, Sepia, Solarized, or OLED pure black — plus darkness and warmth sliders.", offset: "sm:-translate-y-2" },
+              { n: "3", t: "Read", d: "Page through with keyboard, touch, or the page controls. Need a file to keep? Use the converter.", offset: "sm:translate-y-0" },
+            ].map((s) => (
+              <div
+                key={s.n}
+                className={`p-6 rounded-xl border border-neutral-800 bg-neutral-900/30 transition-transform ${s.offset}`}
+              >
+                <div className="text-2xl font-bold text-amber-400">{s.n}</div>
+                <h3 className="mt-2 font-semibold text-neutral-50">{s.t}</h3>
+                <div className="mt-1 text-sm text-neutral-400">{s.d}</div>
+              </div>
+            ))}
           </div>
         </section>
 
