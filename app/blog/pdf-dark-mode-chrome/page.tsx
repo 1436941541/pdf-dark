@@ -228,8 +228,9 @@ export default function ChromeVariantPage() {
                     Runs on one webpage — no install, no extension permissions
                   </li>
                   <li>
-                    Brightness-mapped per pixel — no hue flips, no halos on
-                    colored text, one consistent dark page
+                    Rewrites the PDF&apos;s own colors with hue preserved — no
+                    film-negative flips, no halos on colored text, one
+                    consistent dark page
                   </li>
                   <li>
                     Produces a downloadable dark-themed PDF that&apos;s dark in

@@ -156,7 +156,10 @@ export default function SumatraVariantPage() {
             <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
               Credit where it&apos;s due: Sumatra PDF gives you more than most
               readers do out of the box. Both options are real — and both have
-              a catch.
+              a catch. (Recent builds, 3.5.2 and later, also add built-in Dark
+              and Darker app themes — with a known quirk: while one of those
+              themes is active, custom colors from settings.txt can be
+              ignored.)
             </p>
 
             <div className="space-y-5">

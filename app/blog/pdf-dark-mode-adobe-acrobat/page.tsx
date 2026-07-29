@@ -5,9 +5,9 @@ import { RelatedVariants } from "@/components/related-variants";
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-adobe-acrobat";
-const TITLE = "PDF Dark Mode in Adobe Acrobat — The Setting Is Hidden in Accessibility";
+const TITLE = "PDF Dark Mode in Adobe Acrobat — Hidden in Accessibility";
 const DESCRIPTION =
-  "Acrobat's 'Dark Gray' theme only skins the toolbar — your PDF pages stay white. The real page-darkening option lives in Preferences → Accessibility, and it's a software setting, not a file setting. Here's the difference, and a faster way.";
+  "Acrobat's Dark Gray theme only skins the toolbar. The real page-darkening setting hides in Preferences → Accessibility — here's the path, and a faster way.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -72,6 +72,25 @@ function StructuredData() {
       acceptedAnswer: { "@type": "Answer", text: f.a },
     })),
   };
+  // Plain-text mirror of the visible "quick answer" steps — keep in sync
+  // with the <ol> in the Quick answer section below.
+  const howTo = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: "How to darken PDF pages in Adobe Acrobat",
+    totalTime: "PT2M",
+    step: [
+      "Open Preferences: Edit → Preferences (Ctrl+K) on Windows, or Acrobat → Preferences (⌘K) on Mac.",
+      "Select the Accessibility category.",
+      "Check Replace Document Colors.",
+      "Choose Use Custom Color — set Page Background to a dark color and Document Text to a light one (or pick a built-in high-contrast combination).",
+      "Click OK — every PDF you open now renders dark.",
+    ].map((text, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      text,
+    })),
+  };
   return (
     <>
       <script
@@ -81,6 +100,10 @@ function StructuredData() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }}
       />
     </>
   );

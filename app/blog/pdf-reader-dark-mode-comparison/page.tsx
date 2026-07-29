@@ -100,10 +100,10 @@ const ROWS: Row[] = [
   },
   {
     name: "Firefox (PDF.js)",
-    hasDarkMode: "No",
+    hasDarkMode: "Partially",
     permanence: "—",
     images: "—",
-    note: "Same story as Chrome — the built-in PDF.js viewer has no dark page option.",
+    note: "The PDF.js viewer's toolbar can go dark, but the page itself always renders on white.",
     link: { href: "/blog/pdf-dark-mode-firefox", label: "Full Firefox guide →" },
   },
   {

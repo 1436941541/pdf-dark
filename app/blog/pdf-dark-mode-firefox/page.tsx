@@ -49,7 +49,7 @@ const FAQ = [
   },
   {
     q: "Is the original PDF uploaded anywhere?",
-    a: "No. Everything runs in your Firefox tab. You can confirm this via Firefox DevTools (Ctrl/Cmd + Shift + E) — no upload request is made for the file.",
+    a: "No. Everything runs in your Firefox tab. You can confirm this in the Network panel of Firefox DevTools (Ctrl+Shift+E on Windows, Cmd+Option+E on Mac) — no upload request is made for the file.",
   },
 ];
 

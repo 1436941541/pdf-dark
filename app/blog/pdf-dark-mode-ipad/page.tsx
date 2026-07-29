@@ -6,9 +6,9 @@ import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-ipad";
 const TITLE =
-  "PDF Dark Mode on iPad & iPhone — What iOS 26 Fixed, and What It Didn't";
+  "PDF Dark Mode on iPad & iPhone — the iOS 26 Toggle & Beyond";
 const DESCRIPTION =
-  "iOS and iPadOS 26 finally added a Dark Background toggle for PDFs in Files and Books. Here's exactly what it does, its four limits, and how to get a PDF that stays dark everywhere.";
+  "iOS 26 added a Dark Background toggle for PDFs in Files and Books. Here's what it does, its four limits, and how to get a PDF that stays dark everywhere.";
 
 export const metadata: Metadata = {
   title: TITLE,

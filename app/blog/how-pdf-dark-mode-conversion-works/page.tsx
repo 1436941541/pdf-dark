@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Which PDFs get the vector treatment, and which fall back?",
-    a: "Files exported from Word, Google Docs, LaTeX, browsers ('Print to PDF'), and most e-book pipelines declare their colors in plain RGB or grayscale — those recolor as vectors, keeping text selectable and razor-sharp. Design and print-shop files that use spot colors, gradients, color patterns, or indexed palettes fall back to the raster path for that page. Scanned pages are images by nature and always take the raster path.",
+    a: "Files exported from Word, Google Docs, LaTeX, browsers ('Print to PDF'), and most e-book pipelines declare their colors in plain RGB, grayscale, or CMYK — those recolor as vectors, keeping text selectable and razor-sharp. Design and print-shop files that use spot colors, gradients, color patterns, or indexed palettes fall back to the raster path for that page. Scanned pages are images by nature and always take the raster path.",
   },
   {
     q: "Why not just invert every pixel? It sounds simpler.",

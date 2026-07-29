@@ -32,6 +32,10 @@ const FAQ = [
     a: "We invert each page so the bright background becomes a dark color (your choice of Midnight, Sepia, Solarized, or OLED) and the originally-dark text becomes near-white. The result is a normal PDF file with dark pages baked in — it stays dark in every reader and on every device.",
   },
   {
+    q: "I want darker text on a white page (for printing) — is this the right tool?",
+    a: "No — this tool inverts the page into a dark theme for on-screen reading. If your goal is to make faded scan text blacker while keeping the white background for print, look for tools that advertise 'PDF contrast enhancement' or use a scanner app's enhancement mode instead.",
+  },
+  {
     q: "Do I have to upload my PDF somewhere?",
     a: "No. The whole process runs in your browser using the File API and a Web Worker. The PDF never touches a server. Open DevTools → Network and you'll see zero upload requests during conversion.",
   },
@@ -86,7 +90,7 @@ function StructuredData() {
         "@type": "HowToStep",
         position: 2,
         name: "Pick a dark theme",
-        text: "Switch between Midnight, Sepia, Solarized, and OLED to preview the darkened pages instantly. The Images toggle next to the themes controls how photos and figures are treated.",
+        text: "Pick Midnight, Sepia, Solarized, or OLED — the theme cards preview each color scheme instantly. To flip through your own document's pages live, open it in the reader on the homepage first. The Images toggle next to the themes controls how photos and figures are treated.",
       },
       {
         "@type": "HowToStep",

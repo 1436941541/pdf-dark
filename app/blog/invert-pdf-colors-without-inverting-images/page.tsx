@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
@@ -222,6 +223,58 @@ export default function InvertWithoutImagesPage() {
                 </ul>
               </div>
             </div>
+
+            {/* Visual proof — same assets as the home page comparison */}
+            <div className="mt-10">
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-neutral-800">
+                    <Image
+                      src="/compare/original.png"
+                      alt="Original PDF page: black text on a white background with a full-color sunset photo"
+                      width={720}
+                      height={933}
+                      sizes="33vw"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                    Original
+                  </figcaption>
+                </figure>
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-neutral-800">
+                    <Image
+                      src="/compare/naive-invert.png"
+                      alt="The same page after naive inversion — the sunset photo becomes a false-color negative"
+                      width={720}
+                      height={933}
+                      sizes="33vw"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                    Naive invert — photo ruined
+                  </figcaption>
+                </figure>
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                    <Image
+                      src="/compare/pdf-dark.png"
+                      alt="The same page inverted by PDF Dark — dark background, light text, photo keeps its original colors"
+                      width={720}
+                      height={933}
+                      sizes="33vw"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-amber-400">
+                    PDF Dark — photo preserved
+                  </figcaption>
+                </figure>
+              </div>
+              <p className="mt-3 text-xs text-neutral-600 text-center">
+                Real output: left is the source page, middle a raw RGB
+                inversion, right PDF Dark&apos;s Auto mode (Midnight theme).
+              </p>
+            </div>
           </div>
         </section>
 
@@ -248,7 +301,14 @@ export default function InvertWithoutImagesPage() {
                 White, colorless figures (screenshots, tables, diagrams
                 exported as images) are inverted with the page so they blend
                 into the dark theme. Photos keep their original colors. Bright
-                colorful images get a gentle dim so they don&apos;t glare.
+                colorful images get a gentle dim so they don&apos;t glare.{" "}
+                <Link
+                  href="/blog/how-pdf-dark-mode-conversion-works"
+                  className="text-amber-400 hover:underline"
+                >
+                  Here&apos;s the full breakdown of how the detection works
+                </Link>
+                .
               </p>
             </div>
 
