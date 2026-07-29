@@ -24,6 +24,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.9,
     },
+    {
+      url: `${base}/blog`,
+      // The index re-renders whenever any post changes — track the newest one.
+      lastModified: VARIANTS.map((v) => v.updatedAt).sort().at(-1),
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
     ...VARIANTS.map((v) => ({
       url: `${base}/blog/${v.slug}`,
       lastModified: v.updatedAt,

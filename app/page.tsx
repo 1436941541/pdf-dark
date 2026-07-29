@@ -154,7 +154,7 @@ export default function Home() {
           <nav className="text-sm text-neutral-400 flex gap-5">
             <Link href="/converter" className="hover:text-neutral-100">Converter</Link>
             <a href="#how" className="hover:text-neutral-100">How it works</a>
-            <a href="#tools" className="hover:text-neutral-100">Blog</a>
+            <Link href="/blog" className="hover:text-neutral-100">Blog</Link>
             <a href="#faq" className="hover:text-neutral-100">FAQ</a>
           </nav>
         </div>

@@ -155,7 +155,7 @@ export default function ConverterPage() {
             <a href="#how" className="hover:text-neutral-100">
               How it works
             </a>
-            <Link href="/#tools" className="hover:text-neutral-100">
+            <Link href="/blog" className="hover:text-neutral-100">
               Blog
             </Link>
             <a href="#faq" className="hover:text-neutral-100">
