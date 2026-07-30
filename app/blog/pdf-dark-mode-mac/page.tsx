@@ -110,12 +110,6 @@ export default function MacVariantPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <a href="#why" className="hover:text-neutral-100">
-              What Preview does
-            </a>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
           </nav>
         </div>
       </header>

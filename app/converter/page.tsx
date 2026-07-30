@@ -153,9 +153,6 @@ export default function ConverterPage() {
             <Link href="/" className="hover:text-neutral-100">
               Reader
             </Link>
-            <a href="#how" className="hover:text-neutral-100">
-              How it works
-            </a>
             <Link href="/blog" className="hover:text-neutral-100">
               Blog
             </Link>

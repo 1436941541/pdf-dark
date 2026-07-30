@@ -224,12 +224,6 @@ export default function ComparisonPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <a href="#table" className="hover:text-neutral-100">
-              Comparison
-            </a>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
           </nav>
         </div>
       </header>

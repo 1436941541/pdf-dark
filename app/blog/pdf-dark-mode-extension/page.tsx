@@ -110,15 +110,6 @@ export default function ExtensionVariantPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <a href="#options" className="hover:text-neutral-100">
-              Your options
-            </a>
-            <a href="#the-catch" className="hover:text-neutral-100">
-              The catch
-            </a>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
           </nav>
         </div>
       </header>

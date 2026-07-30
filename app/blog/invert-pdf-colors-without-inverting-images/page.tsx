@@ -111,15 +111,6 @@ export default function InvertWithoutImagesPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <Link href="/converter" className="hover:text-neutral-100">
-              Converter
-            </Link>
-            <a href="#how" className="hover:text-neutral-100">
-              How it works
-            </a>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
           </nav>
         </div>
       </header>

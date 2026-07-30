@@ -151,15 +151,6 @@ export default function HowToDarkenPdfPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <Link href="/converter" className="hover:text-neutral-100">
-              Converter
-            </Link>
-            <a href="#steps" className="hover:text-neutral-100">
-              Steps
-            </a>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
           </nav>
         </div>
       </header>

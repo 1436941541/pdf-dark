@@ -114,15 +114,6 @@ export default function DarkenScannedPdfPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <Link href="/converter" className="hover:text-neutral-100">
-              Converter
-            </Link>
-            <a href="#scans" className="hover:text-neutral-100">
-              Why scans hurt
-            </a>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
           </nav>
         </div>
       </header>

@@ -110,18 +110,6 @@ export default function HowItWorksPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <a href="#vector" className="hover:text-neutral-100">
-              Vector mode
-            </a>
-            <a href="#images" className="hover:text-neutral-100">
-              Images
-            </a>
-            <a href="#fallback" className="hover:text-neutral-100">
-              Fallback
-            </a>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
           </nav>
         </div>
       </header>

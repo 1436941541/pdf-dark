@@ -133,12 +133,6 @@ export default function AdobeAcrobatVariantPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <a href="#why" className="hover:text-neutral-100">
-              Why Acrobat&apos;s setting confuses people
-            </a>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
           </nav>
         </div>
       </header>

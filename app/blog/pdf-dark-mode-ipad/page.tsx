@@ -111,12 +111,6 @@ export default function IpadVariantPage() {
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-            <a href="#why" className="hover:text-neutral-100">
-              What iOS 26 changed
-            </a>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
           </nav>
         </div>
       </header>
