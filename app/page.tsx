@@ -97,6 +97,7 @@ function StructuredData() {
       "https://www.libhunt.com/r/pdf-dark",
       "https://devpost.com/software/pdf-dark",
       "https://yunjie3.substack.com",
+      "https://www.youtube.com/watch?v=ugLGDvqoSe0",
     ],
     applicationCategory: "UtilityApplication",
     operatingSystem: "Any (browser-based)",
