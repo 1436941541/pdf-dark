@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-android";
 const TITLE = "PDF Dark Mode on Android — No Root, No System Hack";
 const DESCRIPTION =
   "Android's default PDF viewers have no real dark mode, and system color inversion flips your screen negative. Convert the file once — it opens dark in every app.";
+const PUBLISHED = "2026-07-29";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -61,7 +63,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -139,7 +143,7 @@ export default function AndroidVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 25, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>7 min read</span>
           </div>
@@ -190,7 +194,25 @@ export default function AndroidVariantPage() {
                     </td>
                     <td className="px-4 py-4 align-top text-neutral-400">
                       Page content still renders white; requested on
-                      Google&apos;s own forums for years, unresolved
+                      Google&apos;s own{" "}
+                      <a
+                        href="https://support.google.com/drive/thread/406087422"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-400 hover:underline"
+                      >
+                        Drive
+                      </a>{" "}
+                      and{" "}
+                      <a
+                        href="https://support.google.com/docs/thread/301868736"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-400 hover:underline"
+                      >
+                        Docs
+                      </a>{" "}
+                      forums for years, unresolved
                     </td>
                   </tr>
                   <tr className="border-b border-neutral-900">

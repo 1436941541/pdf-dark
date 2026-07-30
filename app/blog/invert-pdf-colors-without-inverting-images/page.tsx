@@ -3,12 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/invert-pdf-colors-without-inverting-images";
 const TITLE = "Invert PDF Colors — Without Turning Images into Negatives";
 const DESCRIPTION =
   "Invert PDF colors to dark mode while photos keep their original colors. Per-image smart detection — or full manual control. Free, browser-only, no upload.";
+const PUBLISHED = "2026-04-25";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -62,7 +64,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -133,7 +137,16 @@ export default function InvertWithoutImagesPage() {
             </span>
           </h1>
           <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Most one-click inverters turn photos into creepy film negatives —
+            Most one-click inverters turn photos into creepy{" "}
+            <a
+              href="https://en.wikipedia.org/wiki/Negative_(photography)"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              film negatives
+            </a>{" "}
+            —
             and the ones that skip images only fix your screen, never the
             file.{" "}
             <strong className="text-neutral-100">
@@ -151,7 +164,7 @@ export default function InvertWithoutImagesPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>6 min read</span>
           </div>

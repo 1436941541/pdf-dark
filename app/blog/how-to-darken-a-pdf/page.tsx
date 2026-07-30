@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/how-to-darken-a-pdf";
 const TITLE = "How to Darken a PDF — 3 Steps, No Install";
 const DESCRIPTION =
   "Darken any PDF in your browser in three steps: drop the file, pick a dark theme, download the new file. Free, no upload, works offline.";
+const PUBLISHED = "2026-06-26";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -69,7 +71,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const howTo = {
     "@context": "https://schema.org",
@@ -188,7 +192,7 @@ export default function HowToDarkenPdfPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>4 min read</span>
           </div>
@@ -227,7 +231,15 @@ export default function HowToDarkenPdfPage() {
                         PDF Dark converter
                       </Link>{" "}
                       and drag the file onto the drop zone, or click to pick a
-                      file from disk. The file is parsed in-browser with PDF.js
+                      file from disk. The file is parsed in-browser with{" "}
+                      <a
+                        href="https://github.com/mozilla/pdf.js"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-400 hover:underline"
+                      >
+                        PDF.js
+                      </a>{" "}
                       — nothing is uploaded.
                     </p>
                   </div>

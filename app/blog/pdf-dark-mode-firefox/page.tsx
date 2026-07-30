@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-firefox";
 const TITLE = "PDF Dark Mode in Firefox — Beyond the about:config Hack";
 const DESCRIPTION =
   "Firefox's PDF.js viewer only darkens the toolbar, not the page content. Convert any PDF to dark mode in your browser — no about:config, no extensions.";
+const PUBLISHED = "2026-04-25";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -61,7 +63,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -136,7 +140,7 @@ export default function FirefoxVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -162,7 +166,15 @@ export default function FirefoxVariantPage() {
                   PDF.js renders the page faithfully
                 </h3>
                 <p className="text-sm text-neutral-400">
-                  PDF.js treats a PDF as authoritative — if the page background
+                  <a
+                    href="https://github.com/mozilla/pdf.js"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-400 hover:underline"
+                  >
+                    PDF.js
+                  </a>{" "}
+                  treats a PDF as authoritative — if the page background
                   is white, it paints white. That&apos;s the right default for
                   print/review work, but it&apos;s also why a
                   &ldquo;toggle&rdquo; dark mode would be contentious: Mozilla
@@ -225,8 +237,17 @@ export default function FirefoxVariantPage() {
                   These apply a CSS filter on top of the rendered page. The
                   result is the same as naive invert: photos become negatives,
                   diagrams get mangled, and PDFs with any non-white background
-                  render unpredictably. Dark Reader itself notes limited PDF
-                  support in its documentation.
+                  render unpredictably. Limited PDF support is a
+                  long-running theme on{" "}
+                  <a
+                    href="https://github.com/darkreader/darkreader/issues/12965"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-400 hover:underline"
+                  >
+                    Dark Reader&apos;s own issue tracker
+                  </a>
+                  .
                 </p>
               </div>
 

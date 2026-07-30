@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: "PDF Dark Mode — Free Online Dark Mode PDF Reader | pdfdark.org",
+  title: "PDF Dark Mode — Free Online Dark Mode PDF Reader | PDF Dark",
   description:
     "Read any PDF in dark mode or night mode right in your browser. Free, no upload, no signup. Need to keep it? Convert and download a permanent dark PDF.",
   keywords: [

@@ -2,13 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-ipad";
 const TITLE =
   "PDF Dark Mode on iPad & iPhone — the iOS 26 Toggle & Beyond";
 const DESCRIPTION =
   "iOS 26 added a Dark Background toggle for PDFs in Files and Books. Here's what it does, its four limits, and how to get a PDF that stays dark everywhere.";
+const PUBLISHED = "2026-07-29";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -62,7 +64,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -140,7 +144,7 @@ export default function IpadVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -204,7 +208,16 @@ export default function IpadVariantPage() {
                   <code className="text-amber-400 text-xs bg-neutral-950 px-1.5 py-0.5 rounded">
                     •••
                   </code>
-                  ) menu reveals a Dark Background switch. Turn it on and the
+                  ) menu reveals a{" "}
+                  <a
+                    href="https://blog.sangeeth.dev/notes/preview-app-adds-dark-mode-toggle-for-pdfs-on-macos-tahoe-ios-and-ipados-26/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-400 hover:underline"
+                  >
+                    Dark Background switch
+                  </a>
+                  . Turn it on and the
                   page inverts to dark — and credit where it&apos;s due, it&apos;s
                   done well: text and white space invert, while photos inside
                   the PDF are left alone instead of turning into color

@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/sumatra-pdf-dark-mode";
 const TITLE = "PDF Dark Mode in Sumatra PDF — the i Key vs. Editing settings.txt";
 const DESCRIPTION =
   "Sumatra PDF has two built-in ways to darken a page — the i shortcut and a settings.txt edit. How both work, why they fall short, and a fix that sticks.";
+const PUBLISHED = "2026-07-29";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -61,7 +63,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -138,7 +142,7 @@ export default function SumatraVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -229,6 +233,16 @@ export default function SumatraVariantPage() {
                   </code>{" "}
                   for the background. Save it, and every PDF opens with that
                   color scheme from then on — no more repeated key presses.
+                  Every option in the file is documented in{" "}
+                  <a
+                    href="https://www.sumatrapdfreader.org/settings/settings"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-400 hover:underline"
+                  >
+                    Sumatra&apos;s official settings reference
+                  </a>
+                  .
                   The catch: it&apos;s a manual text-file edit with hex color
                   codes, which is comfortable territory for a lot of Sumatra
                   users but a real barrier for anyone who doesn&apos;t want to
@@ -252,7 +266,16 @@ export default function SumatraVariantPage() {
                     shortcut and the settings.txt colors invert the whole
                     rendered page, and photos or images with transparent
                     backgrounds often end up looking off — a complaint that
-                    comes up on Sumatra&apos;s own forum.
+                    comes up on{" "}
+                    <a
+                      href="https://forum.sumatrapdfreader.org/t/update-has-made-all-images-negatives-unusable-now/4384"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-400 hover:underline"
+                    >
+                      Sumatra&apos;s own forum
+                    </a>
+                    .
                   </li>
                   <li>
                     <strong className="text-neutral-200">

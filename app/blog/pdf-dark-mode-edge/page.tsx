@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-edge";
 const TITLE = "PDF Dark Mode in Microsoft Edge — Beyond the Flags Page Hack";
 const DESCRIPTION =
   "Turning on Edge's dark theme doesn't touch your PDFs — the page stays white. There's a flag that can force it dark, but it wrecks your images. Here's a cleaner fix.";
+const PUBLISHED = "2026-07-29";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -61,7 +63,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -137,7 +141,7 @@ export default function EdgeVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>7 min read</span>
           </div>
@@ -182,7 +186,16 @@ export default function EdgeVariantPage() {
                   The <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">edge://flags</code> workaround
                 </h3>
                 <p className="text-sm text-neutral-400 mb-3">
-                  Edge inherits an experimental Chromium switch —{" "}
+                  Edge inherits{" "}
+                  <a
+                    href="https://developer.chrome.com/blog/auto-dark-theme"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-400 hover:underline"
+                  >
+                    an experimental Chromium switch
+                  </a>{" "}
+                  —{" "}
                   <strong className="text-neutral-200">
                     Force Dark Mode for Web Contents
                   </strong>{" "}

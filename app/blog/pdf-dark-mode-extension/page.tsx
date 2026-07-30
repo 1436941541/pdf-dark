@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-extension";
 const TITLE = "PDF Dark Mode Extensions: What's Available, and What to Check First";
 const DESCRIPTION =
   "An honest map of PDF dark mode extensions in the Chrome and Edge stores — how they darken pages, what breaks, and a checklist before you install one.";
+const PUBLISHED = "2026-07-29";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -61,7 +63,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -142,7 +146,7 @@ export default function ExtensionVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>7 min read</span>
           </div>
@@ -207,7 +211,15 @@ export default function ExtensionVariantPage() {
                   </td>
                   <td className="px-4 py-4 align-top text-neutral-300">
                     Restyles regular web pages; PDF support is limited —
-                    Dark Reader&apos;s own docs say so
+                    a recurring theme on{" "}
+                    <a
+                      href="https://github.com/darkreader/darkreader/issues/12965"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-400 hover:underline"
+                    >
+                      Dark Reader&apos;s own issue tracker
+                    </a>
                   </td>
                   <td className="px-4 py-4 align-top text-neutral-400">
                     Varies; PDFs often simply stay white

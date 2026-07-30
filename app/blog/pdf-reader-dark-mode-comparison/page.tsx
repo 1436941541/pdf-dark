@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-reader-dark-mode-comparison";
 const TITLE = "PDF Readers with Dark Mode: What Actually Works (2026 Comparison)";
 const DESCRIPTION =
   "Acrobat, Foxit, Sumatra, Preview, Chrome, Edge, Firefox, mobile apps — a straight comparison of which PDF readers really have dark mode, and which fake it.";
+const PUBLISHED = "2026-07-29";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -175,9 +177,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
-    datePublished: "2026-07-29",
-    dateModified: "2026-07-29",
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -253,7 +255,7 @@ export default function ComparisonPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>10 min read</span>
           </div>
@@ -266,9 +268,25 @@ export default function ComparisonPage() {
               Support is all over the map. Some readers — Foxit, Acrobat,
               Sumatra — have had a dark-mode option for years, just buried a
               few menus deep. Others — Chrome, Firefox, Android&apos;s stock
-              viewers — have never shipped one, despite years of user
-              requests. A few, like macOS Preview and iOS Files, only just
-              added a toggle in their 2025/2026 releases.
+              viewers — have never shipped one, despite{" "}
+              <a
+                href="https://support.google.com/drive/thread/406087422"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400 hover:underline"
+              >
+                years of user requests
+              </a>
+              . A few, like macOS Preview and iOS Files, only just{" "}
+              <a
+                href="https://blog.sangeeth.dev/notes/preview-app-adds-dark-mode-toggle-for-pdfs-on-macos-tahoe-ios-and-ipados-26/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400 hover:underline"
+              >
+                added a toggle
+              </a>{" "}
+              in their 2025/2026 releases.
             </p>
             <p className="text-neutral-300 leading-relaxed mt-4">
               But almost every option on this list shares the same limitation:

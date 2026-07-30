@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-adobe-acrobat";
 const TITLE = "PDF Dark Mode in Adobe Acrobat — Hidden in Accessibility";
 const DESCRIPTION =
   "Acrobat's Dark Gray theme only skins the toolbar. The real page-darkening setting hides in Preferences → Accessibility — here's the path, and a faster way.";
+const PUBLISHED = "2026-07-29";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -61,7 +63,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -161,7 +165,7 @@ export default function AdobeAcrobatVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -192,9 +196,16 @@ export default function AdobeAcrobatVariantPage() {
               </li>
               <li>
                 Check{" "}
-                <strong className="text-neutral-100">
-                  Replace Document Colors
-                </strong>
+                <a
+                  href="https://helpx.adobe.com/reader/desktop/accessibility-features.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-400 hover:underline"
+                >
+                  <strong className="text-amber-400">
+                    Replace Document Colors
+                  </strong>
+                </a>
                 .
               </li>
               <li>

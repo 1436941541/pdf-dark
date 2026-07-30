@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/how-pdf-dark-mode-conversion-works";
 const TITLE = "How PDF Dark Mode Conversion Works — Under the Hood";
 const DESCRIPTION =
   "Vector recoloring, per-image detection, hue-preserving color mapping, and a per-page fallback chain — how PDF Dark actually converts a PDF to dark mode, explained.";
+const PUBLISHED = "2026-07-17";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -61,9 +63,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
-    datePublished: "2026-07-17",
-    dateModified: "2026-07-27",
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -144,7 +146,7 @@ export default function HowItWorksPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 27, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>9 min read</span>
           </div>
@@ -157,9 +159,17 @@ export default function HowItWorksPage() {
               A PDF is a program, not a picture
             </h2>
             <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              Every PDF page is a list of drawing instructions: &ldquo;set the
-              fill color to black, write this text at these coordinates, place
-              this image in this rectangle.&rdquo; There are two very
+              Every PDF page is{" "}
+              <a
+                href="https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400 hover:underline"
+              >
+                a list of drawing instructions
+              </a>
+              : &ldquo;set the fill color to black, write this text at these
+              coordinates, place this image in this rectangle.&rdquo; There are two very
               different ways to make that page dark.
             </p>
 

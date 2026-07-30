@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-chrome";
 const TITLE = "PDF Dark Mode in Chrome — Without Installing an Extension";
 const DESCRIPTION =
   "Chrome's built-in PDF viewer has no dark mode toggle. Skip the extensions and their permissions — convert any PDF to dark mode right in your browser, free.";
+const PUBLISHED = "2026-04-25";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -61,7 +63,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -136,7 +140,7 @@ export default function ChromeVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>8 min read</span>
           </div>
@@ -172,7 +176,16 @@ export default function ChromeVariantPage() {
                   <code className="text-amber-400 text-xs bg-neutral-950 px-1.5 py-0.5 rounded">
                     chrome://flags/#enable-force-dark
                   </code>{" "}
-                  flag (&ldquo;Auto Dark Mode for Web Contents&rdquo;) — but it
+                  flag (&ldquo;
+                  <a
+                    href="https://developer.chrome.com/blog/auto-dark-theme"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-400 hover:underline"
+                  >
+                    Auto Dark Mode for Web Contents
+                  </a>
+                  &rdquo;) — but it
                   was built for websites, not PDFs: it force-darkens every page
                   you visit, inverts images along the way, and whether it
                   reaches PDF content at all varies by Chrome version. A real
@@ -279,7 +292,15 @@ export default function ChromeVariantPage() {
                 Pages render in your Chrome tab
               </h3>
               <p className="text-neutral-300 leading-relaxed">
-                PDF.js (Mozilla&apos;s open-source PDF renderer, the same
+                <a
+                  href="https://github.com/mozilla/pdf.js"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-400 hover:underline"
+                >
+                  PDF.js
+                </a>{" "}
+                (Mozilla&apos;s open-source PDF renderer, the same
                 engine Firefox ships with) parses the file and paints each
                 page onto a canvas inside your browser tab. The full document
                 stays in memory locally.

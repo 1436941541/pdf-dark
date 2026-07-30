@@ -24,3 +24,17 @@ function stripTrailingSlash(s: string): string {
 
 export const SITE_NAME = "PDF Dark";
 export const SITE_TAGLINE = "Convert Any PDF to Dark Mode in Your Browser";
+
+/**
+ * Format an ISO date ("2026-07-29") as the human-readable form shown in blog
+ * bylines ("July 29, 2026"). Blog pages declare each date once and render both
+ * the JSON-LD field and the visible text from it, so the two can't drift.
+ */
+export function formatPostDate(iso: string): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}

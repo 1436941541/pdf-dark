@@ -1,0 +1,36 @@
+# PDF Dark
+
+> Free online tool that converts any PDF to dark mode directly in the browser. No upload, no signup — files are processed locally via the File API and a Web Worker, so documents never leave the user's device. Read PDFs in dark mode on the spot, or download a permanently dark copy that stays dark in every reader on every device.
+
+PDF Dark (pdfdark.org) is an independent, free web app. Unlike viewer-level dark modes (browser extensions, reader settings, OS color inversion), it rewrites the PDF file itself: dark background, light text, with photos and diagrams kept in their original colors instead of being turned into negatives. It also handles scanned PDFs.
+
+## Tool
+
+- [PDF Dark Mode Reader](https://pdfdark.org/): read any PDF in dark mode in the browser, free, no upload
+- [Convert PDF to Dark Mode](https://pdfdark.org/converter): convert and download a permanent dark-mode copy of a PDF
+
+## Guides
+
+- [How to Darken a PDF — 3 Steps, No Install](https://pdfdark.org/blog/how-to-darken-a-pdf): the general how-to, start here
+- [How PDF Dark Mode Conversion Works — Under the Hood](https://pdfdark.org/blog/how-pdf-dark-mode-conversion-works): the technical explanation of the conversion pipeline
+- [PDF Readers with Dark Mode: What Actually Works (2026 Comparison)](https://pdfdark.org/blog/pdf-reader-dark-mode-comparison): comparison of dark-mode support across popular PDF readers
+- [Invert PDF Colors — Without Turning Images into Negatives](https://pdfdark.org/blog/invert-pdf-colors-without-inverting-images): why naive color inversion ruins images and how content-aware conversion avoids it
+- [Darken a Scanned PDF Online](https://pdfdark.org/blog/darken-scanned-pdf-online): dark mode for scanned/image-based PDFs
+
+## Platform guides
+
+- [PDF Dark Mode in Chrome](https://pdfdark.org/blog/pdf-dark-mode-chrome): without installing an extension
+- [PDF Dark Mode in Firefox](https://pdfdark.org/blog/pdf-dark-mode-firefox): beyond the about:config hack
+- [PDF Dark Mode in Microsoft Edge](https://pdfdark.org/blog/pdf-dark-mode-edge): beyond the flags-page hack
+- [PDF Dark Mode Extensions](https://pdfdark.org/blog/pdf-dark-mode-extension): what's available and what to check first
+- [PDF Dark Mode on Mac](https://pdfdark.org/blog/pdf-dark-mode-mac): beyond Preview's toggle
+- [PDF Dark Mode on iPad & iPhone](https://pdfdark.org/blog/pdf-dark-mode-ipad): the iOS 26 toggle and beyond
+- [PDF Dark Mode on Android](https://pdfdark.org/blog/pdf-dark-mode-android): no root, no system hack
+- [PDF Dark Mode in Adobe Acrobat](https://pdfdark.org/blog/pdf-dark-mode-adobe-acrobat): the setting hidden in Accessibility
+- [PDF Dark Mode in Sumatra PDF](https://pdfdark.org/blog/sumatra-pdf-dark-mode): the i key vs. editing settings.txt
+
+## About
+
+- [About PDF Dark](https://pdfdark.org/about): why it exists, how it's built, who runs it
+- [Privacy](https://pdfdark.org/privacy): files are processed in-browser and never uploaded
+- [Blog index](https://pdfdark.org/blog): all dark-mode guides

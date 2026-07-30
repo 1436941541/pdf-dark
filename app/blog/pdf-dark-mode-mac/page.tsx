@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
-import { getSiteUrl } from "@/lib/site";
+import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-mac";
 const TITLE = "PDF Dark Mode on Mac — Beyond Preview's New Toggle";
 const DESCRIPTION =
   "macOS Tahoe added a dark mode switch for PDFs in Preview. Here's what it does, where it falls short, and how to get a PDF that's dark everywhere.";
+const PUBLISHED = "2026-07-29";
+const UPDATED = "2026-07-29";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -61,7 +63,9 @@ function StructuredData() {
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
-    author: { "@type": "Organization", name: "PDF Dark" },
+    author: { "@type": "Organization", name: "PDF Dark Team" },
+    datePublished: PUBLISHED,
+    dateModified: UPDATED,
   };
   const faq = {
     "@context": "https://schema.org",
@@ -129,7 +133,16 @@ export default function MacVariantPage() {
             </span>
           </h1>
           <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            macOS Tahoe finally gave Preview a real dark-page switch for PDFs.{" "}
+            macOS Tahoe finally gave Preview{" "}
+            <a
+              href="https://blog.sangeeth.dev/notes/preview-app-adds-dark-mode-toggle-for-pdfs-on-macos-tahoe-ios-and-ipados-26/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              a real dark-page switch for PDFs
+            </a>
+            .{" "}
             <strong className="text-neutral-100">
               It&apos;s well made — and it only works in one app, on one OS
               version, for as long as the window stays open.
@@ -138,7 +151,7 @@ export default function MacVariantPage() {
           <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
             <span>By PDF Dark Team</span>
             <span aria-hidden>·</span>
-            <span>Updated July 29, 2026</span>
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
             <span aria-hidden>·</span>
             <span>7 min read</span>
           </div>
