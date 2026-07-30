@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
 import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-firefox";
-const TITLE = "PDF Dark Mode in Firefox — Beyond the about:config Hack";
+const TITLE = "PDF Dark Mode in Firefox — What Works and What Doesn't";
 const DESCRIPTION =
-  "Firefox's PDF.js viewer only darkens the toolbar, not the page content. Convert any PDF to dark mode in your browser — no about:config, no extensions.";
+  "Firefox's dark theme only darkens the PDF toolbar — the page stays white. Here's why, and how to get a real dark PDF in your browser, free.";
 const PUBLISHED = "2026-04-25";
-const UPDATED = "2026-07-29";
+const UPDATED = "2026-07-30";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -31,27 +32,27 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Does Firefox have a built-in PDF dark mode?",
-    a: "Partially. Firefox uses the PDF.js renderer, which supports a dark UI theme for the toolbar — but the actual page content still renders on a white background. There's no public preference to change the page canvas.",
+    a: "Partially. The viewer's toolbar can go dark, but the page content itself always renders on a white background — there's no public preference for the page canvas.",
   },
   {
     q: "What about the about:config pdfjs.viewerCssTheme hack?",
-    a: "Setting pdfjs.viewerCssTheme to 2 does darken the toolbar and the area around the page, but the page itself stays white. It's a cosmetic fix, not a real one.",
+    a: "Setting pdfjs.viewerCssTheme to 2 darkens the toolbar and the area around the page, but the page itself stays white. It's a cosmetic fix, not a real one.",
   },
   {
     q: "Do Firefox dark-mode extensions help?",
-    a: "Barely. Most Firefox extensions apply a CSS filter over the rendered PDF, which inverts images the same way it inverts text — you get photos as negatives and charts become unreadable. Dark Reader (the popular one) explicitly notes PDF support is limited. PDF Dark handles images separately from text, so photos keep their original colors.",
+    a: "Barely. Firefox's PDF viewer is privileged browser UI that extensions mostly can't restyle — Dark Reader itself notes its PDF support is limited — and filter-based approaches invert photos into negatives anyway.",
   },
   {
     q: "Aren't you just using PDF.js like Firefox does?",
-    a: "Yes — we also use Mozilla's PDF.js under the hood. The difference is what happens next: text and background are recolored into your theme (keeping text selectable on most PDFs), images are detected and handled separately so photos keep their colors, and the result is saved as a downloadable file — not just a viewer toggle.",
+    a: "Yes — same Mozilla engine, different next step: text and background are recolored into your theme, images are detected and handled separately so photos keep their colors, and the result is a downloadable file, not a viewer toggle.",
   },
   {
     q: "Does this work on Firefox for Android?",
-    a: "Yes. Firefox on Android supports file upload and Web Workers. The conversion runs on your phone, saves to your Downloads folder, and the dark PDF opens in any reader afterwards.",
+    a: "Yes. The conversion runs on your phone, the dark PDF saves to your Downloads folder, and it opens in any reader afterwards.",
   },
   {
     q: "Is the original PDF uploaded anywhere?",
-    a: "No. Everything runs in your Firefox tab. You can confirm this in the Network panel of Firefox DevTools (Ctrl+Shift+E on Windows, Cmd+Option+E on Mac) — no upload request is made for the file.",
+    a: "No. Everything runs in your Firefox tab — watch the Network panel in Firefox DevTools while converting and you'll see no upload request for the file.",
   },
 ];
 
@@ -115,305 +116,184 @@ export default function FirefoxVariantPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Article hero */}
-        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
-            Blog
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            PDF Dark Mode in Firefox
-            <span className="block text-amber-400 mt-2">
-              Beyond the about:config Hack
-            </span>
+        <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
+            PDF Dark Mode in Firefox — What Works and What Doesn&apos;t
           </h1>
-          <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Firefox&apos;s PDF.js viewer only darkens the{" "}
-            <em className="text-neutral-200">toolbar</em> — pages still render
-            on white. Here&apos;s the actual fix.
+          <p className="text-sm text-neutral-500 mb-10">
+            By PDF Dark Team ·{" "}
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time> ·
+            4 min read
           </p>
-          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
-            <span>By PDF Dark Team</span>
-            <span aria-hidden>·</span>
-            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
-            <span aria-hidden>·</span>
-            <span>8 min read</span>
-          </div>
-        </section>
 
-        {/* Why the gap */}
-        <section
-          id="why"
-          className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
-        >
-          <div className="max-w-3xl mx-auto px-6">
-            <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-              Why Firefox&apos;s dark mode stops at the toolbar
-            </h2>
-            <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              PDF.js is intentionally conservative with page rendering —
-              here&apos;s why, and what actually works.
-            </p>
+          <p className="text-lg mb-8">
+            You switched Firefox to its dark theme, opened a PDF from your
+            Downloads folder, and watched the toolbar go dark while the page
+            underneath stayed a bright white sheet. So you searched, found the
+            hidden-preference trick every forum mentions, flipped the value —
+            and the toolbar got a little darker while the page itself
+            didn&apos;t change at all. That&apos;s the whole story of
+            Firefox&apos;s built-in options: the darkness stops at the edge of
+            the document. Here&apos;s what actually darkens the page.
+          </p>
 
-            <div className="space-y-5">
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                  PDF.js renders the page faithfully
-                </h3>
-                <p className="text-sm text-neutral-400">
-                  <a
-                    href="https://github.com/mozilla/pdf.js"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-amber-400 hover:underline"
-                  >
-                    PDF.js
-                  </a>{" "}
-                  treats a PDF as authoritative — if the page background
-                  is white, it paints white. That&apos;s the right default for
-                  print/review work, but it&apos;s also why a
-                  &ldquo;toggle&rdquo; dark mode would be contentious: Mozilla
-                  would have to choose a color-inversion strategy that works
-                  for every document in the world. They haven&apos;t.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                  <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">
-                    about:config → pdfjs.viewerCssTheme
-                  </code>
-                </h3>
-                <p className="text-sm text-neutral-400 mb-3">
-                  This one comes up on every forum. If you want to try it, the
-                  full sequence is:
-                </p>
-                <ol className="text-sm text-neutral-400 list-decimal pl-5 space-y-1.5 mb-3">
-                  <li>
-                    Type{" "}
-                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                      about:config
-                    </code>{" "}
-                    in the address bar and click{" "}
-                    <em>Accept the Risk and Continue</em>.
-                  </li>
-                  <li>
-                    Search for{" "}
-                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                      pdfjs.viewerCssTheme
-                    </code>
-                    .
-                  </li>
-                  <li>
-                    Set the value to{" "}
-                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                      2
-                    </code>{" "}
-                    and reopen your PDF tab.
-                  </li>
-                </ol>
-                <p className="text-sm text-neutral-400">
-                  Two catches. First, it darkens the <em>chrome</em> around
-                  the PDF — toolbar, sidebar, page border — while the page
-                  canvas itself stays white; it&apos;s a cosmetic fix dressed
-                  up as a feature. Second, recent Firefox versions have been
-                  moving the viewer to simply follow your browser/system
-                  theme, so if the pref is missing in your about:config,
-                  that&apos;s why — and the page still renders white either
-                  way.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                  Dark Reader and similar extensions
-                </h3>
-                <p className="text-sm text-neutral-400">
-                  These apply a CSS filter on top of the rendered page. The
-                  result is the same as naive invert: photos become negatives,
-                  diagrams get mangled, and PDFs with any non-white background
-                  render unpredictably. Limited PDF support is a
-                  long-running theme on{" "}
-                  <a
-                    href="https://github.com/darkreader/darkreader/issues/12965"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-amber-400 hover:underline"
-                  >
-                    Dark Reader&apos;s own issue tracker
-                  </a>
-                  .
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-                <h3 className="font-semibold text-amber-400 mb-1 text-base m-0 mt-0">
-                  What PDF Dark does differently
-                </h3>
-                <ul className="text-sm text-neutral-300 list-disc pl-5 space-y-1.5">
-                  <li>
-                    Uses the same PDF.js underneath — so compatibility is
-                    identical to Firefox
-                  </li>
-                  <li>
-                    Recolors text and background into your chosen theme while
-                    photos keep their original colors — one consistent look
-                    for the whole document
-                  </li>
-                  <li>
-                    Produces a downloadable dark PDF — no about:config, no
-                    extension, and no dependence on the Firefox session
-                  </li>
-                  <li>
-                    The file never leaves your browser; check DevTools →
-                    Network
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* How it works in Firefox */}
-        <section className="max-w-3xl mx-auto px-6 py-20">
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
-            How PDF Dark works in Firefox
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            The quick answer
           </h2>
-          <div className="space-y-8">
-            <div>
-              <div className="text-xs text-amber-400 font-semibold mb-1">
-                Step 1
-              </div>
-              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
-                You drop a PDF on the converter
-              </h3>
-              <p className="text-neutral-300 leading-relaxed">
-                From the{" "}
-                <Link href="/converter" className="text-amber-400 hover:underline">
-                  PDF Dark converter
-                </Link>
-                , drag a PDF from your desktop, Downloads folder, or any
-                Firefox file picker. Firefox hands the file to the page via
-                the File API — no upload, no extension, no about:config.
-              </p>
-            </div>
-
-            <div>
-              <div className="text-xs text-amber-400 font-semibold mb-1">
-                Step 2
-              </div>
-              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
-                Pages render inside the tab
-              </h3>
-              <p className="text-neutral-300 leading-relaxed">
-                We use the same PDF.js engine Firefox ships with, so anything
-                Firefox can read, PDF Dark can read. Pages are painted to a
-                canvas in your tab — same compatibility, just with the dark
-                theme applied.
-              </p>
-            </div>
-
-            <div>
-              <div className="text-xs text-amber-400 font-semibold mb-1">
-                Step 3
-              </div>
-              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
-                You pick a theme
-              </h3>
-              <p className="text-neutral-300 leading-relaxed">
-                Choose from{" "}
-                <strong className="text-neutral-100">Midnight</strong>,{" "}
-                <strong className="text-neutral-100">Sepia</strong>,{" "}
-                <strong className="text-neutral-100">Solarized</strong>, or{" "}
-                <strong className="text-neutral-100">OLED</strong>. The
-                conversion runs in a Web Worker, so even a long document
-                doesn&apos;t freeze the Firefox UI.
-              </p>
-            </div>
-
-            <div>
-              <div className="text-xs text-amber-400 font-semibold mb-1">
-                Step 4
-              </div>
-              <h3 className="text-lg font-semibold text-neutral-50 m-0 mb-2">
-                You download the dark PDF
-              </h3>
-              <p className="text-neutral-300 leading-relaxed">
-                Click <strong className="text-neutral-100">Download</strong>{" "}
-                and Firefox saves the dark version to your Downloads folder.
-                Open it in Firefox again or hand it off to another reader —
-                it stays dark, no per-viewer toggle needed. Just reading
-                tonight? Skip the download and open the{" "}
-                <Link href="/" className="text-amber-400 hover:underline">
-                  dark mode PDF reader
-                </Link>{" "}
-                instead — same themes, nothing saved to disk.
-              </p>
-            </div>
-          </div>
-
-          <p className="mt-10 text-sm text-neutral-500">
-            Works on Firefox for Windows, macOS, Linux, and Android — any
-            release from the last few years is fine.
-          </p>
-        </section>
-
-        {/* CTA — back to the tool */}
-        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
-          <h2 className="text-xl font-semibold text-neutral-50 mb-2">
-            Ready to read a PDF in dark mode on Firefox?
-          </h2>
-          <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
-            3 steps, no about:config, no extensions
-          </h3>
-          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop a PDF on the reader and it renders dark right in Firefox —
-            no file saved, no about:config.
-          </p>
-          <Link
-            href="/"
-            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
-          >
-            Open the dark mode reader →
-          </Link>
-          <p className="mt-4 text-sm text-neutral-500">
-            Want to keep the file?{" "}
+          <p className="mb-5">
+            To just read, open the{" "}
+            <Link href="/" className="text-amber-400 hover:underline">
+              PDF dark mode reader
+            </Link>{" "}
+            in a Firefox tab and drag your PDF onto it. To make the file
+            itself dark — in Acrobat, on your phone, in Firefox next week —
+            use the{" "}
             <Link href="/converter" className="text-amber-400 hover:underline">
-              Convert &amp; download it instead
-            </Link>
-            .
+              converter
+            </Link>{" "}
+            and download a dark copy. Both run entirely in your browser; the
+            file is never uploaded.
           </p>
-        </section>
 
-        <RelatedVariants currentSlug="pdf-dark-mode-firefox" />
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 1: read with a dark theme in Firefox
+          </h2>
+          <p className="mb-4">
+            The fastest route — no hidden preferences, nothing installed:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open a new Firefox tab and go to the{" "}
+              <Link href="/" className="text-amber-400 hover:underline">
+                PDF dark mode reader
+              </Link>
+              .
+            </li>
+            <li>
+              Drag your PDF onto the page, or click to pick it from your
+              Downloads folder.
+            </li>
+            <li>
+              Pick a theme — Midnight, Sepia, Solarized, or pure-black OLED —
+              and read. Pages render dark right in the tab.
+            </li>
+          </ol>
+          <p className="mb-5">
+            Nothing is stored: close the tab and the file is gone. If
+            it&apos;s a paper you&apos;ll be reading all week, Option 2 below
+            gives you a copy that opens dark on its own.
+          </p>
 
-        {/* FAQ */}
-        <section
-          id="faq"
-          className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
-        >
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Before / after
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-neutral-800">
+                <Image
+                  src="/compare/original.png"
+                  alt="A PDF page as Firefox normally shows it: black text on a bright white background with a color photo"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                Before — Firefox&apos;s default white page
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                <Image
+                  src="/compare/pdf-dark.png"
+                  alt="The same PDF page in dark mode: dark background, light text, and the photo kept in its original colors"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-amber-400">
+                After — dark page, photo untouched
+              </figcaption>
+            </figure>
+          </div>
+          <p className="text-xs text-neutral-600 mb-10">
+            Real output (Midnight theme, Auto image mode) — not a mockup.
+            Notice the photo keeps its original colors instead of flipping
+            into a negative.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 2: convert the file, then keep it dark everywhere
+          </h2>
+          <p className="mb-4">
+            Firefox renders PDFs with{" "}
+            <a
+              href="https://github.com/mozilla/pdf.js"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              PDF.js
+            </a>
+            , Mozilla&apos;s open-source engine — and the converter uses the
+            same engine, so anything Firefox can open, it can open. Instead
+            of framing the page, it rewrites the colors saved inside the
+            file:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open the{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                converter
+              </Link>{" "}
+              in Firefox and drop your PDF on it.
+            </li>
+            <li>Pick a theme and click Download.</li>
+            <li>
+              Open the dark copy from Firefox&apos;s downloads panel — the
+              arrow icon in the toolbar — or press{" "}
+              <strong className="text-neutral-100">Ctrl+O</strong> and pick
+              it from Downloads. This time the page renders dark.
+            </li>
+          </ol>
+          <p className="mb-5">
+            Background dark, text light, photos detected and left in their
+            original colors — the recoloring keeps text selectable on most
+            PDFs, since it isn&apos;t a screen filter. And because the change
+            lives inside the file, the copy opens dark in Acrobat, on your
+            phone, in any viewer. Works in Firefox on Windows, macOS, Linux,
+            and Android.
+          </p>
+
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
+            <p className="text-neutral-300 mb-4">
+              Have a PDF open right now? Drop it on the reader and it renders
+              dark in this same Firefox tab — nothing installed, nothing
+              saved.
+            </p>
+            <Link
+              href="/"
+              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Read a PDF in dark mode →
+            </Link>
+          </div>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
             PDF dark mode in Firefox FAQ
           </h2>
-          <div className="space-y-3">
-            {FAQ.map((f) => (
-              <details
-                key={f.q}
-                className="group rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60 transition-colors [&_summary::-webkit-details-marker]:hidden"
-              >
-                <summary className="cursor-pointer p-4 flex items-center justify-between list-none text-neutral-100">
-                  <h3 className="font-medium text-base m-0">{f.q}</h3>
-                  <span
-                    aria-hidden
-                    className="text-neutral-500 transition-transform group-open:rotate-180 group-hover:text-amber-400"
-                  >
-                    ⌄
-                  </span>
-                </summary>
-                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+          {FAQ.map((f) => (
+            <div key={f.q} className="mb-7">
+              <h3 className="text-lg font-semibold text-neutral-50 mb-2">
+                {f.q}
+              </h3>
+              <p className="text-neutral-400">{f.a}</p>
+            </div>
+          ))}
+        </article>
+
+        <RelatedVariants currentSlug="pdf-dark-mode-firefox" />
       </main>
 
       <Footer />

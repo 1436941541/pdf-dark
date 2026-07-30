@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
@@ -9,7 +10,7 @@ const TITLE = "PDF Dark Mode in Microsoft Edge — Beyond the Flags Page Hack";
 const DESCRIPTION =
   "Turning on Edge's dark theme doesn't touch your PDFs — the page stays white. There's a flag that can force it dark, but it wrecks your images. Here's a cleaner fix.";
 const PUBLISHED = "2026-07-29";
-const UPDATED = "2026-07-29";
+const UPDATED = "2026-07-30";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -31,27 +32,27 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Does Microsoft Edge have a built-in PDF dark mode?",
-    a: "Not really. Switching Edge itself to Dark (Settings → Appearance → Mode) darkens the toolbar, tabs, and menus, but the PDF page underneath still renders on a white background. Edge is built on Chromium, so its bundled PDF viewer behaves the same way Chrome's does here — the app theme and the document content are handled separately, and only the app theme got the dark treatment.",
+    a: "No. Edge's dark theme darkens the toolbar, tabs, and menus, but the PDF page itself always renders on a white background — same as Chrome, since both use the same viewer.",
   },
   {
     q: "What is the 'Force Dark Mode for Web Contents' flag in edge://flags?",
-    a: "It's an experimental setting: type edge://flags into the address bar, search for \"Force Dark Mode for Web Contents\" (sometimes labeled Auto Dark Mode for Web Contents), and switch it from Default to Enabled, then relaunch. Once on, Edge force-darkens rendered page content, PDFs included. It's not something most people stumble into — flags are tucked away specifically because they're unfinished — and the name or behavior can change or disappear in a future Edge update, since that's the nature of a flags page.",
+    a: "An experimental switch that force-darkens all rendered page content. It was built for websites, inverts images along the way, and can change or disappear in any Edge update.",
   },
   {
     q: "If I enable that flag, will my PDF actually look good?",
-    a: "For a plain text document, it's passable. For anything with photos, a logo, or a colored chart, no — the flag applies one blanket filter to everything on the page. It doesn't know the difference between a paragraph of text and a product photo, so both get inverted the same way. Expect washed-out or color-flipped images sitting next to your now-dark text.",
+    a: "Plain text documents look passable. Anything with photos, a logo, or a colored chart gets the same blanket filter as the text — expect color-flipped images next to your dark pages.",
   },
   {
     q: "What's the F12 Console trick people mention for Edge PDFs?",
-    a: "Open DevTools (F12), go to the Console tab, and run document.embeds[0].style.filter = 'invert(0.95)' while viewing a PDF. It inverts the embedded PDF viewer on the spot. It works, but it's a manual, one-tab, one-session fix — reload the page or open a new PDF and you're typing it in again. It's really a trick for people comfortable poking at DevTools, not a real workflow.",
+    a: "A DevTools command that inverts the embedded viewer for the current tab only. It works, but you retype it every time you reload or open a new PDF — a tinkerer's trick, not a workflow.",
   },
   {
     q: "Are there Microsoft Edge Add-ons for PDF dark mode?",
-    a: "Yes, the Edge Add-ons store carries a few extensions with names along those lines, built the same way as their Chrome Web Store counterparts — a CSS invert filter over the page. They carry the same trade-offs: images get inverted along with text, and you're granting a browser extension permission to read and modify the page.",
+    a: "Yes, built like their Chrome counterparts: a CSS invert filter over the page. Images get inverted along with text, and the extension gets permission to read and modify pages.",
   },
   {
     q: "Is my PDF uploaded anywhere when I use PDF Dark?",
-    a: "No. The conversion runs entirely inside your Edge tab through the File API and a Web Worker. Open DevTools → Network while you use the tool and you won't see a request carrying your file anywhere.",
+    a: "No. The conversion runs entirely inside your Edge tab — open DevTools → Network while converting and you'll see no request carrying your file.",
   },
 ];
 
@@ -115,285 +116,209 @@ export default function EdgeVariantPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Article hero */}
-        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
-            Blog
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            PDF Dark Mode in Microsoft Edge
-            <span className="block text-amber-400 mt-2">
-              Beyond the Flags Page Hack
-            </span>
+        <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
+            PDF Dark Mode in Microsoft Edge — Beyond the Flags Page Hack
           </h1>
-          <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Turning on Edge&apos;s dark theme doesn&apos;t touch your PDFs —
-            the page itself stays{" "}
-            <em className="text-neutral-200">white</em>. There&apos;s a flag
-            that can force it dark, but it wrecks your images along the way.
+          <p className="text-sm text-neutral-500 mb-10">
+            By PDF Dark Team ·{" "}
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time> ·
+            5 min read
           </p>
-          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
-            <span>By PDF Dark Team</span>
-            <span aria-hidden>·</span>
-            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
-            <span aria-hidden>·</span>
-            <span>7 min read</span>
-          </div>
-        </section>
 
-        {/* Why the flag falls short */}
-        <section
-          id="why"
-          className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
-        >
-          <div className="max-w-3xl mx-auto px-6">
-            <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-              Why Edge&apos;s PDF dark mode is stuck behind a flag
-            </h2>
-            <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              Edge and Chrome share the same Chromium core, so it&apos;s no
-              surprise they share the same gap — Edge just also hides an
-              unfinished workaround in its settings.
-            </p>
+          <p className="text-lg mb-8">
+            You set Edge to Dark in its appearance settings and watched the
+            tabs and menus dim, then opened tonight&apos;s reading — a PDF —
+            and the document is exactly as bright as before. You check the
+            PDF toolbar: draw, highlight, read aloud, but nothing about a
+            dark background. In Edge, the app theme and the document&apos;s
+            own colors are two separate things, and only one of them has a
+            switch. Here&apos;s how to darken the document itself.
+          </p>
 
-            <div className="space-y-5">
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                  Edge&apos;s Dark appearance setting
-                </h3>
-                <p className="text-sm text-neutral-400">
-                  Flip Edge to Dark under{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1.5 py-0.5 rounded">
-                    edge://settings/appearance
-                  </code>{" "}
-                  and the toolbar, tabs, and menus go dark right away. Open a
-                  PDF and the page itself is exactly as bright as before —
-                  Edge&apos;s built-in viewer treats the document canvas as
-                  separate from the app chrome, same as Chrome&apos;s does,
-                  because underneath they&apos;re the same Chromium
-                  component.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                  The <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">edge://flags</code> workaround
-                </h3>
-                <p className="text-sm text-neutral-400 mb-3">
-                  Edge inherits{" "}
-                  <a
-                    href="https://developer.chrome.com/blog/auto-dark-theme"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-amber-400 hover:underline"
-                  >
-                    an experimental Chromium switch
-                  </a>{" "}
-                  —{" "}
-                  <strong className="text-neutral-200">
-                    Force Dark Mode for Web Contents
-                  </strong>{" "}
-                  — the same flag Chrome keeps behind{" "}
-                  <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">
-                    chrome://flags
-                  </code>
-                  . Turn it on and Edge will force-darken page content, PDFs
-                  included. To try it:
-                </p>
-                <ol className="text-sm text-neutral-400 list-decimal pl-5 space-y-1.5 mb-3">
-                  <li>
-                    Type{" "}
-                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                      edge://flags
-                    </code>{" "}
-                    into the address bar.
-                  </li>
-                  <li>
-                    Search for{" "}
-                    <em>Force Dark Mode for Web Contents</em> (sometimes
-                    labeled <em>Auto Dark Mode for Web Contents</em>).
-                  </li>
-                  <li>
-                    Switch it from <em>Default</em> to <em>Enabled</em>, then
-                    relaunch Edge. To undo it later, set it back to{" "}
-                    <em>Default</em>.
-                  </li>
-                </ol>
-                <p className="text-sm text-neutral-400 mb-3">
-                  It works — with real caveats:
-                </p>
-                <ul className="text-sm text-neutral-400 list-disc pl-5 space-y-1.5">
-                  <li>
-                    <strong className="text-neutral-200">
-                      It&apos;s a blanket filter.
-                    </strong>{" "}
-                    It doesn&apos;t distinguish text from images, so photos,
-                    logos, and charts get inverted right along with the
-                    paragraphs.
-                  </li>
-                  <li>
-                    <strong className="text-neutral-200">
-                      It&apos;s buried on purpose.
-                    </strong>{" "}
-                    You have to know the exact flag name to find it — it
-                    isn&apos;t surfaced anywhere in Edge&apos;s normal
-                    settings.
-                  </li>
-                  <li>
-                    <strong className="text-neutral-200">
-                      It&apos;s experimental, full stop.
-                    </strong>{" "}
-                    Flags are Microsoft&apos;s staging ground for unfinished
-                    features. The name, the default, or the flag itself can
-                    change or vanish in a later Edge release without notice.
-                  </li>
-                </ul>
-              </div>
-
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                  DevTools console tricks and Edge Add-ons
-                </h3>
-                <p className="text-sm text-neutral-400">
-                  If you&apos;d rather not touch flags, there&apos;s a
-                  console one-liner some people run instead —{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    document.embeds[0].style.filter = &apos;invert(0.95)&apos;
-                  </code>{" "}
-                  in DevTools (F12) — but it only lasts for that tab and
-                  resets the moment you reload. The Edge Add-ons store also
-                  carries a handful of &ldquo;PDF Dark Mode&rdquo;-style
-                  extensions built the same way as their Chrome equivalents,
-                  with the same image-inverting downsides.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-                <h3 className="font-semibold text-amber-400 mb-1 text-base m-0 mt-0">
-                  What PDF Dark does differently
-                </h3>
-                <ul className="text-sm text-neutral-300 list-disc pl-5 space-y-1.5">
-                  <li>
-                    No flags to hunt down, no relaunching Edge, no extension
-                    permissions
-                  </li>
-                  <li>
-                    Text and background are recolored into your theme while
-                    photos keep their real colors — nothing gets swept into
-                    one blanket filter
-                  </li>
-                  <li>
-                    Produces a downloadable dark PDF that stays dark in any
-                    viewer, not just in a tab with a flag switched on
-                  </li>
-                  <li>
-                    Your file never leaves your browser — check DevTools →
-                    Network to confirm
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Using PDF Dark in Edge */}
-        <section className="max-w-3xl mx-auto px-6 py-20">
-          <h2 className="text-2xl font-bold mb-6 text-center text-neutral-50">
-            Using PDF Dark in Microsoft Edge
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            The quick answer
           </h2>
-          <p className="text-neutral-300 leading-relaxed">
-            From the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
-              PDF Dark converter
-            </Link>
-            , drag a PDF in from your desktop or File Explorer, pick a theme,
-            and download. Edge saves the dark version to your usual
-            Downloads folder — open it later in Acrobat, Preview, or your
-            phone and it&apos;s still dark, with no flag to re-enable and no
-            extension to reinstall.
-          </p>
-          <p className="text-neutral-300 leading-relaxed mt-4">
-            The recoloring runs the same way in every browser — vector text
-            and background swaps, photo detection so images keep their real
-            colors, no whole-page invert filter involved.{" "}
-            <Link
-              href="/blog/how-pdf-dark-mode-conversion-works"
-              className="text-amber-400 hover:underline"
-            >
-              See how the conversion works
-            </Link>{" "}
-            for the technical breakdown. Only reading it once? Skip the
-            download and use the{" "}
+          <p className="mb-5">
+            To just read, open the{" "}
             <Link href="/" className="text-amber-400 hover:underline">
-              dark mode PDF reader
+              PDF dark mode reader
             </Link>{" "}
-            instead.
-          </p>
-
-          <p className="mt-10 text-sm text-neutral-500">
-            Works on Edge for Windows, Mac, and Linux — and on Edge for
-            Android and iOS through the mobile browser. No flags to flip, no
-            relaunch required.
-          </p>
-        </section>
-
-        {/* CTA — back to the tool */}
-        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
-          <h2 className="text-xl font-semibold text-neutral-50 mb-2">
-            Ready to read a PDF in dark mode on Edge?
-          </h2>
-          <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
-            3 steps, no edge://flags, no extensions
-          </h3>
-          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop a PDF on the reader and it renders dark right in your Edge
-            tab — no file saved, no experimental flag required.
-          </p>
-          <Link
-            href="/"
-            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
-          >
-            Read a PDF in dark mode →
-          </Link>
-          <p className="mt-4 text-sm text-neutral-500">
-            Want to keep the file?{" "}
+            in an Edge tab and drop your file on it. To keep a dark copy —
+            or to annotate it with Edge&apos;s own tools — use the{" "}
             <Link href="/converter" className="text-amber-400 hover:underline">
-              Convert &amp; download it instead
-            </Link>
-            .
+              converter
+            </Link>{" "}
+            first, then open the downloaded file in Edge. Both run entirely
+            in your browser; the file is never uploaded.
           </p>
-        </section>
 
-        <RelatedVariants currentSlug="pdf-dark-mode-edge" />
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 1: read with a dark theme in Edge
+          </h2>
+          <p className="mb-4">
+            The fastest route — nothing installed, nothing saved:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open a new Edge tab and go to the{" "}
+              <Link href="/" className="text-amber-400 hover:underline">
+                PDF dark mode reader
+              </Link>
+              .
+            </li>
+            <li>
+              Drag your PDF onto the page, or click to pick it from your
+              Downloads folder.
+            </li>
+            <li>
+              Pick a theme — Midnight, Sepia, Solarized, or pure-black OLED —
+              and read. Pages render dark right in the tab.
+            </li>
+          </ol>
 
-        {/* FAQ */}
-        <section
-          id="faq"
-          className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
-        >
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Before / after
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-neutral-800">
+                <Image
+                  src="/compare/original.png"
+                  alt="A PDF page as Edge normally shows it: black text on a bright white background with a color photo"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                Before — Edge&apos;s default white page
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                <Image
+                  src="/compare/pdf-dark.png"
+                  alt="The same PDF page in dark mode: dark background, light text, and the photo kept in its original colors"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-amber-400">
+                After — dark page, photo untouched
+              </figcaption>
+            </figure>
+          </div>
+          <p className="text-xs text-neutral-600 mb-10">
+            Real output (Midnight theme, Auto image mode) — not a mockup.
+            Notice the photo keeps its original colors instead of flipping
+            into a negative.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 2: convert the file, then annotate it in Edge
+          </h2>
+          <p className="mb-4">
+            Edge&apos;s built-in PDF viewer has solid annotation tools. They
+            can&apos;t darken the page — but they work fine on a page that
+            comes to them already dark:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open the{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                converter
+              </Link>{" "}
+              in Edge and drop your PDF on it. The file is parsed right in
+              the tab by{" "}
+              <a
+                href="https://github.com/mozilla/pdf.js"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400 hover:underline"
+              >
+                PDF.js
+              </a>
+              , Mozilla&apos;s open-source PDF engine — nothing is uploaded.
+            </li>
+            <li>Pick a theme and click Download.</li>
+            <li>
+              Open the downloaded file in Edge — drag it into a new tab, or
+              press <strong className="text-neutral-100">Ctrl+O</strong> and
+              pick it from Downloads.
+            </li>
+            <li>
+              Annotate as usual with Draw, Highlight, or Add text. On a dark
+              page, lighter ink colors — white, yellow — stay readable.
+            </li>
+          </ol>
+          <p className="mb-5">
+            When you save, your annotations and the dark background are both
+            part of the file. Send it to a colleague or open it on your
+            phone, and it shows up dark with your notes intact.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            What Edge&apos;s PDF viewer brings to the table
+          </h2>
+          <p className="mb-4">
+            Edge&apos;s viewer is better equipped than Chrome&apos;s, which is
+            worth knowing if you read a lot of PDFs in the browser:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 mb-5">
+            <li>
+              <strong className="text-neutral-100">Draw</strong> — freehand
+              ink with adjustable color and thickness
+            </li>
+            <li>
+              <strong className="text-neutral-100">Highlight</strong> and{" "}
+              <strong className="text-neutral-100">Add text</strong> — for
+              marking up contracts and papers
+            </li>
+            <li>
+              <strong className="text-neutral-100">Read aloud</strong> — Edge
+              reads the document to you
+            </li>
+            <li>
+              <strong className="text-neutral-100">Ask Copilot</strong> — on
+              recent versions, summarize or question the document
+            </li>
+          </ul>
+          <p className="mb-5">
+            None of these change the page background — and all of them work
+            normally on a converted dark PDF. That combination is the point
+            of Option 2: Edge supplies the tools, the converted file supplies
+            the dark page.
+          </p>
+
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
+            <p className="text-neutral-300 mb-4">
+              Have a PDF open in Edge right now? Drop it on the reader and
+              keep reading it dark — nothing installed, nothing saved.
+            </p>
+            <Link
+              href="/"
+              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Read a PDF in dark mode →
+            </Link>
+          </div>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
             PDF dark mode in Microsoft Edge FAQ
           </h2>
-          <div className="space-y-3">
-            {FAQ.map((f) => (
-              <details
-                key={f.q}
-                className="group rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60 transition-colors [&_summary::-webkit-details-marker]:hidden"
-              >
-                <summary className="cursor-pointer p-4 flex items-center justify-between list-none text-neutral-100">
-                  <h3 className="font-medium text-base m-0">{f.q}</h3>
-                  <span
-                    aria-hidden
-                    className="text-neutral-500 transition-transform group-open:rotate-180 group-hover:text-amber-400"
-                  >
-                    ⌄
-                  </span>
-                </summary>
-                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+          {FAQ.map((f) => (
+            <div key={f.q} className="mb-7">
+              <h3 className="text-lg font-semibold text-neutral-50 mb-2">
+                {f.q}
+              </h3>
+              <p className="text-neutral-400">{f.a}</p>
+            </div>
+          ))}
+        </article>
+
+        <RelatedVariants currentSlug="pdf-dark-mode-edge" />
       </main>
 
       <Footer />

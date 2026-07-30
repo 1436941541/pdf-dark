@@ -9,7 +9,7 @@ const TITLE = "PDF Readers with Dark Mode: What Actually Works (2026 Comparison)
 const DESCRIPTION =
   "Acrobat, Foxit, Sumatra, Preview, Chrome, Edge, Firefox, mobile apps — a straight comparison of which PDF readers really have dark mode, and which fake it.";
 const PUBLISHED = "2026-07-29";
-const UPDATED = "2026-07-29";
+const UPDATED = "2026-07-30";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -145,27 +145,27 @@ const ROWS: Row[] = [
 const FAQ = [
   {
     q: "Which PDF reader has the best built-in dark mode?",
-    a: "Foxit PDF Reader has the most complete native implementation — a Dark Skin option, a View → Night mode toggle, and an Accessibility color-override setting. It's still off by default and desktop-only, but it's more built out than Acrobat's buried Replace Document Colors option.",
+    a: "Foxit PDF Reader — a Dark Skin option, a View → Night mode toggle, and an Accessibility color override. Still off by default and desktop-only.",
   },
   {
     q: "Why is almost every reader's dark mode 'temporary'?",
-    a: "Because it's a software setting, not a property of the file. Toggle dark mode in Preview, Foxit, or a browser extension and the PDF itself hasn't changed at all — open the exact same file in a different app, on a different device, or send it to someone else, and it's back to a white page. Only a tool that rewrites the PDF's actual color data (like PDF Dark) produces a file that stays dark everywhere.",
+    a: "Because it's a software setting, not a property of the file — open the same PDF in another app, on another device, or send it to someone, and it's white again. Only rewriting the file's color data makes the darkness travel with it.",
   },
   {
     q: "Why do images get distorted in so many of these dark modes?",
-    a: "Most dark-mode implementations work by inverting every pixel on the page — text and images alike. That flips a photo's colors into a negative (skies turn orange, skin turns blue). A proper implementation has to detect which regions are photographic content and leave those colors alone, which is what PDF Dark's Images toggle and Auto detection do.",
+    a: "Most implementations invert every pixel on the page, photos included, which flips them into negatives. Doing it right means detecting photographic regions and leaving their colors alone — which is what PDF Dark's Auto detection does.",
   },
   {
     q: "Does Adobe Acrobat have a real dark mode for PDFs?",
-    a: "Sort of. It's hidden in Preferences → Accessibility → Replace Document Colors, and it recolors the page content. But it's an app-wide setting you have to configure per install — the file you view stays a normal white PDF everywhere else.",
+    a: "Sort of — Preferences → Accessibility → Replace Document Colors recolors the page, but it's a per-install app setting; the file stays a normal white PDF everywhere else.",
   },
   {
     q: "Do phones and tablets support PDF dark mode?",
-    a: "Only very recently, and only in specific apps. iOS/iPadOS 26 added a Dark Background toggle to Files and Books, and macOS Tahoe (26) added one to Preview. Older OS versions and most Android PDF viewers still have nothing — the page stays white regardless of system dark mode.",
+    a: "Only very recently: iOS/iPadOS 26 added a Dark Background toggle to Files and Books, and macOS Tahoe (26) added one to Preview. Older versions and most Android viewers still have nothing.",
   },
   {
     q: "If I just want a PDF that's dark everywhere, what should I use?",
-    a: "Convert it once instead of hunting for a per-app toggle. PDF Dark runs entirely in your browser, detects and preserves photos automatically, and produces a real dark-themed PDF file you can reopen in Acrobat, Preview, your phone, or anywhere else — no per-app setting required.",
+    a: "Convert it once instead of hunting for a per-app toggle. PDF Dark runs in your browser, keeps photos in their original colors, and produces a dark PDF file that opens dark in any reader.",
   },
 ];
 
@@ -229,82 +229,44 @@ export default function ComparisonPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Hero */}
-        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
-            Blog · Comparison
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            PDF Readers with Dark Mode
-            <span className="block text-amber-400 mt-2">What Actually Works</span>
+        <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
+            PDF Readers with Dark Mode: What Actually Works (2026 Comparison)
           </h1>
-          <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            &ldquo;Does my PDF app have dark mode&rdquo; has a different answer
-            for every piece of software.{" "}
-            <strong className="text-neutral-100">
-              Here&apos;s every major reader, side by side
-            </strong>{" "}
-            — what it actually supports, and what it doesn&apos;t.
+          <p className="text-sm text-neutral-500 mb-10">
+            By PDF Dark Team ·{" "}
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time> ·
+            5 min read
           </p>
-          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
-            <span>By PDF Dark Team</span>
-            <span aria-hidden>·</span>
-            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
-            <span aria-hidden>·</span>
-            <span>10 min read</span>
-          </div>
-        </section>
 
-        {/* Summary */}
-        <section className="w-full py-16 border-y border-neutral-900 bg-[#0e0e0e]">
-          <div className="max-w-3xl mx-auto px-6">
-            <p className="text-neutral-300 leading-relaxed">
-              Support is all over the map. Some readers — Foxit, Acrobat,
-              Sumatra — have had a dark-mode option for years, just buried a
-              few menus deep. Others — Chrome, Firefox, Android&apos;s stock
-              viewers — have never shipped one, despite{" "}
-              <a
-                href="https://support.google.com/drive/thread/406087422"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-400 hover:underline"
-              >
-                years of user requests
-              </a>
-              . A few, like macOS Preview and iOS Files, only just{" "}
-              <a
-                href="https://blog.sangeeth.dev/notes/preview-app-adds-dark-mode-toggle-for-pdfs-on-macos-tahoe-ios-and-ipados-26/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-amber-400 hover:underline"
-              >
-                added a toggle
-              </a>{" "}
-              in their 2025/2026 releases.
-            </p>
-            <p className="text-neutral-300 leading-relaxed mt-4">
-              But almost every option on this list shares the same limitation:
-              it&apos;s a <strong className="text-neutral-100">software
-              setting</strong>, not a property of the file. Turn on dark mode
-              in Preview or Foxit and the PDF itself hasn&apos;t changed —
-              open it in a different app, on a different device, or send it
-              to a colleague, and it&apos;s a plain white document again. The
-              table below spells out, reader by reader, whether what you get
-              is a permanent dark file or just a temporary viewer effect —
-              and what happens to the images along the way.
-            </p>
-          </div>
-        </section>
+          <p className="text-lg mb-8">
+            Your editor, browser, and terminal are all dark — then a PDF
+            opens and floods the screen white. So you start checking: does
+            Preview have a toggle now? Foxit? That extension a coworker
+            mentioned? Every app gives a different answer, and half the
+            advice online describes a version from three years ago.
+            Here&apos;s the current state of dark mode in every major PDF
+            reader, checked and in one table.
+          </p>
 
-        {/* Comparison table */}
-        <section id="table" className="max-w-5xl mx-auto px-6 py-20">
-          <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            The short version
+          </h2>
+          <p className="mb-5">
+            Almost no PDF reader has a true dark mode — one that changes the
+            document rather than the software displaying it. The few that
+            offer anything do it as a viewer setting: dark in that one app,
+            on that one machine, white everywhere else. The table below goes
+            reader by reader.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
             The comparison
           </h2>
-          <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
+          <p className="mb-6">
             12 third-party readers and viewers — plus our own converter —
-            checked for native dark-mode support, how permanent the effect is,
-            and what happens to embedded images.
+            checked for native dark-mode support, how permanent the effect
+            is, and what happens to embedded images:
           </p>
 
           <div className="overflow-x-auto rounded-xl border border-neutral-800">
@@ -374,69 +336,102 @@ export default function ComparisonPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-neutral-500 text-center mt-4">
+          <p className="text-xs text-neutral-600 mt-4 mb-10">
             Scroll sideways on small screens to see the full table.
           </p>
-        </section>
 
-        {/* CTA */}
-        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
-          <h2 className="text-xl font-semibold text-neutral-50 mb-2">
-            Skip the per-app hunt for a dark-mode toggle
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            The pattern behind the table
           </h2>
-          <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
-            Convert once, stays dark everywhere
-          </h3>
-          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            PDF Dark produces an actual dark-themed PDF file — no login, no
-            upload, photos kept in their real colors. Open it in any reader,
-            on any device, and it&apos;s dark by default.
+          <p className="mb-5">
+            Support is drifting in slowly: Foxit, Acrobat, and Sumatra have
+            had an option for years, buried a few menus deep; macOS Preview
+            and iOS Files only just{" "}
+            <a
+              href="https://blog.sangeeth.dev/notes/preview-app-adds-dark-mode-toggle-for-pdfs-on-macos-tahoe-ios-and-ipados-26/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              added a toggle
+            </a>{" "}
+            in their 26 releases; Chrome and Android&apos;s stock viewers
+            still have nothing despite{" "}
+            <a
+              href="https://support.google.com/drive/thread/406087422"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              years of user requests
+            </a>
+            . More important, every &ldquo;yes&rdquo; in the table except
+            the last row is a software setting, not a property of the file.
+            Toggle dark mode in Preview or Foxit and the PDF itself
+            hasn&apos;t changed — open it in another app, on another device,
+            or send it to a colleague, and it&apos;s a white page again.
           </p>
-          <Link
-            href="/converter"
-            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
-          >
-            Convert a PDF to dark mode →
-          </Link>
-          <p className="mt-4 text-sm text-neutral-500">
-            Just want to read something now?{" "}
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Making the file itself dark
+          </h2>
+          <p className="mb-4">
+            To get a document that stays dark everywhere, rewrite its color
+            data once instead of hunting for a toggle in every app:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open the{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                converter
+              </Link>{" "}
+              and drop the PDF on it.
+            </li>
+            <li>
+              Pick a theme — photos are detected and kept in their original
+              colors.
+            </li>
+            <li>
+              Download. The copy opens dark in every reader in the table.
+            </li>
+          </ol>
+          <p className="mb-5">
+            Everything runs in your browser; the file is never uploaded. To
+            read one file right now without saving a copy, the{" "}
             <Link href="/" className="text-amber-400 hover:underline">
-              Open it in the dark-mode reader instead
-            </Link>
-            .
+              dark mode reader
+            </Link>{" "}
+            does the same thing on screen.
           </p>
-        </section>
 
-        <RelatedVariants currentSlug="pdf-reader-dark-mode-comparison" />
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
+            <p className="text-neutral-300 mb-4">
+              Skip the per-app hunt for a toggle. Convert the file once — no
+              login, no upload, photos kept in their real colors — and it
+              opens dark in every reader on this list.
+            </p>
+            <Link
+              href="/converter"
+              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Convert a PDF to dark mode →
+            </Link>
+          </div>
 
-        {/* FAQ */}
-        <section
-          id="faq"
-          className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
-        >
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
             PDF dark mode comparison FAQ
           </h2>
-          <div className="space-y-3">
-            {FAQ.map((f) => (
-              <details
-                key={f.q}
-                className="group rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60 transition-colors [&_summary::-webkit-details-marker]:hidden"
-              >
-                <summary className="cursor-pointer p-4 flex items-center justify-between list-none text-neutral-100">
-                  <h3 className="font-medium text-base m-0">{f.q}</h3>
-                  <span
-                    aria-hidden
-                    className="text-neutral-500 transition-transform group-open:rotate-180 group-hover:text-amber-400"
-                  >
-                    ⌄
-                  </span>
-                </summary>
-                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+          {FAQ.map((f) => (
+            <div key={f.q} className="mb-7">
+              <h3 className="text-lg font-semibold text-neutral-50 mb-2">
+                {f.q}
+              </h3>
+              <p className="text-neutral-400">{f.a}</p>
+            </div>
+          ))}
+        </article>
+
+        <RelatedVariants currentSlug="pdf-reader-dark-mode-comparison" />
       </main>
 
       <Footer />

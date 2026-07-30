@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
@@ -9,7 +10,7 @@ const TITLE = "Darken a Scanned PDF Online — Free, In-Browser";
 const DESCRIPTION =
   "Got a scanned PDF that's painfully bright at night? Darken every page online in seconds. Free, no upload, no install — works on phones and laptops.";
 const PUBLISHED = "2026-06-26";
-const UPDATED = "2026-07-29";
+const UPDATED = "2026-07-30";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -31,31 +32,31 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Will this make the original text darker, or invert the whole page?",
-    a: "PDF Dark inverts. The bright background of your scan becomes a dark color (your theme), and the dark text becomes near-white. The result reads like a true dark-mode page — much easier on the eyes at night than the original bright scan, but it does change the visual style. If you specifically want to keep a white background and only deepen faded text, use an OCR + contrast tool instead.",
+    a: "It inverts: the bright background becomes your theme color and the dark text becomes near-white. If you want to keep the white background and only deepen faded text for printing, use an OCR + contrast tool instead.",
   },
   {
     q: "Which theme works best for scanned pages?",
-    a: "OLED (pure black) gives the highest contrast and is best on OLED phones for battery. Midnight (deep blue-grey) is the most comfortable for long sessions. Avoid Sepia for scans that already have yellow paper tones — the warm theme can blend into faded scans.",
+    a: "OLED (pure black) gives the deepest contrast and saves battery on OLED phones; Midnight (deep blue-grey) is the most comfortable for long sessions. Skip Sepia on yellow-tinted old scans — a warm theme on warm paper loses contrast.",
   },
   {
     q: "Does the scan need to be OCR'd first?",
-    a: "No. PDF Dark treats a scanned page as an image, which is exactly what it is, and darkens it uniformly. Tip: the Images toggle controls scans too — Auto and Invert darken them, while Original leaves scanned pages exactly as they came.",
+    a: "No. A scanned page is treated as the image it is and darkened directly — the Images toggle controls it: Auto and Invert darken scans, Original leaves them as they came.",
   },
   {
     q: "Is my scanned PDF uploaded anywhere?",
-    a: "No. Conversion happens entirely in your browser via the File API and a Web Worker. Open DevTools → Network and you'll see no upload during conversion. The PDF never leaves your device.",
+    a: "No. Conversion happens entirely in your browser — open DevTools → Network during conversion and you'll see no upload. The file never leaves your device.",
   },
   {
     q: "My scan is 300+ pages. Will this still work?",
-    a: "On a laptop, yes — we render and darken pages in chunks. On a phone, very large scans can stall when memory runs out. If that happens, split the PDF first (any free PDF splitter works) and darken the halves separately.",
+    a: "On a laptop, yes — pages are rendered and darkened in chunks. On a phone, very large scans can stall when memory runs out; split the PDF first and darken the halves separately.",
   },
   {
     q: "Will old yellowed paper still look yellowed after darkening?",
-    a: "No. The brightness-mapping algorithm pulls every page toward your chosen theme color, so yellowed paper, off-white scans, and pure white pages all end up the same dark background. That uniformity is one of the biggest reading wins for old book scans.",
+    a: "No. The brightness mapping pulls every page toward your theme color, so yellowed, off-white, and pure white pages all end up as the same dark background.",
   },
   {
     q: "Is there a file size or page limit?",
-    a: "No hard limit. Everything runs locally, so the only limit is your device's memory. Hundreds of pages are fine on modern hardware.",
+    a: "No hard limit — everything runs locally, so your device's memory is the only ceiling.",
   },
 ];
 
@@ -119,22 +120,129 @@ export default function DarkenScannedPdfPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Hero */}
-        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
-            Blog
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Darken a Scanned PDF
-            <span className="block text-amber-400 mt-2">in your browser</span>
+        <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
+            Darken a Scanned PDF Online — Free, In-Browser
           </h1>
-          <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Scans are usually a photo of a bright white page, which is rough on
-            the eyes after sunset. PDF Dark flips that — the background becomes
-            a dark color you pick, the text becomes near-white, and you get a
-            new PDF you can keep.
+          <p className="text-sm text-neutral-500 mb-10">
+            By PDF Dark Team ·{" "}
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time> ·
+            4 min read
           </p>
-          <div className="mt-7">
+
+          <p className="text-lg mb-8">
+            You finally tracked down the chapter you needed — a scan of an old
+            book, photographed page by page — and opened it in bed. Every page
+            is a picture of bright white paper. You flipped your reader&apos;s
+            dark mode on, and nothing happened: the interface went dark, the
+            pages stayed white. That&apos;s not a bug. A scan has no text for
+            the reader to restyle, so the dark setting never reaches the page
+            itself. Here&apos;s how to darken the scan for real.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            The quick answer
+          </h2>
+          <p className="mb-5">
+            Drop your scanned PDF on the{" "}
+            <Link href="/converter" className="text-amber-400 hover:underline">
+              PDF Dark converter
+            </Link>
+            , pick a theme, and click Download. A scanned page is one big
+            picture of paper, so the converter darkens it as an image — with
+            the Images toggle on Auto, every page comes back dark, as a
+            normal PDF you can keep. No OCR needed, no upload, no install;
+            everything runs in your browser, on a phone or a laptop.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            The steps
+          </h2>
+          <ol className="list-decimal pl-6 space-y-4 mb-5">
+            <li>
+              Open the{" "}
+              <Link
+                href="/converter"
+                className="text-amber-400 hover:underline"
+              >
+                converter
+              </Link>{" "}
+              in any browser and drag the scanned PDF onto the drop zone. The
+              file is parsed locally and never leaves your device.
+            </li>
+            <li>
+              Pick a theme and check the Images toggle. Because a scan has no
+              text layer, the whole page is treated as a single image: Auto
+              and Invert both darken scanned pages, while Original leaves
+              them exactly as they came — only useful when a mostly digital
+              PDF has a few scanned inserts you want to keep as-is. For a
+              night-reading scan, leave it on Auto.
+            </li>
+            <li>
+              Click Download. The brightness mapping pulls every shade of
+              light paper — pure white, yellowed, gray near the spine — to
+              the same dark background, so an old book scan whose page color
+              drifts chapter to chapter comes back as one calm, uniform
+              theme.
+            </li>
+          </ol>
+          <p className="mb-5">
+            Theme choice matters more on scans than on digital PDFs. OLED
+            gives the deepest contrast and saves battery on OLED phones;
+            Midnight is the most comfortable for long sessions; skip Sepia on
+            yellow-tinted old scans, where a warm theme on warm paper loses
+            contrast. To try them on your own scan before saving anything,
+            open it in the{" "}
+            <Link href="/" className="text-amber-400 hover:underline">
+              dark mode reader
+            </Link>{" "}
+            and switch themes live.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Before / after
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-neutral-800">
+                <Image
+                  src="/compare/original.png"
+                  alt="Original bright PDF page: dark text on a white background with a full-color sunset photo"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                Before — bright page, the way a scan opens
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                <Image
+                  src="/compare/pdf-dark.png"
+                  alt="The same page darkened by PDF Dark — uniform dark background with near-white text"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-amber-400">
+                After — background normalized to the theme
+              </figcaption>
+            </figure>
+          </div>
+          <p className="text-xs text-neutral-600 mb-10">
+            Real output (Midnight theme, Auto image mode) — not a mockup.
+            Scanned pages get the same brightness mapping.
+          </p>
+
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
+            <p className="text-neutral-300 mb-4">
+              Reading an old scan tonight? Drop it on the converter and the
+              darkened copy downloads right away — free, no account, nothing
+              uploaded.
+            </p>
             <Link
               href="/converter"
               className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
@@ -142,190 +250,21 @@ export default function DarkenScannedPdfPage() {
               Darken my scanned PDF →
             </Link>
           </div>
-          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
-            <span>By PDF Dark Team</span>
-            <span aria-hidden>·</span>
-            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
-            <span aria-hidden>·</span>
-            <span>5 min read</span>
-          </div>
-        </section>
 
-        {/* Why scans hurt */}
-        <section
-          id="scans"
-          className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
-        >
-          <div className="max-w-3xl mx-auto px-6">
-            <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-              Why scanned PDFs are harder to read at night
-            </h2>
-            <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              Two things make scans different from regular PDFs, and most
-              reader apps can&apos;t do much about either.
-            </p>
-
-            <div className="grid sm:grid-cols-2 gap-5">
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="text-sm font-semibold text-amber-400 mb-3 m-0">
-                  Scans are pure raster
-                </h3>
-                <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
-                  <li>No text layer, no fonts, no styles to restyle</li>
-                  <li>
-                    PDF reader &quot;dark mode&quot; toggles do nothing — they
-                    only retheme text PDFs
-                  </li>
-                  <li>
-                    You&apos;re looking at a photo of a page, and the photo is
-                    white
-                  </li>
-                </ul>
-              </div>
-
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="text-sm font-semibold text-amber-400 mb-3 m-0">
-                  And the background varies
-                </h3>
-                <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
-                  <li>Yellowed paper, off-white book scans, gray shadows</li>
-                  <li>
-                    OS-level invert turns yellow into purple — even uglier than
-                    the original
-                  </li>
-                  <li>
-                    A real color flip needs to normalize the background first,
-                    then apply the theme
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <p className="text-xs text-neutral-500 text-center mt-8">
-              PDF Dark&apos;s brightness mapping pulls every shade of
-              &ldquo;light&rdquo; to your single theme color — old yellow scans
-              and crisp white scans end up the same calm dark.
-            </p>
-          </div>
-        </section>
-
-        {/* What to expect — honest preview */}
-        <section className="max-w-3xl mx-auto px-6 py-20">
-          <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-            What &ldquo;darken&rdquo; means here
-          </h2>
-          <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-            Worth being upfront about this before you feed in a 400-page
-            scan: the tool inverts the page rather than just dimming it.
-          </p>
-
-          <div className="space-y-6">
-            <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                ✅ Great fit
-              </h3>
-              <p className="text-sm text-neutral-300">
-                You want a true dark-mode reading experience: dark page,
-                light text, comfortable at night. You&apos;re fine with the
-                visual style changing — you care about eye strain, not about
-                printing the file later.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                ⚠️ Probably not what you want
-              </h3>
-              <p className="text-sm text-neutral-400">
-                You want to keep a white background and only make faded text
-                blacker (a contrast-only tweak). For that, look for tools that
-                advertise &ldquo;PDF contrast enhancement&rdquo; or
-                &ldquo;OCR-and-rethreshold&rdquo; — they preserve the page
-                style and just deepen the strokes.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Pick the right theme for scans
-              </h3>
-              <ul className="text-sm text-neutral-400 space-y-2 mt-3 list-disc pl-5">
-                <li>
-                  <strong className="text-neutral-200">OLED</strong> — deepest
-                  contrast, best on OLED phones for battery
-                </li>
-                <li>
-                  <strong className="text-neutral-200">Midnight</strong> —
-                  calm blue-grey, easiest on the eyes for long reads
-                </li>
-                <li>
-                  <strong className="text-neutral-200">Solarized</strong> —
-                  cool teal; nice on retina laptops
-                </li>
-                <li>
-                  Skip <strong className="text-neutral-200">Sepia</strong> on
-                  yellow-tinted old scans — too much warm-on-warm
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
-          <h2 className="text-xl font-semibold text-neutral-50 mb-3">
-            Try it on one of your scans
-          </h2>
-          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Pick OLED, Midnight, or another theme on the converter, drop your
-            scan, and the darkened copy downloads itself. The download is a
-            regular PDF you can email or sync like any other.
-          </p>
-          <Link
-            href="/converter"
-            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
-          >
-            Open PDF Dark →
-          </Link>
-          <p className="mt-4 text-sm text-neutral-500">
-            Reading an old scan in bed tonight?{" "}
-            <Link href="/" className="text-amber-400 hover:underline">
-              Read it in dark mode
-            </Link>{" "}
-            without saving anything.
-          </p>
-        </section>
-
-        <RelatedVariants currentSlug="darken-scanned-pdf-online" />
-
-        {/* FAQ */}
-        <section
-          id="faq"
-          className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
-        >
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
             Darken scanned PDF — FAQ
           </h2>
-          <div className="space-y-3">
-            {FAQ.map((f) => (
-              <details
-                key={f.q}
-                className="group rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60 transition-colors [&_summary::-webkit-details-marker]:hidden"
-              >
-                <summary className="cursor-pointer p-4 flex items-center justify-between list-none text-neutral-100">
-                  <h3 className="font-medium text-base m-0">{f.q}</h3>
-                  <span
-                    aria-hidden
-                    className="text-neutral-500 transition-transform group-open:rotate-180 group-hover:text-amber-400"
-                  >
-                    ⌄
-                  </span>
-                </summary>
-                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+          {FAQ.map((f) => (
+            <div key={f.q} className="mb-7">
+              <h3 className="text-lg font-semibold text-neutral-50 mb-2">
+                {f.q}
+              </h3>
+              <p className="text-neutral-400">{f.a}</p>
+            </div>
+          ))}
+        </article>
+
+        <RelatedVariants currentSlug="darken-scanned-pdf-online" />
       </main>
 
       <Footer />

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
@@ -9,7 +10,7 @@ const TITLE = "PDF Dark Mode in Adobe Acrobat — Hidden in Accessibility";
 const DESCRIPTION =
   "Acrobat's Dark Gray theme only skins the toolbar. The real page-darkening setting hides in Preferences → Accessibility — here's the path, and a faster way.";
 const PUBLISHED = "2026-07-29";
-const UPDATED = "2026-07-29";
+const UPDATED = "2026-07-30";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -31,27 +32,27 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "I turned on Dark Gray in Acrobat but my PDF pages are still white — why?",
-    a: "Because Dark Gray is an interface theme, not a page setting. It lives under View → Display Theme, and it only recolors the toolbar, side panels, and menus. The document canvas — the actual page you're reading — keeps rendering with whatever background color is baked into the PDF, almost always white.",
+    a: "Dark Gray (View → Display Theme) is an interface theme — it recolors the toolbar, panels, and menus, not the page. The document canvas keeps rendering the PDF's own colors, almost always white.",
   },
   {
     q: "So how do you actually make the page content dark in Acrobat?",
-    a: "Open Edit → Preferences on Windows (Acrobat → Preferences on Mac), pick the Accessibility category, and check 'Replace Document Colors.' Then choose 'Use Custom Color' and set Page Background to a dark color and Document Text to a light color (or pick one of Acrobat's built-in high-contrast presets from the same dropdown). This is the setting that actually repaints the page — Dark Gray never touches it.",
+    a: "Open Edit → Preferences on Windows (Acrobat → Preferences on Mac), pick the Accessibility category, check Replace Document Colors, then set a dark page background and light document text.",
   },
   {
     q: "Why is this setting under Accessibility instead of somewhere more obvious?",
-    a: "Because Adobe built it for low-vision and high-contrast reading needs, not as a 'dark mode' feature. It works for darkening PDFs too, but nothing in the main View or Theme menus points you there — most users never find it, and support threads are full of people who assumed Dark Gray was supposed to do this.",
+    a: "Adobe built it for low-vision and high-contrast reading, not as a dark mode — nothing in the View or Theme menus points to it, which is why most users never find it.",
   },
   {
     q: "Do images stay normal-colored when I use Replace Document Colors?",
-    a: "Yes — Acrobat's color replacement only touches page background and text, so photos and images keep their original colors instead of getting inverted into film-negative colors. That part is done right. The trade-off is getting there: it's a multi-step trip through Preferences that most readers won't discover on their own.",
+    a: "Yes — only page background and text are recolored, so photos keep their original colors instead of turning into negatives.",
   },
   {
     q: "If I set this up on my laptop, will the PDF still look dark on my phone or on a coworker's computer?",
-    a: "No. Replace Document Colors is an Acrobat application preference, not something saved inside the PDF file. It only affects how your copy of Acrobat displays PDFs. Open the same file in Acrobat Reader mobile, a different desktop, Preview, or send it to a colleague, and it opens back up in its original white-background colors — the darkness never travels with the file.",
+    a: "No. It's an Acrobat application preference, not saved inside the PDF — the same file opens with its original white background everywhere else.",
   },
   {
     q: "Is there a way to get a PDF that's actually dark everywhere, on any device, for anyone who opens it?",
-    a: "Yes — convert the file itself instead of changing a viewer setting. PDF Dark repaints the page pixels and saves a new PDF, so the dark theme is part of the file. Open it in Acrobat, Preview, a phone, anywhere, with no preferences to configure and nothing to explain to whoever you send it to.",
+    a: "Yes — convert the file itself. PDF Dark rewrites the colors saved inside the PDF, so the dark theme travels with the file to any app on any device.",
   },
 ];
 
@@ -76,8 +77,8 @@ function StructuredData() {
       acceptedAnswer: { "@type": "Answer", text: f.a },
     })),
   };
-  // Plain-text mirror of the visible "quick answer" steps — keep in sync
-  // with the <ol> in the Quick answer section below.
+  // Plain-text mirror of the visible Option 1 steps — keep in sync
+  // with the <ol> in the Option 1 section below.
   const howTo = {
     "@context": "https://schema.org",
     "@type": "HowTo",
@@ -138,295 +139,191 @@ export default function AdobeAcrobatVariantPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Article hero */}
-        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
-            Blog
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            PDF Dark Mode in Adobe Acrobat
-            <span className="block text-amber-400 mt-2">
-              Hidden in Accessibility, Not Themes
-            </span>
+        <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
+            PDF Dark Mode in Adobe Acrobat — Hidden in Accessibility
           </h1>
-          <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Acrobat&apos;s{" "}
-            <strong className="text-neutral-100">Dark Gray</strong> theme only
-            recolors the app around the page — the page itself stays white.
-            The setting that actually darkens it lives somewhere most people
-            never look.
+          <p className="text-sm text-neutral-500 mb-10">
+            By PDF Dark Team ·{" "}
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time> ·
+            4 min read
           </p>
-          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
-            <span>By PDF Dark Team</span>
-            <span aria-hidden>·</span>
-            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
-            <span aria-hidden>·</span>
-            <span>8 min read</span>
-          </div>
-        </section>
 
-        {/* Quick answer */}
-        <section className="max-w-3xl mx-auto px-6 pb-12">
-          <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5 text-left">
-            <h2 className="text-base font-semibold text-amber-400 m-0 mb-3">
-              The quick answer: darken the page in Acrobat
-            </h2>
-            <ol className="text-sm text-neutral-300 list-decimal pl-5 space-y-1.5 m-0">
-              <li>
-                Open Preferences:{" "}
-                <strong className="text-neutral-100">
-                  Edit → Preferences
-                </strong>{" "}
-                (Ctrl+K) on Windows, or{" "}
-                <strong className="text-neutral-100">
-                  Acrobat → Preferences
-                </strong>{" "}
-                (⌘K) on Mac.
-              </li>
-              <li>
-                Select the{" "}
-                <strong className="text-neutral-100">Accessibility</strong>{" "}
-                category.
-              </li>
-              <li>
-                Check{" "}
-                <a
-                  href="https://helpx.adobe.com/reader/desktop/accessibility-features.html"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-amber-400 hover:underline"
-                >
-                  <strong className="text-amber-400">
-                    Replace Document Colors
-                  </strong>
-                </a>
-                .
-              </li>
-              <li>
-                Choose{" "}
-                <strong className="text-neutral-100">Use Custom Color</strong>{" "}
-                — set Page Background to a dark color and Document Text to a
-                light one (or pick a built-in high-contrast combination).
-              </li>
-              <li>Click OK — every PDF you open now renders dark.</li>
-            </ol>
-            <p className="text-sm text-neutral-400 mt-4 mb-0">
-              This is a viewer preference on your machine — it never changes
-              the file itself. The Dark Gray theme under View → Display Theme
-              only recolors the toolbar, never the page.
-            </p>
-          </div>
-        </section>
+          <p className="text-lg mb-8">
+            You already found what looked like the answer: View → Display
+            Theme → Dark Gray. You switched it on, the toolbar and panels
+            went dark — and the document itself kept glowing white in the
+            middle of the window. A second, slower pass through the View
+            menu turns up nothing else that sounds right. The setting that
+            darkens the actual page does exist; Adobe just filed it under
+            Accessibility, where almost nobody thinks to look.
+          </p>
 
-        {/* Why Acrobat's dark mode confuses people */}
-        <section
-          id="why"
-          className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
-        >
-          <div className="max-w-3xl mx-auto px-6">
-            <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-              Two different settings, one confusing name
-            </h2>
-            <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              Acrobat actually has two unrelated things people lump together
-              as &ldquo;dark mode.&rdquo; Only one of them touches the page.
-            </p>
-
-            <div className="overflow-x-auto rounded-xl border border-neutral-800 mb-5">
-              <table className="w-full min-w-[640px] border-collapse text-sm">
-                <thead>
-                  <tr className="bg-neutral-900/60 text-left">
-                    <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
-                      Setting
-                    </th>
-                    <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
-                      Where
-                    </th>
-                    <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
-                      What it changes
-                    </th>
-                    <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
-                      The catch
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-neutral-900">
-                    <td className="px-4 py-4 align-top font-semibold text-neutral-100 whitespace-nowrap">
-                      &ldquo;Dark Gray&rdquo; theme
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      <code className="text-amber-400 text-xs bg-neutral-950 px-1.5 py-0.5 rounded">
-                        View → Display Theme
-                      </code>
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      App chrome only — toolbar, side panels, menus
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-400">
-                      The page itself, the part you&apos;re actually reading,
-                      never changes color
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-4 align-top font-semibold text-neutral-100 whitespace-nowrap">
-                      Replace Document Colors
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      <code className="text-amber-400 text-xs bg-neutral-950 px-1.5 py-0.5 rounded">
-                        Edit → Preferences → Accessibility
-                      </code>
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      Page background + text color, via Custom Color
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-400">
-                      Filed under accessibility not display, manual to set
-                      up, and it&apos;s an app preference — not saved into
-                      the file, so it doesn&apos;t travel to another device
-                      or a shared copy
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p className="text-neutral-400 text-sm mb-5">
-              Images stay their original color under Replace Document
-              Colors — Acrobat gets that part right. The trade-off is
-              getting there: a multi-step trip through Preferences most
-              readers never find on their own.
-            </p>
-
-            <div className="space-y-5">
-              <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-                <h3 className="font-semibold text-amber-400 mb-1 text-base m-0 mt-0">
-                  What PDF Dark does differently
-                </h3>
-                <ul className="text-sm text-neutral-300 list-disc pl-5 space-y-1.5">
-                  <li>
-                    Darkens the actual file, so it&apos;s dark in Acrobat, on
-                    your phone, and for whoever you send it to — no
-                    per-device setup
-                  </li>
-                  <li>
-                    One drop zone, no Preferences menu, no Accessibility tab
-                    to dig through
-                  </li>
-                  <li>
-                    Images keep their real colors automatically — no manual
-                    color picking required
-                  </li>
-                  <li>
-                    Runs entirely in your browser — your file never leaves
-                    your device
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Using PDF Dark instead */}
-        <section className="max-w-3xl mx-auto px-6 py-20">
-          <h2 className="text-2xl font-bold mb-6 text-center text-neutral-50">
-            Using PDF Dark instead of Acrobat&apos;s menus
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            The quick answer
           </h2>
-          <p className="text-neutral-300 leading-relaxed">
-            From the{" "}
+          <p className="mb-5">
+            Acrobat can darken the page natively: the setting is Preferences
+            → Accessibility → Replace Document Colors, and Option 1 walks
+            through it. It only changes how this copy of Acrobat displays
+            PDFs — to make the file itself dark, on your phone or for anyone
+            you send it to, run it through the{" "}
             <Link href="/converter" className="text-amber-400 hover:underline">
-              PDF Dark converter
-            </Link>
-            , drag in the same PDF you&apos;d normally open in Acrobat, pick
-            a theme, and download. Photos and images are detected and kept
-            in their original colors automatically — no Page Background /
-            Document Text pickers to fuss with, no Preferences menu, no
-            Accessibility tab.
-          </p>
-          <p className="text-neutral-300 leading-relaxed mt-4">
-            The image handling in particular runs itself, with no color
-            pickers to configure — pages are read as vector data where
-            possible, and each image is sampled for brightness before the
-            tool decides whether to touch it.{" "}
-            <Link
-              href="/blog/how-pdf-dark-mode-conversion-works"
-              className="text-amber-400 hover:underline"
-            >
-              Here&apos;s exactly how that works
-            </Link>
-            . The output is a new PDF file, dark in Acrobat, on any computer,
-            on your phone, or for whoever you send it to, with nothing to
-            configure on their end. Just want to read it once without saving
-            a new file? You can also{" "}
-            <Link href="/" className="text-amber-400 hover:underline">
-              read a PDF in dark mode
+              converter
             </Link>{" "}
-            right on this page instead.
+            once instead, which is Option 2.
           </p>
 
-          <p className="mt-10 text-sm text-neutral-500">
-            Works in any modern browser on Windows, Mac, Linux, or mobile — no
-            Adobe Acrobat installation required to use it.
-          </p>
-        </section>
-
-        {/* CTA — back to the tool */}
-        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
-          <h2 className="text-xl font-semibold text-neutral-50 mb-2">
-            Skip Acrobat&apos;s Preferences menu entirely
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 1: turn on Replace Document Colors
           </h2>
-          <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
-            A dark PDF that stays dark, on every device, for anyone you send it to
-          </h3>
-          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop your PDF in, pick a theme, and download a file that&apos;s
-            already dark — no Accessibility settings to find or reconfigure
-            on your next machine.
+          <p className="mb-4">
+            Dark Gray only recolors the application around the document. The
+            setting that repaints the page itself lives here:
           </p>
-          <Link
-            href="/converter"
-            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
-          >
-            Convert a PDF to dark mode →
-          </Link>
-          <p className="mt-4 text-sm text-neutral-500">
-            Just want to read one file right now?{" "}
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open Preferences:{" "}
+              <strong className="text-neutral-100">Edit → Preferences</strong>{" "}
+              (Ctrl+K) on Windows, or{" "}
+              <strong className="text-neutral-100">
+                Acrobat → Preferences
+              </strong>{" "}
+              (⌘K) on Mac.
+            </li>
+            <li>
+              Select the{" "}
+              <strong className="text-neutral-100">Accessibility</strong>{" "}
+              category.
+            </li>
+            <li>
+              Check{" "}
+              <a
+                href="https://helpx.adobe.com/reader/desktop/accessibility-features.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400 hover:underline"
+              >
+                Replace Document Colors
+              </a>
+              .
+            </li>
+            <li>
+              Choose{" "}
+              <strong className="text-neutral-100">Use Custom Color</strong> —
+              set Page Background to a dark color and Document Text to a
+              light one (or pick a built-in high-contrast combination).
+            </li>
+            <li>Click OK — every PDF you open now renders dark.</li>
+          </ol>
+          <p className="mb-5">
+            One thing to know about its scope: this is an application
+            preference, stored in your copy of Acrobat, and it never
+            modifies the file — the same document opens white in any other
+            app or on any other device. Images are handled well, though:
+            only background and text are recolored, so photos keep their
+            original colors.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 2: convert the file
+          </h2>
+          <p className="mb-4">
+            To make the darkness part of the document rather than a viewer
+            setting, rewrite the colors inside the file:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open the{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                converter
+              </Link>{" "}
+              and drop your PDF on it.
+            </li>
+            <li>Pick a theme and click Download.</li>
+            <li>Open the downloaded copy in Acrobat — or anywhere else.</li>
+          </ol>
+          <p className="mb-5">
+            The dark colors are written into the file itself, so it opens
+            dark in Acrobat, Preview, on your phone, and for anyone you send
+            it to — nothing to configure on their end. Photos are detected
+            and left in their original colors automatically, and the
+            conversion runs entirely in your browser; the PDF is never
+            uploaded. Just want to read one document right now without
+            saving a copy? Open it in the{" "}
             <Link href="/" className="text-amber-400 hover:underline">
-              Open it in the dark-mode reader instead
-            </Link>
-            .
+              dark mode PDF reader
+            </Link>{" "}
+            instead.
           </p>
-        </section>
 
-        <RelatedVariants currentSlug="pdf-dark-mode-adobe-acrobat" />
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Before / after
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-neutral-800">
+                <Image
+                  src="/compare/original.png"
+                  alt="A PDF page as Adobe Acrobat normally shows it: black text on a bright white background with a color photo"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                Before — Acrobat&apos;s default white page
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                <Image
+                  src="/compare/pdf-dark.png"
+                  alt="The same PDF page in dark mode: dark background, light text, and the photo kept in its original colors"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-amber-400">
+                After — dark page, photo untouched
+              </figcaption>
+            </figure>
+          </div>
+          <p className="text-xs text-neutral-600 mb-10">
+            Real output (Midnight theme, Auto image mode) — not a mockup.
+            The photo keeps its original colors instead of flipping into a
+            negative.
+          </p>
 
-        {/* FAQ */}
-        <section
-          id="faq"
-          className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
-        >
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
+            <p className="text-neutral-300 mb-4">
+              Skip the trip through Preferences. Drop your PDF in, pick a
+              theme, and download a file that&apos;s already dark — in
+              Acrobat, on your phone, and for anyone you send it to.
+            </p>
+            <Link
+              href="/converter"
+              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Convert a PDF to dark mode →
+            </Link>
+          </div>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
             Adobe Acrobat PDF dark mode FAQ
           </h2>
-          <div className="space-y-3">
-            {FAQ.map((f) => (
-              <details
-                key={f.q}
-                className="group rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60 transition-colors [&_summary::-webkit-details-marker]:hidden"
-              >
-                <summary className="cursor-pointer p-4 flex items-center justify-between list-none text-neutral-100">
-                  <h3 className="font-medium text-base m-0">{f.q}</h3>
-                  <span
-                    aria-hidden
-                    className="text-neutral-500 transition-transform group-open:rotate-180 group-hover:text-amber-400"
-                  >
-                    ⌄
-                  </span>
-                </summary>
-                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+          {FAQ.map((f) => (
+            <div key={f.q} className="mb-7">
+              <h3 className="text-lg font-semibold text-neutral-50 mb-2">
+                {f.q}
+              </h3>
+              <p className="text-neutral-400">{f.a}</p>
+            </div>
+          ))}
+        </article>
+
+        <RelatedVariants currentSlug="pdf-dark-mode-adobe-acrobat" />
       </main>
 
       <Footer />

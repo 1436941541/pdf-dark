@@ -7,13 +7,9 @@ export function RelatedVariants({ currentSlug }: { currentSlug: string }) {
 
   return (
     <section className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900">
-      <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
+      <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
         More from the PDF Dark blog
       </h2>
-      <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-        Pick the guide that matches your reader, platform, or use case — every
-        post links straight to the free converter.
-      </p>
       <div className="grid sm:grid-cols-3 gap-4">
         {others.map((v) => (
           <Link

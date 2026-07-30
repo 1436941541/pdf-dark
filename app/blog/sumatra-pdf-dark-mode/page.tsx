@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
@@ -9,7 +10,7 @@ const TITLE = "PDF Dark Mode in Sumatra PDF — the i Key vs. Editing settings.t
 const DESCRIPTION =
   "Sumatra PDF has two built-in ways to darken a page — the i shortcut and a settings.txt edit. How both work, why they fall short, and a fix that sticks.";
 const PUBLISHED = "2026-07-29";
-const UPDATED = "2026-07-29";
+const UPDATED = "2026-07-30";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -31,27 +32,27 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Does Sumatra PDF have a dark mode?",
-    a: "Sort of — and it's better equipped than most PDF viewers here. Sumatra ships with a keyboard shortcut that inverts page colors on the spot, plus a settings file you can edit for a permanent custom color scheme. Neither is a one-click \"dark mode\" toggle in the settings menu, but both are real, built-in options.",
+    a: "Yes, several — press i to invert the current document, pick the built-in Dark theme (3.5.2 and later), or set custom page colors via Advanced Options. None of them is labeled \"dark mode\" in the menus.",
   },
   {
     q: "How do I invert colors in Sumatra PDF?",
-    a: "Open a PDF, then press the i key on your keyboard. Sumatra immediately inverts the current document — background goes black, text goes white. It's the fastest way to get a dark page, but it only applies to that viewing session: close the file and reopen it, and you'll need to press i again.",
+    a: "Open a PDF and press the i key — the background goes black and the text goes white immediately. It lasts only for the current session.",
   },
   {
     q: "How do I make Sumatra's dark colors stick permanently?",
-    a: "Go to Settings → Advanced Options. This opens a text file called SumatraPDF-settings.txt. Inside it, find the FixedPageUI and EbookUI sections and change the TextColor and BackgroundColor values to hex colors — for example TextColor eeeeee (light gray) and BackgroundColor 1a1a1a (near-black). Save the file and every PDF you open afterward uses that color scheme automatically, no more pressing i.",
+    a: "Settings → Advanced Options opens SumatraPDF-settings.txt; set TextColor and BackgroundColor under FixedPageUI to hex values and save. Every PDF then opens with those colors on this PC.",
   },
   {
     q: "Why do images look strange after pressing i or editing settings.txt?",
-    a: "Both methods are a straight color inversion applied to the whole rendered page, images included. Photos and especially images with transparent backgrounds can come out looking wrong — this is a known complaint on Sumatra's own forum. There's no way to tell Sumatra \"invert the text but leave photos alone.\"",
+    a: "Both apply the color change to the whole rendered page, images included — photos come out as negatives and transparent images can distort. There's no way to invert text only.",
   },
   {
     q: "Will this work on my phone or on a Mac?",
-    a: "No. Sumatra PDF is Windows-only, so the i shortcut and the settings.txt edit only affect PDFs opened in Sumatra on that specific Windows machine. Open the same file on your phone, on a Mac, or in a browser, and you're back to a white page — you'd have to solve dark mode separately on every device.",
+    a: "No. Sumatra is Windows-only, so everything you set up lives on that one PC — the same file opens white everywhere else.",
   },
   {
     q: "Is my PDF uploaded anywhere when I use PDF Dark?",
-    a: "No. The conversion runs entirely in your browser tab via the File API and a Web Worker — nothing is sent to a server. You can confirm this yourself by opening DevTools → Network while converting a file.",
+    a: "No. The conversion runs entirely in your browser tab — open DevTools → Network while converting and you'll see no request carrying your file.",
   },
 ];
 
@@ -115,303 +116,202 @@ export default function SumatraVariantPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Article hero */}
-        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
-            Blog
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            PDF Dark Mode in Sumatra PDF
-            <span className="block text-amber-400 mt-2">
-              The i Key, the Settings.txt Fix — and What Both Miss
-            </span>
+        <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
+            PDF Dark Mode in Sumatra PDF — the i Key vs. Editing settings.txt
           </h1>
-          <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Unlike Chrome or Adobe, Sumatra actually{" "}
-            <strong className="text-neutral-100">
-              ships with two ways to darken a page
-            </strong>
-            . Here&apos;s exactly how they work, and where they fall short.
+          <p className="text-sm text-neutral-500 mb-10">
+            By PDF Dark Team ·{" "}
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time> ·
+            4 min read
           </p>
-          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
-            <span>By PDF Dark Team</span>
-            <span aria-hidden>·</span>
-            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
-            <span aria-hidden>·</span>
-            <span>8 min read</span>
-          </div>
-        </section>
 
-        {/* What Sumatra offers, and where it falls short */}
-        <section
-          id="why"
-          className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
-        >
-          <div className="max-w-3xl mx-auto px-6">
-            <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-              Sumatra&apos;s two built-in dark mode tricks
-            </h2>
-            <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              Credit where it&apos;s due: Sumatra PDF gives you more than most
-              readers do out of the box. Both options are real — and both have
-              a catch. (Recent builds, 3.5.2 and later, also add built-in Dark
-              and Darker app themes — with a known quirk: while one of those
-              themes is active, custom colors from settings.txt can be
-              ignored.)
-            </p>
+          <p className="text-lg mb-8">
+            You picked Sumatra because it opens a PDF before heavier readers
+            finish drawing their splash screen. Tonight that speed delivers a
+            wall of white into a dark room, and a pass through Sumatra&apos;s
+            famously sparse menus turns up nothing called dark mode. It&apos;s
+            there — twice, actually. Sumatra just never labels it.
+          </p>
 
-            <div className="space-y-5">
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                  The{" "}
-                  <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">
-                    i
-                  </code>{" "}
-                  key — instant, but it doesn&apos;t stick
-                </h3>
-                <p className="text-sm text-neutral-400">
-                  With a PDF open in Sumatra, press{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    i
-                  </code>{" "}
-                  on your keyboard and the whole document inverts on the spot
-                  — background black, text white. It&apos;s the quickest dark
-                  mode of any PDF viewer we&apos;ve covered. The catch: Sumatra
-                  doesn&apos;t remember the setting per file. Close the
-                  document and open it again — or open a different PDF — and
-                  it&apos;s back to white until you press{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    i
-                  </code>{" "}
-                  again.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                  Editing SumatraPDF-settings.txt — permanent, but technical
-                </h3>
-                <p className="text-sm text-neutral-400">
-                  For a fix that survives closing the app, go to{" "}
-                  <strong className="text-neutral-200">Settings</strong> →{" "}
-                  <strong className="text-neutral-200">
-                    Advanced Options
-                  </strong>
-                  . This opens a plain text file,{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    SumatraPDF-settings.txt
-                  </code>
-                  . Inside, look for the{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    FixedPageUI
-                  </code>{" "}
-                  and{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    EbookUI
-                  </code>{" "}
-                  sections and change{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    TextColor
-                  </code>{" "}
-                  and{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    BackgroundColor
-                  </code>{" "}
-                  to hex values — for example{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    eeeeee
-                  </code>{" "}
-                  for text and{" "}
-                  <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                    1a1a1a
-                  </code>{" "}
-                  for the background. Save it, and every PDF opens with that
-                  color scheme from then on — no more repeated key presses.
-                  Every option in the file is documented in{" "}
-                  <a
-                    href="https://www.sumatrapdfreader.org/settings/settings"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-amber-400 hover:underline"
-                  >
-                    Sumatra&apos;s official settings reference
-                  </a>
-                  .
-                  The catch: it&apos;s a manual text-file edit with hex color
-                  codes, which is comfortable territory for a lot of Sumatra
-                  users but a real barrier for anyone who doesn&apos;t want to
-                  hand-edit a config file.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                  Both methods share the same two blind spots
-                </h3>
-                <ul className="text-sm text-neutral-400 list-disc pl-5 space-y-1.5">
-                  <li>
-                    <strong className="text-neutral-200">
-                      Images can come out wrong.
-                    </strong>{" "}
-                    Both the{" "}
-                    <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
-                      i
-                    </code>{" "}
-                    shortcut and the settings.txt colors invert the whole
-                    rendered page, and photos or images with transparent
-                    backgrounds often end up looking off — a complaint that
-                    comes up on{" "}
-                    <a
-                      href="https://forum.sumatrapdfreader.org/t/update-has-made-all-images-negatives-unusable-now/4384"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-amber-400 hover:underline"
-                    >
-                      Sumatra&apos;s own forum
-                    </a>
-                    .
-                  </li>
-                  <li>
-                    <strong className="text-neutral-200">
-                      It&apos;s tied to this one Windows PC.
-                    </strong>{" "}
-                    Sumatra PDF is Windows-only. Neither the shortcut nor the
-                    settings file follows the document to your phone, a Mac,
-                    or a browser — open the same PDF anywhere else and
-                    you&apos;re looking at a white page again.
-                  </li>
-                </ul>
-              </div>
-
-              <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-                <h3 className="font-semibold text-amber-400 mb-1 text-base m-0 mt-0">
-                  What PDF Dark does differently
-                </h3>
-                <ul className="text-sm text-neutral-300 list-disc pl-5 space-y-1.5">
-                  <li>
-                    Convert once and the file itself is dark — no shortcut to
-                    repeat, no settings file to edit
-                  </li>
-                  <li>
-                    Photos and images are detected and kept in their original
-                    colors, so nothing turns into a negative
-                  </li>
-                  <li>
-                    The resulting PDF stays dark in Sumatra, on your phone, on
-                    a Mac, or in any browser — not just this one PC
-                  </li>
-                  <li>
-                    Runs entirely in your browser tab — your file never
-                    leaves your device
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Using PDF Dark for Sumatra users */}
-        <section className="max-w-3xl mx-auto px-6 py-20">
-          <h2 className="text-2xl font-bold mb-6 text-center text-neutral-50">
-            Using PDF Dark instead of the i key or settings.txt
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            The quick answer
           </h2>
-          <p className="text-neutral-300 leading-relaxed">
-            Open the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
-              PDF Dark converter
-            </Link>{" "}
-            in any browser, drag in the file, pick a theme, and download. No{" "}
-            <code className="text-amber-400 text-xs bg-neutral-950 px-1 py-0.5 rounded">
+          <p className="mb-5">
+            To darken the page right now, press the{" "}
+            <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">
               i
             </code>{" "}
-            key to remember, no settings.txt to edit — and unlike Sumatra&apos;s
-            inversion, images are detected and kept in their original colors
-            automatically.
+            key — Sumatra inverts the document on the spot. To get a copy
+            that stays dark — with photos kept in their original colors, on
+            any device — run the file through the{" "}
+            <Link href="/converter" className="text-amber-400 hover:underline">
+              converter
+            </Link>{" "}
+            once. Both take under a minute; the details are below.
           </p>
-          <p className="text-neutral-300 leading-relaxed mt-4">
-            It&apos;s a more deliberate process than a blanket invert — text
-            gets recolored as vector data, and each image is evaluated on
-            its own before the tool decides whether to touch it.{" "}
-            <Link
-              href="/blog/how-pdf-dark-mode-conversion-works"
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 1: press the i key
+          </h2>
+          <p className="mb-4">
+            Sumatra&apos;s fastest dark mode isn&apos;t in any menu —
+            it&apos;s a keyboard shortcut:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>Open your PDF in Sumatra.</li>
+            <li>
+              Press the{" "}
+              <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">
+                i
+              </code>{" "}
+              key. The page inverts immediately — black background, white
+              text.
+            </li>
+            <li>
+              Press{" "}
+              <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">
+                i
+              </code>{" "}
+              again to flip back.
+            </li>
+          </ol>
+          <p className="mb-5">
+            Two things to know about its scope. The inversion covers the
+            whole rendered page, images included, so photos come out as
+            negatives — a long-standing complaint{" "}
+            <a
+              href="https://forum.sumatrapdfreader.org/t/update-has-made-all-images-negatives-unusable-now/4384"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-amber-400 hover:underline"
             >
-              The full technical writeup is here
-            </Link>
-            . The file it produces opens dark in Sumatra, on your phone, a
-            Mac, or a different Windows machine, because the color change is
-            baked into the file itself. Just want to read something once
-            without saving a copy? Use the{" "}
+              on Sumatra&apos;s own forum
+            </a>
+            . And it lasts only for the current session: close the file and
+            it opens white again.
+          </p>
+          <p className="mb-5">
+            For a dark page that survives restarts, recent builds (3.5.2 and
+            later) ship Dark and Darker themes under the Settings menu, and
+            Settings → Advanced Options lets you set permanent custom page
+            colors — every field is documented in{" "}
+            <a
+              href="https://www.sumatrapdfreader.org/settings/settings"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              Sumatra&apos;s official settings reference
+            </a>
+            . Both recolor the page the same way the{" "}
+            <code className="text-amber-400 text-sm bg-neutral-950 px-1.5 py-0.5 rounded">
+              i
+            </code>{" "}
+            key does, images included.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 2: convert the file
+          </h2>
+          <p className="mb-4">
+            To keep photos in their real colors — or to have the document
+            stay dark beyond this one Windows PC — change the file instead
+            of the viewer:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open the{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                converter
+              </Link>{" "}
+              in your browser and drop the PDF on it.
+            </li>
+            <li>
+              Pick a theme — Midnight, Sepia, Solarized, or pure-black OLED.
+            </li>
+            <li>Click Download and open the copy in Sumatra as usual.</li>
+          </ol>
+          <p className="mb-5">
+            The colors are rewritten inside the file: background dark, text
+            light, photos detected and kept as they are. The conversion runs
+            entirely in your browser — the file is never uploaded — and the
+            result opens dark in Sumatra, on your phone, on a Mac, anywhere.
+            Just want to read something once without saving a copy? Open it
+            in the{" "}
             <Link href="/" className="text-amber-400 hover:underline">
               dark mode PDF reader
             </Link>{" "}
             instead.
           </p>
 
-          <p className="mt-10 text-sm text-neutral-500">
-            Works in any modern browser on Windows, macOS, Linux, or a phone —
-            you don&apos;t need Sumatra PDF installed to use it, and the file
-            it produces still opens correctly in Sumatra afterward.
-          </p>
-        </section>
-
-        {/* CTA — back to the tool */}
-        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
-          <h2 className="text-xl font-semibold text-neutral-50 mb-2">
-            Ready for a PDF that&apos;s dark without pressing i every time?
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Before / after
           </h2>
-          <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
-            3 steps, no settings.txt, no repeating a shortcut per file
-          </h3>
-          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Convert once and the dark theme is part of the file — open it in
-            Sumatra, on your phone, or anywhere else and it stays dark.
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-neutral-800">
+                <Image
+                  src="/compare/original.png"
+                  alt="A PDF page as Sumatra normally shows it: black text on a bright white background with a color photo"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                Before — Sumatra&apos;s default white page
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                <Image
+                  src="/compare/pdf-dark.png"
+                  alt="The same PDF page in dark mode: dark background, light text, and the photo kept in its original colors"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-amber-400">
+                After — dark page, photo untouched
+              </figcaption>
+            </figure>
+          </div>
+          <p className="text-xs text-neutral-600 mb-10">
+            Real output (Midnight theme, Auto image mode) — not a mockup.
+            Notice the photo keeps its original colors instead of flipping
+            into a negative, which is where the i key falls short.
           </p>
-          <Link
-            href="/converter"
-            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
-          >
-            Convert a PDF to dark mode →
-          </Link>
-          <p className="mt-4 text-sm text-neutral-500">
-            Just want to read one now?{" "}
-            <Link href="/" className="text-amber-400 hover:underline">
-              Open the dark mode reader instead
+
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
+            <p className="text-neutral-300 mb-4">
+              Reading in Sumatra tonight? Convert the file once and it opens
+              dark from now on — no key to press per document, and it stays
+              dark on every device.
+            </p>
+            <Link
+              href="/converter"
+              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Convert a PDF to dark mode →
             </Link>
-            .
-          </p>
-        </section>
+          </div>
 
-        <RelatedVariants currentSlug="sumatra-pdf-dark-mode" />
-
-        {/* FAQ */}
-        <section
-          id="faq"
-          className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
-        >
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
             Sumatra PDF dark mode FAQ
           </h2>
-          <div className="space-y-3">
-            {FAQ.map((f) => (
-              <details
-                key={f.q}
-                className="group rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60 transition-colors [&_summary::-webkit-details-marker]:hidden"
-              >
-                <summary className="cursor-pointer p-4 flex items-center justify-between list-none text-neutral-100">
-                  <h3 className="font-medium text-base m-0">{f.q}</h3>
-                  <span
-                    aria-hidden
-                    className="text-neutral-500 transition-transform group-open:rotate-180 group-hover:text-amber-400"
-                  >
-                    ⌄
-                  </span>
-                </summary>
-                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+          {FAQ.map((f) => (
+            <div key={f.q} className="mb-7">
+              <h3 className="text-lg font-semibold text-neutral-50 mb-2">
+                {f.q}
+              </h3>
+              <p className="text-neutral-400">{f.a}</p>
+            </div>
+          ))}
+        </article>
+
+        <RelatedVariants currentSlug="sumatra-pdf-dark-mode" />
       </main>
 
       <Footer />

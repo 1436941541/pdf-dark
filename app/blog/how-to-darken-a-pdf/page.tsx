@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
@@ -9,7 +10,7 @@ const TITLE = "How to Darken a PDF — 3 Steps, No Install";
 const DESCRIPTION =
   "Darken any PDF in your browser in three steps: drop the file, pick a dark theme, download the new file. Free, no upload, works offline.";
 const PUBLISHED = "2026-06-26";
-const UPDATED = "2026-07-29";
+const UPDATED = "2026-07-30";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -31,35 +32,35 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "What does 'darken a PDF' actually mean here?",
-    a: "We invert each page so the bright background becomes a dark color (your choice of Midnight, Sepia, Solarized, or OLED) and the originally-dark text becomes near-white. The result is a normal PDF file with dark pages baked in — it stays dark in every reader and on every device.",
+    a: "Each page is inverted: the bright background becomes a dark color (Midnight, Sepia, Solarized, or OLED) and the dark text becomes near-white. The result is a normal PDF with dark pages baked in, so it stays dark in every reader on every device.",
   },
   {
     q: "I want darker text on a white page (for printing) — is this the right tool?",
-    a: "No — this tool inverts the page into a dark theme for on-screen reading. If your goal is to make faded scan text blacker while keeping the white background for print, look for tools that advertise 'PDF contrast enhancement' or use a scanner app's enhancement mode instead.",
+    a: "No — this tool inverts pages into a dark theme for on-screen reading. To make faded text blacker on a white page for print, look for 'PDF contrast enhancement' tools or a scanner app's enhancement mode instead.",
   },
   {
     q: "Do I have to upload my PDF somewhere?",
-    a: "No. The whole process runs in your browser using the File API and a Web Worker. The PDF never touches a server. Open DevTools → Network and you'll see zero upload requests during conversion.",
+    a: "No. The whole process runs in your browser — open DevTools → Network during conversion and you'll see zero requests carrying your file.",
   },
   {
     q: "Is this free? Do I need an account?",
-    a: "Free, no account, no email, no watermark, no page limit. It's a one-page web tool — drop the file, pick a theme, download.",
+    a: "Free, no account, no email, no watermark, no page limit.",
   },
   {
     q: "Which theme should I pick?",
-    a: "Midnight (dark blue) is the most neutral choice for general reading. OLED (pure black) is best on OLED screens for battery savings and the deepest contrast. Sepia is warm and easy on the eyes for long sessions. Solarized is a popular developer color scheme. To compare them on your own document first, open it in the reader on the homepage and flip through the themes live, then convert with the one you like.",
+    a: "Midnight is the most neutral for general reading, OLED gives the deepest contrast and saves battery on OLED screens, Sepia is warm for long sessions, and Solarized is the developer favorite. To compare them on your own document, open it in the reader on the homepage first.",
   },
   {
     q: "Can I still select text in the darkened PDF?",
-    a: "Yes — on most digital PDFs the darkened output keeps real, selectable text, and image-rendered pages carry an invisible text layer, so search and copy work either way. Photos and figures keep their original colors unless you switch the Images toggle to Invert.",
+    a: "Yes — most pages keep real, selectable text, and image-rendered pages carry an invisible text layer, so search and copy work either way.",
   },
   {
     q: "What about photos and color charts inside the PDF?",
-    a: "Photos keep their original colors — each image is detected and restored after the page is darkened. White screenshots and diagrams are inverted so they blend into the dark page. The Images toggle in the toolbar lets you override this: Original keeps every image untouched, Invert darkens everything.",
+    a: "In Auto mode photos keep their original colors, while white screenshots and diagrams are inverted to blend into the dark page. The Images toggle can force Original (nothing touched) or Invert (everything darkened) instead.",
   },
   {
     q: "What's the largest PDF I can darken?",
-    a: "There's no hard limit, but everything runs in your browser, so memory is the ceiling. Hundreds of pages work on a modern laptop. Phones may struggle with very large documents — try chunking if it stalls.",
+    a: "No hard limit — everything runs locally, so your device's memory is the ceiling. Hundreds of pages work on a modern laptop; phones may struggle with very large files.",
   },
 ];
 
@@ -88,19 +89,19 @@ function StructuredData() {
         "@type": "HowToStep",
         position: 1,
         name: "Drop your PDF",
-        text: "Open PDF Dark and drag your PDF onto the drop zone, or click to choose a file from disk.",
+        text: "Drag your PDF onto the converter's drop zone, or click to pick a file from disk. It's parsed right in the browser by PDF.js — nothing is uploaded.",
       },
       {
         "@type": "HowToStep",
         position: 2,
         name: "Pick a dark theme",
-        text: "Pick Midnight, Sepia, Solarized, or OLED — the theme cards preview each color scheme instantly. To flip through your own document's pages live, open it in the reader on the homepage first. The Images toggle next to the themes controls how photos and figures are treated.",
+        text: "Choose Midnight, Sepia, Solarized, or OLED, and leave the Images toggle on Auto so photos keep their original colors.",
       },
       {
         "@type": "HowToStep",
         position: 3,
         name: "Download the darkened PDF",
-        text: "Click Download to save a new PDF file with the dark theme baked in. Open it in any reader on any device.",
+        text: "Click Download to save a new PDF with the dark theme baked in. It opens dark in any reader on any device.",
       },
     ],
   };
@@ -156,233 +157,149 @@ export default function HowToDarkenPdfPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Hero */}
-        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
-            Blog
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            How to Darken a PDF
-            <span className="block text-amber-400 mt-2">
-              in your browser
-            </span>
+        <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
+            How to Darken a PDF — 3 Steps, No Install
           </h1>
-          <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            This guide walks through the three things you&apos;ll click — pick
-            the file, pick a theme, save the result. The whole flow stays in
-            the browser tab, so the PDF doesn&apos;t get uploaded anywhere.
+          <p className="text-sm text-neutral-500 mb-10">
+            By PDF Dark Team ·{" "}
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time> ·
+            4 min read
           </p>
-          <div className="mt-7">
+
+          <p className="text-lg mb-8">
+            It&apos;s 11 pm and you still have forty pages to get through. You
+            pulled the screen brightness all the way down, but the page itself
+            is still a white rectangle, and your eyes are starting to give up.
+            Your PDF reader has a dark theme in its settings — you tried it —
+            and it only darkened the toolbar, not the document. What you
+            actually need is to darken the pages themselves, and that takes
+            about a minute.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            The quick answer
+          </h2>
+          <p className="mb-5">
+            Open the{" "}
+            <Link href="/converter" className="text-amber-400 hover:underline">
+              PDF Dark converter
+            </Link>{" "}
+            in any browser, drag your PDF onto the drop zone, pick a dark
+            theme, and click Download. You get a new PDF with the dark pages
+            baked in — it opens dark in Acrobat, Preview, Firefox, on your
+            phone, anywhere. Nothing is installed and nothing is uploaded;
+            the conversion runs in your browser tab.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            The 3 steps, in detail
+          </h2>
+          <ol className="list-decimal pl-6 space-y-4 mb-5">
+            <li>
+              <strong className="text-neutral-100">Drop your PDF.</strong>{" "}
+              Drag the file onto the converter&apos;s drop zone, or click it
+              to pick from disk. It&apos;s parsed right in the browser by{" "}
+              <a
+                href="https://github.com/mozilla/pdf.js"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400 hover:underline"
+              >
+                PDF.js
+              </a>
+              , the same open-source engine Firefox uses to display PDFs — no
+              account, no email, and no request ever carries your file.
+            </li>
+            <li>
+              <strong className="text-neutral-100">Pick a dark theme.</strong>{" "}
+              Midnight is a neutral dark blue, Sepia is warm amber, Solarized
+              is the developer-favorite teal scheme, and OLED is pure black
+              for the deepest contrast. The Images toggle next to the themes
+              decides what happens to pictures — leave it on Auto and photos
+              keep their original colors. To compare themes on your own
+              document first, open it in the{" "}
+              <Link href="/" className="text-amber-400 hover:underline">
+                dark mode reader
+              </Link>{" "}
+              and switch them live.
+            </li>
+            <li>
+              <strong className="text-neutral-100">Download.</strong> The
+              darkened copy saves to your Downloads folder as a standard PDF.
+              The dark theme is part of the file now, not a viewer setting,
+              so it looks the same wherever you open it — a different reader,
+              another device, a colleague&apos;s laptop.
+            </li>
+          </ol>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Before / after
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-neutral-800">
+                <Image
+                  src="/compare/original.png"
+                  alt="Original PDF page before darkening: black text on a white background with a full-color sunset photo"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                Before — the original white page
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                <Image
+                  src="/compare/pdf-dark.png"
+                  alt="The same PDF page darkened: dark background, light text, and the photo kept in its original colors"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-amber-400">
+                After — dark page, photo untouched
+              </figcaption>
+            </figure>
+          </div>
+          <p className="text-xs text-neutral-600 mb-10">
+            Real output (Midnight theme, Auto image mode) — not a mockup.
+            Notice the photo keeps its original colors instead of flipping
+            into a negative.
+          </p>
+
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
+            <p className="text-neutral-300 mb-4">
+              Got a PDF you&apos;ve been meaning to read? Drop it on the
+              converter, pick a theme, and the darkened copy downloads right
+              away — free, no account, nothing uploaded.
+            </p>
             <Link
               href="/converter"
               className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
             >
-              Darken a PDF now — free, no install
+              Darken a PDF now →
             </Link>
           </div>
-          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
-            <span>By PDF Dark Team</span>
-            <span aria-hidden>·</span>
-            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
-            <span aria-hidden>·</span>
-            <span>4 min read</span>
-          </div>
-        </section>
 
-        {/* Steps */}
-        <section
-          id="steps"
-          className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
-        >
-          <div className="max-w-3xl mx-auto px-6">
-            <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-              The three steps
-            </h2>
-            <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              From dropping the file to having the darkened PDF on disk usually
-              takes well under a minute on a normal-sized document.
-            </p>
-
-            <ol className="space-y-5">
-              <li className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="flex items-start gap-4">
-                  <span className="shrink-0 w-9 h-9 rounded-full bg-amber-400 text-neutral-950 font-bold flex items-center justify-center text-base">
-                    1
-                  </span>
-                  <div>
-                    <h3 className="font-semibold text-neutral-50 m-0 mt-0.5 text-lg">
-                      Drop your PDF on the page
-                    </h3>
-                    <p className="text-sm text-neutral-400 mt-2">
-                      Open the{" "}
-                      <Link
-                        href="/converter"
-                        className="text-amber-400 hover:text-amber-300"
-                      >
-                        PDF Dark converter
-                      </Link>{" "}
-                      and drag the file onto the drop zone, or click to pick a
-                      file from disk. The file is parsed in-browser with{" "}
-                      <a
-                        href="https://github.com/mozilla/pdf.js"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-amber-400 hover:underline"
-                      >
-                        PDF.js
-                      </a>{" "}
-                      — nothing is uploaded.
-                    </p>
-                  </div>
-                </div>
-              </li>
-
-              <li className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="flex items-start gap-4">
-                  <span className="shrink-0 w-9 h-9 rounded-full bg-amber-400 text-neutral-950 font-bold flex items-center justify-center text-base">
-                    2
-                  </span>
-                  <div>
-                    <h3 className="font-semibold text-neutral-50 m-0 mt-0.5 text-lg">
-                      Pick a dark theme
-                    </h3>
-                    <p className="text-sm text-neutral-400 mt-2">
-                      Toggle between <strong>Midnight</strong> (cool blue),{" "}
-                      <strong>Sepia</strong> (warm amber),{" "}
-                      <strong>Solarized</strong> (developer-popular teal), and{" "}
-                      <strong>OLED</strong> (pure black, battery-friendly).
-                      The theme cards preview each color scheme instantly — you
-                      pick your settings before dropping the file, and the
-                      download uses exactly what you chose.
-                      Next to the themes sits an <strong>Images</strong> toggle:
-                      Auto (smart per-image handling), Original (photos and
-                      figures untouched), or Invert (everything goes dark).
-                    </p>
-                  </div>
-                </div>
-              </li>
-
-              <li className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
-                <div className="flex items-start gap-4">
-                  <span className="shrink-0 w-9 h-9 rounded-full bg-amber-400 text-neutral-950 font-bold flex items-center justify-center text-base">
-                    3
-                  </span>
-                  <div>
-                    <h3 className="font-semibold text-neutral-50 m-0 mt-0.5 text-lg">
-                      Download the darkened PDF
-                    </h3>
-                    <p className="text-sm text-neutral-400 mt-2">
-                      You get a standard PDF. On text-based pages the colors
-                      are rewritten in place, so the text stays real and
-                      selectable; pages with unusual color setups fall back to
-                      a darkened image with an invisible text layer. Either way
-                      it opens dark in Acrobat, Preview, Firefox, on an iPad —
-                      anywhere. The dark theme is part of the file now, not a
-                      viewer setting.
-                    </p>
-                  </div>
-                </div>
-              </li>
-            </ol>
-          </div>
-        </section>
-
-        {/* Why this beats the alternatives */}
-        <section className="max-w-3xl mx-auto px-6 py-20">
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
-            What people usually try first — and why it falls short
-          </h2>
-
-          <div className="space-y-6">
-            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Inverting colors in the OS
-              </h3>
-              <p className="text-sm text-neutral-400">
-                macOS Smart Invert and Windows High Contrast affect the whole
-                screen, distort photos, and only last as long as the toggle is
-                on. They never produce a sharable file.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Installing a browser extension
-              </h3>
-              <p className="text-sm text-neutral-400">
-                Dark Reader and friends only invert what the browser renders.
-                The PDF is still light if you download it, email it, or open it
-                in Acrobat tomorrow. Most extensions also request broad page
-                permissions you probably don&apos;t want.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Uploading to a SaaS converter
-              </h3>
-              <p className="text-sm text-neutral-400">
-                Most online converters upload your file, queue it on their
-                servers, and email you a download. For a one-shot color flip,
-                that&apos;s a lot of trust and a lot of waiting. PDF Dark runs
-                entirely client-side — the file never leaves your machine.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
-        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
-          <h2 className="text-xl font-semibold text-neutral-50 mb-3">
-            Try it on a PDF you&apos;ve been meaning to read
-          </h2>
-          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Pick a theme on the converter and drop the file — the darkened
-            copy downloads right away. Not sure which theme? Read it first on
-            the{" "}
-            <Link href="/" className="text-amber-400 hover:underline">
-              dark mode PDF reader
-            </Link>{" "}
-            and switch themes live.
-          </p>
-          <Link
-            href="/converter"
-            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
-          >
-            Open PDF Dark →
-          </Link>
-        </section>
-
-        <RelatedVariants currentSlug="how-to-darken-a-pdf" />
-
-        {/* FAQ */}
-        <section
-          id="faq"
-          className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
-        >
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
             How to darken a PDF — FAQ
           </h2>
-          <div className="space-y-3">
-            {FAQ.map((f) => (
-              <details
-                key={f.q}
-                className="group rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60 transition-colors [&_summary::-webkit-details-marker]:hidden"
-              >
-                <summary className="cursor-pointer p-4 flex items-center justify-between list-none text-neutral-100">
-                  <h3 className="font-medium text-base m-0">{f.q}</h3>
-                  <span
-                    aria-hidden
-                    className="text-neutral-500 transition-transform group-open:rotate-180 group-hover:text-amber-400"
-                  >
-                    ⌄
-                  </span>
-                </summary>
-                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+          {FAQ.map((f) => (
+            <div key={f.q} className="mb-7">
+              <h3 className="text-lg font-semibold text-neutral-50 mb-2">
+                {f.q}
+              </h3>
+              <p className="text-neutral-400">{f.a}</p>
+            </div>
+          ))}
+        </article>
+
+        <RelatedVariants currentSlug="how-to-darken-a-pdf" />
       </main>
 
       <Footer />

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
@@ -9,7 +10,7 @@ const TITLE = "PDF Dark Mode on Android — No Root, No System Hack";
 const DESCRIPTION =
   "Android's default PDF viewers have no real dark mode, and system color inversion flips your screen negative. Convert the file once — it opens dark in every app.";
 const PUBLISHED = "2026-07-29";
-const UPDATED = "2026-07-29";
+const UPDATED = "2026-07-30";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -31,27 +32,27 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "Does Android have a built-in PDF dark mode?",
-    a: "Not a real one, at least not today. The default viewer built into Files by Google (which also handles the PDF viewer Google Drive used to ship separately) still renders PDF pages on a white background regardless of your system theme. Users have been asking for it on Google's own Drive/Docs support forums for years without an official fix.",
+    a: "Not a real one, at least not today. The default viewer in Files by Google still renders PDF pages on a white background regardless of your system theme.",
   },
   {
     q: "What about the 'Dark theme' setting inside Files by Google or Drive?",
-    a: "That toggle changes the app chrome — toolbars, menus, file lists — around the PDF. The page content itself, once you open a PDF to read it, still renders as black text on a white page.",
+    a: "That toggle darkens the app chrome — toolbars, menus, file lists. The PDF page itself still renders as black text on white.",
   },
   {
     q: "Can I use Android's Color Inversion accessibility setting instead?",
-    a: "You can, but it's a blunt instrument. Settings → Accessibility → Color Inversion (sometimes labeled Negative Colors) flips your entire screen — every app, every icon, every photo — not just the PDF page. Photos and icons turn into negatives, and you have to remember to switch it back off when you're done reading.",
+    a: "You can, but it flips your entire screen — every app, icon, and photo, not just the PDF — and you have to remember to switch it back off.",
   },
   {
     q: "What about viewing PDFs saved in Samsung Notes?",
-    a: "Samsung Notes has a known dark-mode quirk with imported PDFs: if the note's default color style is set to Transparent, dark mode doesn't apply properly to the PDF content. Switching the default color style to Black in Notes settings is the workaround people report fixing it.",
+    a: "Samsung Notes has a known quirk: dark mode doesn't apply to imported PDFs when the note's default color style is Transparent. Switching it to Black in Notes settings is the reported fix.",
   },
   {
     q: "How is this different from a system-wide fix?",
-    a: "PDF Dark doesn't touch your phone's display or any app settings. You convert the file once in your Android browser, and the output is an ordinary PDF with the dark theme baked into the pages — it opens dark in Files by Google, WPS, Adobe Acrobat, or any other viewer, and stays dark if you send it to someone else's phone too.",
+    a: "PDF Dark changes nothing on your phone. You convert the file once, and the output is an ordinary PDF with the dark theme baked in — it opens dark in any viewer, on any phone.",
   },
   {
     q: "Is my PDF uploaded anywhere when I use this on my phone?",
-    a: "No. The conversion runs entirely in your Android browser tab using the File API and a Web Worker — nothing is sent to a server. There's no account, no install, and no permissions beyond picking a file.",
+    a: "No. The conversion runs entirely in your Android browser tab — nothing is sent to a server, and there's no account or install.",
   },
 ];
 
@@ -115,282 +116,192 @@ export default function AndroidVariantPage() {
       </header>
 
       <main className="flex-1 w-full">
-        {/* Article hero */}
-        <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-          <p className="text-xs uppercase tracking-widest text-amber-400 mb-4">
-            Blog
-          </p>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            PDF Dark Mode on Android
-            <span className="block text-amber-400 mt-2">
-              No Root, No System Hack
-            </span>
+        <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
+          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
+            PDF Dark Mode on Android — No Root, No System Hack
           </h1>
-          <p className="mt-6 text-lg text-neutral-300 max-w-2xl mx-auto">
-            The default PDF viewer still opens every page white, and the
-            system-wide color inversion trick{" "}
-            <strong className="text-neutral-100">
-              flips your whole screen negative
-            </strong>{" "}
-            — icons, photos, everything. There&apos;s a cleaner middle ground.
+          <p className="text-sm text-neutral-500 mb-10">
+            By PDF Dark Team ·{" "}
+            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time> ·
+            4 min read
           </p>
-          <div className="mt-6 text-sm text-neutral-500 flex flex-wrap justify-center gap-x-3 gap-y-1">
-            <span>By PDF Dark Team</span>
-            <span aria-hidden>·</span>
-            <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time>
-            <span aria-hidden>·</span>
-            <span>7 min read</span>
-          </div>
-        </section>
 
-        {/* Why not built-in */}
-        <section
-          id="why"
-          className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
-        >
-          <div className="max-w-3xl mx-auto px-6">
-            <h2 className="text-2xl font-bold mb-3 text-center text-neutral-50">
-              Why reading a PDF in the dark on Android is still awkward
-            </h2>
-            <p className="text-neutral-400 text-center mb-10 max-w-xl mx-auto text-sm">
-              None of the built-in options actually darken the page you&apos;re
-              reading without side effects.
-            </p>
-
-            <div className="overflow-x-auto rounded-xl border border-neutral-800 mb-5">
-              <table className="w-full min-w-[700px] border-collapse text-sm">
-                <thead>
-                  <tr className="bg-neutral-900/60 text-left">
-                    <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
-                      Option
-                    </th>
-                    <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
-                      Where
-                    </th>
-                    <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
-                      What happens
-                    </th>
-                    <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
-                      The catch
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-neutral-900">
-                    <td className="px-4 py-4 align-top font-semibold text-neutral-100 whitespace-nowrap">
-                      Files by Google / Drive dark theme
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      In-app setting
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      Darkens the app chrome — menus, file browser
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-400">
-                      Page content still renders white; requested on
-                      Google&apos;s own{" "}
-                      <a
-                        href="https://support.google.com/drive/thread/406087422"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-amber-400 hover:underline"
-                      >
-                        Drive
-                      </a>{" "}
-                      and{" "}
-                      <a
-                        href="https://support.google.com/docs/thread/301868736"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-amber-400 hover:underline"
-                      >
-                        Docs
-                      </a>{" "}
-                      forums for years, unresolved
-                    </td>
-                  </tr>
-                  <tr className="border-b border-neutral-900">
-                    <td className="px-4 py-4 align-top font-semibold text-neutral-100 whitespace-nowrap">
-                      Color Inversion
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      <code className="text-amber-400 text-xs bg-neutral-950 px-1.5 py-0.5 rounded">
-                        Settings → Accessibility
-                      </code>
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      Inverts the entire screen
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-400">
-                      Not scoped to the PDF — icons, other apps, and photos
-                      invert too; manual toggle on and off
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-4 align-top font-semibold text-neutral-100 whitespace-nowrap">
-                      Samsung Notes dark mode
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      Notes app color style setting
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-300">
-                      Applies dark mode to imported PDFs
-                    </td>
-                    <td className="px-4 py-4 align-top text-neutral-400">
-                      Only works if the default color style is Black — breaks
-                      silently when it&apos;s set to Transparent
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p className="text-neutral-400 text-sm mb-5">
-              None of these three darken just the PDF page without a side
-              effect — a whole-screen invert, an app-chrome-only theme, or a
-              setting most people never think to check.
-            </p>
-
-            <div className="space-y-5">
-              <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
-                <h3 className="font-semibold text-amber-400 mb-1 text-base m-0 mt-0">
-                  What PDF Dark does differently
-                </h3>
-                <ul className="text-sm text-neutral-300 list-disc pl-5 space-y-1.5">
-                  <li>
-                    Darkens only the PDF, once — not your icons, your other
-                    apps, or the rest of your screen
-                  </li>
-                  <li>
-                    Photos keep their real colors while text and backgrounds
-                    switch to your chosen theme
-                  </li>
-                  <li>
-                    Saves a normal PDF file that opens dark in Files by
-                    Google, WPS, Adobe Acrobat, or any reader — no toggle to
-                    remember each time
-                  </li>
-                  <li>
-                    Runs entirely in your phone&apos;s browser tab — the file
-                    is never uploaded anywhere
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Using PDF Dark on Android */}
-        <section className="max-w-3xl mx-auto px-6 py-20">
-          <h2 className="text-2xl font-bold mb-6 text-center text-neutral-50">
-            Using PDF Dark on Android
-          </h2>
-          <p className="text-neutral-300 leading-relaxed">
-            Go to the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
-              PDF Dark converter
-            </Link>{" "}
-            in Chrome, Firefox, or any Android browser, pick a PDF from
-            Downloads or Google Drive, choose a theme, and download. The file
-            saves to your phone&apos;s Downloads and opens dark in Files by
-            Google, WPS, or whatever app you normally use — no accessibility
-            toggle to flip on and off.
-          </p>
-          <p className="text-neutral-300 leading-relaxed mt-4">
-            None of this depends on your phone&apos;s manufacturer or Android
-            version — the pixel work happens inside the browser tab, not the
-            OS.{" "}
-            <Link
-              href="/blog/how-pdf-dark-mode-conversion-works"
+          <p className="text-lg mb-8">
+            You tap a PDF attachment on your phone and the viewer fills the
+            screen with white — even though the phone has been on the dark
+            theme for years. You check the viewer&apos;s menu: print, share,
+            open with, nothing about dark. So you dig into Settings, find
+            Color Inversion under Accessibility, and now your home screen
+            icons and photos look like X-ray film. That dead end isn&apos;t
+            your phone — Android has no real PDF dark mode, and users have
+            been asking for one on Google&apos;s own{" "}
+            <a
+              href="https://support.google.com/drive/thread/406087422"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-amber-400 hover:underline"
             >
-              Here&apos;s the mechanics behind it
-            </Link>
-            . Just want to read it once tonight without saving a new file?
-            Use the{" "}
-            <Link href="/" className="text-amber-400 hover:underline">
-              dark mode PDF reader
-            </Link>{" "}
-            instead.
-          </p>
-
-          <p className="mt-10 text-sm text-neutral-500">
-            Works in any modern Android browser — Chrome, Firefox, or Samsung
-            Internet. Already reading inside your browser instead of a native
-            app? See the{" "}
-            <Link
-              href="/blog/pdf-dark-mode-chrome"
-              className="text-amber-400 hover:underline"
-            >
-              Chrome
-            </Link>{" "}
+              Drive
+            </a>{" "}
             and{" "}
-            <Link
-              href="/blog/pdf-dark-mode-firefox"
+            <a
+              href="https://support.google.com/docs/thread/301868736"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-amber-400 hover:underline"
             >
-              Firefox
-            </Link>{" "}
-            posts for the mobile-browser specifics.
+              Docs
+            </a>{" "}
+            forums for years. Here&apos;s the way around it.
           </p>
-        </section>
 
-        {/* CTA — back to the tool */}
-        <section className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-900 text-center">
-          <h2 className="text-xl font-semibold text-neutral-50 mb-2">
-            Ready to read a PDF in dark mode on your Android phone?
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            The quick answer
           </h2>
-          <h3 className="text-sm font-medium text-amber-400 m-0 mb-4">
-            No app install, no Accessibility settings to flip
-          </h3>
-          <p className="text-sm text-neutral-400 mb-6 max-w-xl mx-auto">
-            Drop a PDF on the reader and it renders dark right in your phone
-            browser — no file saved, nothing installed.
-          </p>
-          <Link
-            href="/"
-            className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
-          >
-            Read a PDF in dark mode →
-          </Link>
-          <p className="mt-4 text-sm text-neutral-500">
-            Want to keep the file?{" "}
+          <p className="mb-5">
+            To just read, open the{" "}
+            <Link href="/" className="text-amber-400 hover:underline">
+              PDF dark mode reader
+            </Link>{" "}
+            in any Android browser and pick your PDF — it renders dark
+            immediately. To keep a dark copy that opens dark in Files by
+            Google, WPS, or any other viewer, run it through the{" "}
             <Link href="/converter" className="text-amber-400 hover:underline">
-              Convert &amp; download it instead
-            </Link>
-            .
+              converter
+            </Link>{" "}
+            once. Both run on your phone; the file is never uploaded.
           </p>
-        </section>
 
-        <RelatedVariants currentSlug="pdf-dark-mode-android" />
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 1: read with a dark theme in your browser
+          </h2>
+          <p className="mb-4">
+            Android&apos;s built-in viewers have no dark switch for the page,
+            and the system-level Color Inversion isn&apos;t scoped to the
+            document — so the fastest route skips both:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open the{" "}
+              <Link href="/" className="text-amber-400 hover:underline">
+                PDF dark mode reader
+              </Link>{" "}
+              in Chrome, Firefox, or any Android browser.
+            </li>
+            <li>
+              Pick the PDF from your Downloads folder or file manager.
+            </li>
+            <li>
+              Choose a theme — Midnight, Sepia, Solarized, or pure-black
+              OLED — and read. Pages render dark right in the tab.
+            </li>
+          </ol>
+          <p className="mb-5">
+            Nothing installs and nothing changes on your phone — no
+            Accessibility toggle to remember to switch off afterward. It
+            works the same on a Pixel, a Samsung, or any other phone, in
+            whatever browser you already use.
+          </p>
 
-        {/* FAQ */}
-        <section
-          id="faq"
-          className="max-w-3xl mx-auto px-6 py-20 border-t border-neutral-900"
-        >
-          <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Before / after
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-neutral-800">
+                <Image
+                  src="/compare/original.png"
+                  alt="A PDF page as an Android viewer normally shows it: black text on a bright white background with a color photo"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                Before — the default white page
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                <Image
+                  src="/compare/pdf-dark.png"
+                  alt="The same PDF page in dark mode: dark background, light text, and the photo kept in its original colors"
+                  width={720}
+                  height={933}
+                  sizes="50vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-amber-400">
+                After — dark page, photo untouched
+              </figcaption>
+            </figure>
+          </div>
+          <p className="text-xs text-neutral-600 mb-10">
+            Real output (Midnight theme, Auto image mode) — not a mockup.
+            Notice the photo keeps its original colors instead of flipping
+            into a negative, the way Color Inversion would leave it.
+          </p>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 2: convert the file, then open it in any app
+          </h2>
+          <p className="mb-4">
+            When you want the PDF to stay dark — in your usual viewer app,
+            after reopening, or on someone else&apos;s phone — convert it
+            once:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open the{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                converter
+              </Link>{" "}
+              in your browser and pick the PDF.
+            </li>
+            <li>
+              Choose a theme and tap Download. The dark copy saves to your
+              Downloads folder like any other file.
+            </li>
+            <li>
+              Open it in Files by Google, WPS, Acrobat, or whatever viewer
+              you normally use — it opens dark in all of them.
+            </li>
+          </ol>
+          <p className="mb-5">
+            The conversion runs in the browser tab on your phone, whatever
+            the manufacturer or Android version — nothing is uploaded.
+            Because the colors are rewritten inside the file, the copy stays
+            dark when you send it to someone else&apos;s phone too.
+          </p>
+
+          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
+            <p className="text-neutral-300 mb-4">
+              Have a PDF open on your phone right now? Drop it on the reader
+              and it renders dark in your browser — no app install, no
+              Accessibility settings to flip.
+            </p>
+            <Link
+              href="/"
+              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Read a PDF in dark mode →
+            </Link>
+          </div>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
             PDF dark mode on Android FAQ
           </h2>
-          <div className="space-y-3">
-            {FAQ.map((f) => (
-              <details
-                key={f.q}
-                className="group rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60 transition-colors [&_summary::-webkit-details-marker]:hidden"
-              >
-                <summary className="cursor-pointer p-4 flex items-center justify-between list-none text-neutral-100">
-                  <h3 className="font-medium text-base m-0">{f.q}</h3>
-                  <span
-                    aria-hidden
-                    className="text-neutral-500 transition-transform group-open:rotate-180 group-hover:text-amber-400"
-                  >
-                    ⌄
-                  </span>
-                </summary>
-                <p className="px-4 pb-4 -mt-1 text-sm text-neutral-400">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
+          {FAQ.map((f) => (
+            <div key={f.q} className="mb-7">
+              <h3 className="text-lg font-semibold text-neutral-50 mb-2">
+                {f.q}
+              </h3>
+              <p className="text-neutral-400">{f.a}</p>
+            </div>
+          ))}
+        </article>
+
+        <RelatedVariants currentSlug="pdf-dark-mode-android" />
       </main>
 
       <Footer />
