@@ -53,7 +53,10 @@ export default function AboutPage() {
           Safari support — grew out of those two defaults.
         </p>
 
-        <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
+        <h2
+          id="contact"
+          className="text-xl font-semibold text-neutral-50 mt-12 mb-4 scroll-mt-24"
+        >
           Who runs this
         </h2>
         <p>

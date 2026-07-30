@@ -11,7 +11,7 @@ export function Footer() {
           <Link href="/" className="hover:text-neutral-300">Home</Link>
           <Link href="/converter" className="hover:text-neutral-300">Converter</Link>
           <Link href="/about" className="hover:text-neutral-300">About</Link>
-          <a href="mailto:hello@pdfdark.org" className="hover:text-neutral-300">Contact</a>
+          <Link href="/about#contact" className="hover:text-neutral-300">Contact</Link>
           <Link href="/privacy" className="hover:text-neutral-300">Privacy</Link>
           <Link href="/terms" className="hover:text-neutral-300">Terms</Link>
           <a
