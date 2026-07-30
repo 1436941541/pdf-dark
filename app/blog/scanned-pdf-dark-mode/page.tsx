@@ -5,10 +5,10 @@ import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
 import { formatPostDate, getSiteUrl } from "@/lib/site";
 
-const SLUG = "/blog/darken-scanned-pdf-online";
-const TITLE = "Darken a Scanned PDF Online — Free, In-Browser";
+const SLUG = "/blog/scanned-pdf-dark-mode";
+const TITLE = "Scanned PDF Dark Mode — Read Scans at Night, Free";
 const DESCRIPTION =
-  "Got a scanned PDF that's painfully bright at night? Darken every page online in seconds. Free, no upload, no install — works on phones and laptops.";
+  "Scans open as bright white photos of pages — dark mode settings can't touch them. Convert a scanned PDF to dark mode in your browser. Free, no upload.";
 const PUBLISHED = "2026-06-26";
 const UPDATED = "2026-07-30";
 
@@ -122,7 +122,7 @@ export default function DarkenScannedPdfPage() {
       <main className="flex-1 w-full">
         <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
           <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
-            Darken a Scanned PDF Online — Free, In-Browser
+            Scanned PDF Dark Mode — Read Scans at Night, Free
           </h1>
           <p className="text-sm text-neutral-500 mb-10">
             By PDF Dark Team ·{" "}
@@ -252,7 +252,7 @@ export default function DarkenScannedPdfPage() {
           </div>
 
           <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
-            Darken scanned PDF — FAQ
+            Scanned PDF dark mode FAQ
           </h2>
           {FAQ.map((f) => (
             <div key={f.q} className="mb-7">
@@ -264,7 +264,7 @@ export default function DarkenScannedPdfPage() {
           ))}
         </article>
 
-        <RelatedVariants currentSlug="darken-scanned-pdf-online" />
+        <RelatedVariants currentSlug="scanned-pdf-dark-mode" />
       </main>
 
       <Footer />

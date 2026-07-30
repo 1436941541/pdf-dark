@@ -36,15 +36,15 @@ export const VARIANTS: Variant[] = [
     updatedAt: "2026-07-30",
   },
   {
-    slug: "how-to-darken-a-pdf",
-    title: "How to Darken a PDF",
+    slug: "how-to-put-a-pdf-in-dark-mode",
+    title: "How to Put a PDF in Dark Mode",
     blurb:
       "A three-step walkthrough: drop, pick a theme, download. No accounts, no extensions, no uploads.",
     updatedAt: "2026-07-30",
   },
   {
-    slug: "darken-scanned-pdf-online",
-    title: "Darken a Scanned PDF Online",
+    slug: "scanned-pdf-dark-mode",
+    title: "Scanned PDF Dark Mode",
     blurb:
       "Free, browser-only tool for scanned PDFs that wash out your screen at night. Pick OLED for the deepest contrast.",
     updatedAt: "2026-07-30",

@@ -5,10 +5,10 @@ import { Footer } from "@/components/footer";
 import { RelatedVariants } from "@/components/related-variants";
 import { formatPostDate, getSiteUrl } from "@/lib/site";
 
-const SLUG = "/blog/how-to-darken-a-pdf";
-const TITLE = "How to Darken a PDF — 3 Steps, No Install";
+const SLUG = "/blog/how-to-put-a-pdf-in-dark-mode";
+const TITLE = "How to Put a PDF in Dark Mode — 3 Steps, No Install";
 const DESCRIPTION =
-  "Darken any PDF in your browser in three steps: drop the file, pick a dark theme, download the new file. Free, no upload, works offline.";
+  "Put any PDF in dark mode in three steps: drop the file, pick a dark theme, download. Free, in your browser, no app to install.";
 const PUBLISHED = "2026-06-26";
 const UPDATED = "2026-07-30";
 
@@ -79,7 +79,7 @@ function StructuredData() {
   const howTo = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: "Darken a PDF in 3 steps",
+    name: "Put a PDF in dark mode in 3 steps",
     description: DESCRIPTION,
     totalTime: "PT1M",
     estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: "0" },
@@ -159,7 +159,7 @@ export default function HowToDarkenPdfPage() {
       <main className="flex-1 w-full">
         <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
           <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
-            How to Darken a PDF — 3 Steps, No Install
+            How to Put a PDF in Dark Mode — 3 Steps, No Install
           </h1>
           <p className="text-sm text-neutral-500 mb-10">
             By PDF Dark Team ·{" "}
@@ -287,7 +287,7 @@ export default function HowToDarkenPdfPage() {
           </div>
 
           <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
-            How to darken a PDF — FAQ
+            How to put a PDF in dark mode — FAQ
           </h2>
           {FAQ.map((f) => (
             <div key={f.q} className="mb-7">
@@ -299,7 +299,7 @@ export default function HowToDarkenPdfPage() {
           ))}
         </article>
 
-        <RelatedVariants currentSlug="how-to-darken-a-pdf" />
+        <RelatedVariants currentSlug="how-to-put-a-pdf-in-dark-mode" />
       </main>
 
       <Footer />

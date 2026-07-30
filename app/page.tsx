@@ -51,8 +51,8 @@ const FAQ_ITEMS: FaqItem[] = [
     q: "Does it work for scanned PDFs?",
     a: "Yes. Scanned pages are treated as what they are — images — and inverted uniformly, so handwriting and scanned text become light-on-dark automatically. Even old yellowed scans normalize to your theme background.",
     link: {
-      href: "/blog/darken-scanned-pdf-online",
-      text: "Darken a Scanned PDF Online",
+      href: "/blog/scanned-pdf-dark-mode",
+      text: "Scanned PDF Dark Mode",
     },
   },
   {
