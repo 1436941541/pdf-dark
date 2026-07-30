@@ -195,6 +195,40 @@ export default function IpadVariantPage() {
             arrives white if you AirDrop or email it.
           </p>
 
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 2: convert the file for every other app
+          </h2>
+          <p className="mb-4">
+            When you need the darkness in the file itself — on an older iOS,
+            in a third-party PDF app, or in a copy you&apos;re sending to
+            someone — convert it once:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open the{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                converter
+              </Link>{" "}
+              in Safari and pick the PDF — from Files, iCloud Drive, or a
+              Mail attachment.
+            </li>
+            <li>
+              Choose a theme and tap Download. The dark copy lands in the
+              Files app.
+            </li>
+            <li>
+              Open it in any PDF app — Acrobat, GoodReader, Books, an older
+              iPad still on iOS 17 — and it&apos;s dark there too.
+            </li>
+          </ol>
+          <p className="mb-5">
+            The processing happens in the Safari tab on your device — nothing
+            is uploaded. Because the colors are rewritten inside the file,
+            the dark copy survives reopening, stays dark in every viewer,
+            and shows up dark on the phone of whoever you send it to.
+          </p>
+
           <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
             Before / after
           </h2>
@@ -232,39 +266,6 @@ export default function IpadVariantPage() {
             Real output (Midnight theme, Auto image mode) — not a mockup.
             Notice the photo keeps its original colors instead of flipping
             into a negative.
-          </p>
-
-          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
-            Option 2: convert the file for every other app
-          </h2>
-          <p className="mb-4">
-            When you need the darkness in the file itself — on an older iOS,
-            in a third-party PDF app, or in a copy you&apos;re sending to
-            someone — convert it once:
-          </p>
-          <ol className="list-decimal pl-6 space-y-3 mb-5">
-            <li>
-              Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
-                converter
-              </Link>{" "}
-              in Safari and pick the PDF — from Files, iCloud Drive, or a
-              Mail attachment.
-            </li>
-            <li>
-              Choose a theme and tap Download. The dark copy lands in the
-              Files app.
-            </li>
-            <li>
-              Open it in any PDF app — Acrobat, GoodReader, Books, an older
-              iPad still on iOS 17 — and it&apos;s dark there too.
-            </li>
-          </ol>
-          <p className="mb-5">
-            The processing happens in the Safari tab on your device — nothing
-            is uploaded. Because the colors are rewritten inside the file,
-            the dark copy survives reopening, stays dark in every viewer,
-            and shows up dark on the phone of whoever you send it to.
           </p>
 
           <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">

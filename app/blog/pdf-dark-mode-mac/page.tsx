@@ -194,6 +194,41 @@ export default function MacVariantPage() {
             be all you need.
           </p>
 
+
+          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
+            Option 2: convert the file, then open it anywhere
+          </h2>
+          <p className="mb-4">
+            When the darkness needs to be part of the file — on Sequoia or
+            older, in an app other than Preview, or in a PDF you&apos;re
+            sending to someone — convert it once:
+          </p>
+          <ol className="list-decimal pl-6 space-y-3 mb-5">
+            <li>
+              Open the{" "}
+              <Link href="/converter" className="text-amber-400 hover:underline">
+                converter
+              </Link>{" "}
+              in Safari, Chrome, or any browser and drop your PDF on it.
+            </li>
+            <li>
+              Pick a theme — Midnight, Sepia, Solarized, or pure-black
+              OLED — and click Download.
+            </li>
+            <li>
+              Open the downloaded copy from your Downloads folder — in
+              Preview, Chrome, Acrobat, whichever app you like. It opens
+              dark in all of them, on any macOS version.
+            </li>
+          </ol>
+          <p className="mb-5">
+            The processing happens entirely in the browser tab on your Mac —
+            the file is never uploaded. Your original stays untouched on
+            disk — the converter produces a separate dark copy alongside
+            it — and because the colors are rewritten inside that copy, it
+            stays dark when you email or AirDrop it.
+          </p>
+
           <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
             Before / after
           </h2>
@@ -231,40 +266,6 @@ export default function MacVariantPage() {
             Real output (Midnight theme, Auto image mode) — not a mockup.
             Notice the photo keeps its original colors instead of flipping
             into a negative.
-          </p>
-
-          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
-            Option 2: convert the file, then open it anywhere
-          </h2>
-          <p className="mb-4">
-            When the darkness needs to be part of the file — on Sequoia or
-            older, in an app other than Preview, or in a PDF you&apos;re
-            sending to someone — convert it once:
-          </p>
-          <ol className="list-decimal pl-6 space-y-3 mb-5">
-            <li>
-              Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
-                converter
-              </Link>{" "}
-              in Safari, Chrome, or any browser and drop your PDF on it.
-            </li>
-            <li>
-              Pick a theme — Midnight, Sepia, Solarized, or pure-black
-              OLED — and click Download.
-            </li>
-            <li>
-              Open the downloaded copy from your Downloads folder — in
-              Preview, Chrome, Acrobat, whichever app you like. It opens
-              dark in all of them, on any macOS version.
-            </li>
-          </ol>
-          <p className="mb-5">
-            The processing happens entirely in the browser tab on your Mac —
-            the file is never uploaded. Your original stays untouched on
-            disk — the converter produces a separate dark copy alongside
-            it — and because the colors are rewritten inside that copy, it
-            stays dark when you email or AirDrop it.
           </p>
 
           <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
