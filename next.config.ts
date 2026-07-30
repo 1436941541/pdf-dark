@@ -41,20 +41,6 @@ const nextConfig: NextConfig = {
         destination: "/converter",
         permanent: true,
       },
-      // Retargeted July 2026: SERP check showed "darken a pdf" / "darken
-      // scanned pdf" mean "boost faded text for printing" — the opposite of
-      // dark mode. Both posts moved to slugs matching their real topic
-      // (neither URL was indexed yet).
-      {
-        source: "/blog/darken-scanned-pdf-online",
-        destination: "/blog/scanned-pdf-dark-mode",
-        permanent: true,
-      },
-      {
-        source: "/blog/how-to-darken-a-pdf",
-        destination: "/blog/how-to-put-a-pdf-in-dark-mode",
-        permanent: true,
-      },
     ];
   },
 };
