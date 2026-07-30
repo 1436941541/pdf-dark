@@ -91,6 +91,13 @@ function StructuredData() {
     name: "PDF Dark",
     alternateName: ["pdfdark", "pdfdark.org", "PDF Dark Mode Converter"],
     url: site,
+    sameAs: [
+      "https://github.com/1436941541/pdf-dark",
+      "https://www.saashub.com/pdf-dark",
+      "https://www.libhunt.com/r/pdf-dark",
+      "https://devpost.com/software/pdf-dark",
+      "https://yunjie3.substack.com",
+    ],
     applicationCategory: "UtilityApplication",
     operatingSystem: "Any (browser-based)",
     screenshot: `${site}/compare/pdf-dark.png`,
