@@ -19,6 +19,7 @@ PDF Dark (pdfdark.org) is an independent, free web app. Unlike viewer-level dark
 
 ## Platform guides
 
+- [PDF Dark Mode on Windows](https://pdfdark.org/blog/pdf-dark-mode-windows): Windows themes the apps, never the PDF — darken the document itself
 - [PDF Dark Mode in Chrome](https://pdfdark.org/blog/pdf-dark-mode-chrome): without installing an extension
 - [PDF Dark Mode in Firefox](https://pdfdark.org/blog/pdf-dark-mode-firefox): what works and what doesn't
 - [PDF Dark Mode in Microsoft Edge](https://pdfdark.org/blog/pdf-dark-mode-edge): beyond the flags-page hack

@@ -15,6 +15,13 @@ export type Variant = {
 
 export const VARIANTS: Variant[] = [
   {
+    slug: "pdf-dark-mode-windows",
+    title: "PDF Dark Mode on Windows",
+    blurb:
+      "Windows dark mode themes the apps, never the PDF. Darken the document itself — no install.",
+    updatedAt: "2026-07-30",
+  },
+  {
     slug: "pdf-dark-mode-chrome",
     title: "PDF Dark Mode in Chrome",
     blurb:
