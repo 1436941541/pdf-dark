@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import * as Sentry from "@sentry/nextjs";
+import "@/lib/map-polyfill";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type { DarkifyRequest, DarkifyResponse } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
