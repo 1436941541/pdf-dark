@@ -27,11 +27,22 @@ if (dsn) {
     ],
 
     // Ad-blockers / privacy extensions kill GA + Clarity requests; treat as noise, not a bug.
+    // Crypto wallet extensions (MetaMask, Enkrypt, ...) inject a script into every
+    // page to expose window.ethereum — their internal errors have nothing to do
+    // with this site but still fire in the page's global error handler.
     denyUrls: [
       /google-analytics\.com/i,
       /googletagmanager\.com/i,
       /clarity\.ms/i,
       /\/gtag\/js/i,
+      /^chrome-extension:\/\//i,
+      /^moz-extension:\/\//i,
+      /^safari-web-extension:\/\//i,
+    ],
+    ignoreErrors: [
+      /MetaMask/i,
+      /webext-bridge/i,
+      /enkrypt/i,
     ],
 
     tracesSampleRate: 0,
