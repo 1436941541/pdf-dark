@@ -128,10 +128,9 @@ export type DarkifyRequest = {
   imageDims?: number[];
 };
 
-export type DarkifyResponse = {
-  id: number;
-  blob: Blob;
-};
+export type DarkifyResponse =
+  | { id: number; blob: Blob }
+  | { id: number; error: string };
 
 const ctx = self as unknown as DedicatedWorkerGlobalScope;
 
@@ -209,5 +208,10 @@ ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
     ctx.postMessage(res);
   } catch (err) {
     console.error("[dark-worker] failed", err);
+    const res: DarkifyResponse = {
+      id,
+      error: err instanceof Error ? err.message : String(err),
+    };
+    ctx.postMessage(res);
   }
 };

@@ -43,19 +43,21 @@ export function Downloader() {
   // Worker setup — same darkify worker the reader uses.
   const workerRef = useRef<Worker | null>(null);
   const msgIdRef = useRef(0);
-  const pendingRef = useRef(new Map<number, (blob: Blob) => void>());
+  const pendingRef = useRef(
+    new Map<number, { resolve: (blob: Blob) => void; reject: (err: Error) => void }>(),
+  );
 
   useEffect(() => {
     const w = new Worker(new URL("../lib/dark-worker.ts", import.meta.url), {
       type: "module",
     });
     w.onmessage = (e: MessageEvent<DarkifyResponse>) => {
-      const { id, blob } = e.data;
+      const { id } = e.data;
       const cb = pendingRef.current.get(id);
-      if (cb) {
-        pendingRef.current.delete(id);
-        cb(blob);
-      }
+      if (!cb) return;
+      pendingRef.current.delete(id);
+      if ("error" in e.data) cb.reject(new Error(e.data.error));
+      else cb.resolve(e.data.blob);
     };
     workerRef.current = w;
     return () => {
@@ -84,8 +86,8 @@ export function Downloader() {
         (r) => imageTreatment(imageMode, r) !== "invert",
       );
       const id = ++msgIdRef.current;
-      const outBlob = await new Promise<Blob>((resolve) => {
-        pendingRef.current.set(id, resolve);
+      const outBlob = await new Promise<Blob>((resolve, reject) => {
+        pendingRef.current.set(id, { resolve, reject });
         const req: DarkifyRequest = {
           id,
           bitmap,
