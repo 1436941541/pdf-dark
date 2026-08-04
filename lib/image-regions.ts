@@ -109,7 +109,7 @@ export async function getPageImageRects(
 ): Promise<PageImageScan> {
   // pdf.js is already loaded by the caller (pdf-viewer renders the page
   // first); this resolves from the module cache.
-  const { OPS } = await import("pdfjs-dist");
+  const { OPS } = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const opList = await page.getOperatorList();
 
   const cw = viewport.width;
