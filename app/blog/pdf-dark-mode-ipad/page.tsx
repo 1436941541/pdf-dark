@@ -9,7 +9,7 @@ const SLUG = "/blog/pdf-dark-mode-ipad";
 const TITLE =
   "PDF Dark Mode on iPad & iPhone — the iOS 26 Toggle & Beyond";
 const DESCRIPTION =
-  "iOS 26 added a Dark Background toggle for PDFs in Files and Books. Here's what it does, its four limits, and how to get a PDF that stays dark everywhere.";
+  "iOS 26 added a Dark Background toggle for PDFs in Files and Books. Here's what it does, where it stops, and how to get a PDF that stays dark everywhere.";
 const PUBLISHED = "2026-07-29";
 const UPDATED = "2026-07-30";
 
