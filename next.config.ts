@@ -2,6 +2,25 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          // Autosurf/traffic-exchange sites (cashlee.co etc.) iframe the whole
+          // site to farm "views", polluting analytics. Same-origin framing only.
+          {
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self'",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       // /blog/invert-pdf-colors was retired in June, then the "images keep
