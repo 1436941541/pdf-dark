@@ -33,5 +33,6 @@ PDF Dark (pdfdark.org) is an independent, free web app. Unlike viewer-level dark
 ## About
 
 - [About PDF Dark](https://pdfdark.org/about): why it exists, how it's built, who runs it
+- [Changelog](https://pdfdark.org/changelog): what's new — features, fixes, and improvements, newest first
 - [Privacy](https://pdfdark.org/privacy): files are processed in-browser and never uploaded
 - [Blog index](https://pdfdark.org/blog): all dark-mode guides

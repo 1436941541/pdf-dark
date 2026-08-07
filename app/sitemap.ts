@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/lib/site";
 import { VARIANTS } from "@/lib/variants";
+import { CHANGELOG_UPDATED_AT } from "@/lib/changelog";
 
 // Last real content change per static route, YYYY-MM-DD. Bump when that page's content actually changes.
 const HOME_UPDATED_AT = "2026-07-29";
@@ -42,6 +43,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: ABOUT_UPDATED_AT,
       changeFrequency: "yearly",
       priority: 0.5,
+    },
+    {
+      url: `${base}/changelog`,
+      // Driven by the newest entry in lib/changelog.ts — no manual bumping.
+      lastModified: CHANGELOG_UPDATED_AT,
+      changeFrequency: "weekly",
+      priority: 0.4,
     },
     {
       url: `${base}/privacy`,
