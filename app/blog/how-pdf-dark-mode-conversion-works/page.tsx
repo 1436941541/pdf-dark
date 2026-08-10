@@ -140,7 +140,7 @@ export default function HowItWorksPage() {
           </h2>
           <p className="mb-5">
             Wherever possible, the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>{" "}
             rewrites the file&apos;s own color instructions, so the text
@@ -266,7 +266,7 @@ export default function HowItWorksPage() {
               text, zoom into a figure, open the bookmarks.
             </p>
             <Link
-              href="/converter"
+              href="/invert-pdf-colors"
               className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
             >
               See it run on your own PDF →

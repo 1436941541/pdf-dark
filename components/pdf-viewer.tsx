@@ -879,11 +879,11 @@ export function PdfViewer({ file, onReset }: Props) {
         <div className="border-t border-neutral-800 my-6" />
 
         <a
-          href="/converter"
+          href="/invert-pdf-colors"
           className="block text-center px-4 py-2 rounded-full text-sm text-neutral-300 hover:text-neutral-100 border border-neutral-800 hover:border-neutral-600 transition-colors"
-          title="Open the converter to save a dark-themed copy of your PDF"
+          title="Invert the colors and save a copy of this PDF"
         >
-          Convert &amp; download →
+          Invert &amp; download →
         </a>
         <button
           onClick={onReset}

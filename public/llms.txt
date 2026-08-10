@@ -7,14 +7,13 @@ PDF Dark (pdfdark.org) is an independent, free web app. Unlike viewer-level dark
 ## Tool
 
 - [PDF Dark Mode Reader](https://pdfdark.org/): read any PDF in dark mode in the browser, free, no upload
-- [Convert PDF to Dark Mode](https://pdfdark.org/converter): convert and download a permanent dark-mode copy of a PDF
+- [Invert PDF Colors](https://pdfdark.org/invert-pdf-colors): flip a PDF's colors and download the result — a permanent dark (or light) copy. Choose how far the inversion reaches: everything including images, text and background only, or per-image automatic
 
 ## Guides
 
 - [How to Put a PDF in Dark Mode — 3 Steps, No Install](https://pdfdark.org/blog/how-to-put-a-pdf-in-dark-mode): the general how-to, start here
 - [How PDF Dark Mode Conversion Works — Under the Hood](https://pdfdark.org/blog/how-pdf-dark-mode-conversion-works): the technical explanation of the conversion pipeline
 - [PDF Readers with Dark Mode: What Actually Works (2026 Comparison)](https://pdfdark.org/blog/pdf-reader-dark-mode-comparison): comparison of dark-mode support across popular PDF readers
-- [Invert PDF Colors — Without Turning Images into Negatives](https://pdfdark.org/blog/invert-pdf-colors-without-inverting-images): why naive color inversion ruins images and how content-aware conversion avoids it
 - [Scanned PDF Dark Mode](https://pdfdark.org/blog/scanned-pdf-dark-mode): dark mode for scanned/image-based PDFs
 
 ## Platform guides

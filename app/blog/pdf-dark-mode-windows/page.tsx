@@ -148,7 +148,7 @@ export default function WindowsVariantPage() {
             in any browser and drop your file on it. To get a copy that opens
             dark in every Windows app — Edge, Acrobat, Sumatra, even the File
             Explorer preview — run it through the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>{" "}
             once and download the result. Both run locally in your browser;
@@ -228,7 +228,7 @@ export default function WindowsVariantPage() {
           <ol className="list-decimal pl-6 space-y-3 mb-5">
             <li>
               Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
+              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
                 converter
               </Link>{" "}
               and drop your PDF on it. The file is parsed right in the tab by{" "}

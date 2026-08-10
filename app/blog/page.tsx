@@ -42,8 +42,8 @@ export default function BlogIndexPage() {
             <Link href="/" className="hover:text-neutral-100">
               Reader
             </Link>
-            <Link href="/converter" className="hover:text-neutral-100">
-              Converter
+            <Link href="/invert-pdf-colors" className="hover:text-neutral-100">
+              Invert &amp; Download
             </Link>
           </nav>
         </div>

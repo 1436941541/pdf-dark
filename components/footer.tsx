@@ -9,7 +9,7 @@ export function Footer() {
         <span>© {new Date().getFullYear()} PDF Dark · pdfdark.org</span>
         <div className="flex flex-wrap gap-4">
           <Link href="/" className="hover:text-neutral-300">Home</Link>
-          <Link href="/converter" className="hover:text-neutral-300">Converter</Link>
+          <Link href="/invert-pdf-colors" className="hover:text-neutral-300">Invert PDF Colors</Link>
           <Link href="/about" className="hover:text-neutral-300">About</Link>
           <Link href="/changelog" className="hover:text-neutral-300">Changelog</Link>
           <Link href="/about#contact" className="hover:text-neutral-300">Contact</Link>

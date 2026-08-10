@@ -148,7 +148,7 @@ export default function MacVariantPage() {
               PDF dark mode reader
             </Link>{" "}
             in your browser, or make a dark copy with the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>
             . Both run entirely on your Mac; the file is never uploaded.
@@ -206,7 +206,7 @@ export default function MacVariantPage() {
           <ol className="list-decimal pl-6 space-y-3 mb-5">
             <li>
               Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
+              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
                 converter
               </Link>{" "}
               in Safari, Chrome, or any browser and drop your PDF on it.

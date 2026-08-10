@@ -148,7 +148,7 @@ export default function ChromeVariantPage() {
             in a Chrome tab and drop your file on it. To keep a copy that
             stays dark — in Acrobat, on your phone, everywhere — run it
             through the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>{" "}
             and download the result. Both run entirely in your browser; the
@@ -234,7 +234,7 @@ export default function ChromeVariantPage() {
           <ol className="list-decimal pl-6 space-y-3 mb-5">
             <li>
               Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
+              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
                 converter
               </Link>{" "}
               in Chrome and drop your PDF on it. The rendering is done by{" "}

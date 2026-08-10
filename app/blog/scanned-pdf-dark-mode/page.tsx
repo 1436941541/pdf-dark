@@ -145,7 +145,7 @@ export default function DarkenScannedPdfPage() {
           </h2>
           <p className="mb-5">
             Drop your scanned PDF on the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               PDF Dark converter
             </Link>
             , pick a theme, and click Download. A scanned page is one big
@@ -162,7 +162,7 @@ export default function DarkenScannedPdfPage() {
             <li>
               Open the{" "}
               <Link
-                href="/converter"
+                href="/invert-pdf-colors"
                 className="text-amber-400 hover:underline"
               >
                 converter
@@ -244,7 +244,7 @@ export default function DarkenScannedPdfPage() {
               uploaded.
             </p>
             <Link
-              href="/converter"
+              href="/invert-pdf-colors"
               className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
             >
               Darken my scanned PDF →

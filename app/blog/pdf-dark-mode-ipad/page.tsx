@@ -151,7 +151,7 @@ export default function IpadVariantPage() {
               PDF dark mode reader
             </Link>{" "}
             in Safari, or make a dark copy with the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>
             . Both run on your device; the file is never uploaded.
@@ -207,7 +207,7 @@ export default function IpadVariantPage() {
           <ol className="list-decimal pl-6 space-y-3 mb-5">
             <li>
               Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
+              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
                 converter
               </Link>{" "}
               in Safari and pick the PDF — from Files, iCloud Drive, or a

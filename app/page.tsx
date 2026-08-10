@@ -27,7 +27,7 @@ type FaqItem = {
 const FAQ_ITEMS: FaqItem[] = [
   {
     q: "Can I turn a PDF into dark mode?",
-    a: "Yes — free and without installing anything. Drop the PDF on this page to read it on a dark background right away, or use the converter page to download a copy with the dark theme baked into the file.",
+    a: "Yes — free and without installing anything. Drop the PDF on this page to read it on a dark background right away, or invert its colors and download a copy with the dark theme written into the file.",
   },
   {
     q: "Is my PDF uploaded to your server?",
@@ -35,8 +35,8 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "How can I print a PDF in dark mode?",
-    a: "Use the converter page to download a dark-themed copy, then print it from any reader. Because the dark theme is baked into the file itself, the print output is dark too — not just the on-screen view.",
-    link: { href: "/converter", text: "Convert PDF to Dark Mode" },
+    a: "Download a dark-themed copy first, then print it from any reader. Because the colors are written into the file itself, the print output is dark too — not just the on-screen view.",
+    link: { href: "/invert-pdf-colors", text: "Invert PDF Colors" },
   },
   {
     q: "Does this work on iPhone or iPad?",
@@ -63,13 +63,13 @@ const FAQ_ITEMS: FaqItem[] = [
     q: "Will my photos be inverted too?",
     a: "Only if you want them to be. By default each image gets the best treatment automatically: photos keep their original colors, white screenshots and diagrams are inverted to blend with the page, and bright colorful images get a gentle dim. The Images toggle in the toolbar (next to the themes) lets you force everything Original or everything Inverted.",
     link: {
-      href: "/blog/invert-pdf-colors-without-inverting-images",
-      text: "Invert PDF Colors, Keep Your Images",
+      href: "/invert-pdf-colors",
+      text: "Invert PDF Colors",
     },
   },
   {
     q: "Can I change a PDF background to black?",
-    a: "Yes. The OLED theme renders the background as pure black (#000) and text in light tones — near-white for regular body text — which is the most aggressive dark mode for PDFs. On the converter page you can also download the PDF with that black background baked in.",
+    a: "Yes. The OLED theme renders the background as pure black (#000) and text in light tones — near-white for regular body text — which is the most aggressive dark mode for PDFs. You can also download the PDF with that black background written in.",
   },
   {
     q: "Is this a dark mode for Adobe Acrobat?",
@@ -161,7 +161,7 @@ export default function Home() {
             <span className="text-lg font-semibold hidden sm:inline">PDF Dark</span>
           </div>
           <nav className="text-sm text-neutral-400 flex gap-5">
-            <Link href="/converter" className="hover:text-neutral-100">Converter</Link>
+            <Link href="/invert-pdf-colors" className="hover:text-neutral-100">Invert &amp; Download</Link>
             <Link href="/blog" className="hover:text-neutral-100">Blog</Link>
             <a href="#faq" className="hover:text-neutral-100">FAQ</a>
           </nav>
@@ -201,8 +201,8 @@ export default function Home() {
 
           <p className="mt-6 text-sm text-neutral-500">
             Want to keep the dark version?{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
-              Convert &amp; download it on the converter page
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
+              Invert the colors and download the file
             </Link>
             .
           </p>
@@ -289,8 +289,8 @@ export default function Home() {
             image mode).
           </p>
           <p className="mt-4 text-sm text-center">
-            <Link href="/converter" className="text-amber-400 hover:underline">
-              Convert your own PDF to dark mode →
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
+              Invert your own PDF&apos;s colors →
             </Link>
           </p>
         </section>

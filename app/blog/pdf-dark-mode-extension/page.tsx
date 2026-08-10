@@ -151,7 +151,7 @@ export default function ExtensionVariantPage() {
               PDF dark mode reader
             </Link>{" "}
             in the tab you already have, or use the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>{" "}
             to keep a dark copy of the file itself.
@@ -317,7 +317,7 @@ export default function ExtensionVariantPage() {
             </li>
             <li>
               Want the file itself dark, on every device? Use the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
+              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
                 converter
               </Link>{" "}
               and download a dark copy — it stays dark in Acrobat, Preview,

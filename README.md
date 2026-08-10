@@ -80,20 +80,24 @@ To enable Sentry locally, copy `.env.local.example` to `.env.local` and add your
 
 ```
 app/
-  page.tsx                       Landing page
-  invert-pdf-colors/             SEO variant: image preservation angle
-  pdf-dark-mode-chrome/          SEO variant: Chrome users
-  pdf-dark-mode-firefox/         SEO variant: Firefox users
-  convert-pdf-to-dark-mode/      SEO variant: permanent file vs viewer
+  page.tsx                       Tool: in-browser dark mode reader
+  invert-pdf-colors/             Tool: invert colors & download the new PDF
+                                 (was /converter until Aug 2026 — merged)
+  blog/                          Guides, one dir per post (see lib/variants.ts)
   about/, privacy/, terms/       Legal / about
+  changelog/                     Release history
   sitemap.ts, robots.ts          SEO infrastructure
 components/
   drop-zone.tsx                  File input + drag-and-drop
-  converter.tsx                  Main client orchestrator
-  pdf-viewer.tsx                 Render + dark pass + download
+  converter.tsx                  Reader orchestrator (drop zone + viewer)
+  downloader.tsx                 Convert & download flow; theme/image defaults
+                                 are props so tool pages can start differently
+  pdf-viewer.tsx                 Render + dark pass + in-browser reading
 lib/
-  darkify.ts                     Saturation classifier (core algorithm)
-  variants.ts                    SEO variant metadata
+  dark-color.ts                  Color mapping + per-image classifier
+  build-dark-pdf.ts              Rebuilds the output PDF
+  themes.ts                      Theme background definitions
+  variants.ts                    Blog post registry (drives sitemap + cross-links)
   site.ts                        Canonical URL helper
 ```
 

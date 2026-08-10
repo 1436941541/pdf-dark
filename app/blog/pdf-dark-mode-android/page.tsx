@@ -166,7 +166,7 @@ export default function AndroidVariantPage() {
             in any Android browser and pick your PDF — it renders dark
             immediately. To keep a dark copy that opens dark in Files by
             Google, WPS, or any other viewer, run it through the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>{" "}
             once. Both run on your phone; the file is never uploaded.
@@ -253,7 +253,7 @@ export default function AndroidVariantPage() {
           <ol className="list-decimal pl-6 space-y-3 mb-5">
             <li>
               Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
+              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
                 converter
               </Link>{" "}
               in your browser and pick the PDF.

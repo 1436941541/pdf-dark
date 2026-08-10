@@ -168,7 +168,7 @@ export default function AdobeAcrobatVariantPage() {
             through it. It only changes how this copy of Acrobat displays
             PDFs — to make the file itself dark, on your phone or for anyone
             you send it to, run it through the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>{" "}
             once instead, which is Option 2.
@@ -235,7 +235,7 @@ export default function AdobeAcrobatVariantPage() {
           <ol className="list-decimal pl-6 space-y-3 mb-5">
             <li>
               Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
+              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
                 converter
               </Link>{" "}
               and drop your PDF on it.
@@ -303,7 +303,7 @@ export default function AdobeAcrobatVariantPage() {
               Acrobat, on your phone, and for anyone you send it to.
             </p>
             <Link
-              href="/converter"
+              href="/invert-pdf-colors"
               className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
             >
               Convert a PDF to dark mode →

@@ -5,7 +5,7 @@ import { CHANGELOG_UPDATED_AT } from "@/lib/changelog";
 
 // Last real content change per static route, YYYY-MM-DD. Bump when that page's content actually changes.
 const HOME_UPDATED_AT = "2026-07-29";
-const CONVERTER_UPDATED_AT = "2026-07-29";
+const INVERT_UPDATED_AT = "2026-08-10";
 const ABOUT_UPDATED_AT = "2026-06-26";
 const PRIVACY_UPDATED_AT = "2026-07-25";
 const TERMS_UPDATED_AT = "2026-07-21";
@@ -20,8 +20,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${base}/converter`,
-      lastModified: CONVERTER_UPDATED_AT,
+      url: `${base}/invert-pdf-colors`,
+      lastModified: INVERT_UPDATED_AT,
       changeFrequency: "monthly",
       priority: 0.9,
     },

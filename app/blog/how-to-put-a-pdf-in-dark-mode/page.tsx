@@ -182,7 +182,7 @@ export default function HowToDarkenPdfPage() {
           </h2>
           <p className="mb-5">
             Open the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               PDF Dark converter
             </Link>{" "}
             in any browser, drag your PDF onto the drop zone, pick a dark
@@ -279,7 +279,7 @@ export default function HowToDarkenPdfPage() {
               away — free, no account, nothing uploaded.
             </p>
             <Link
-              href="/converter"
+              href="/invert-pdf-colors"
               className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
             >
               Darken a PDF now →

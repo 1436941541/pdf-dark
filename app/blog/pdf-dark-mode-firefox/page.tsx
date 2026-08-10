@@ -148,7 +148,7 @@ export default function FirefoxVariantPage() {
             in a Firefox tab and drag your PDF onto it. To make the file
             itself dark — in Acrobat, on your phone, in Firefox next week —
             use the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>{" "}
             and download a dark copy. Both run entirely in your browser; the
@@ -244,7 +244,7 @@ export default function FirefoxVariantPage() {
           <ol className="list-decimal pl-6 space-y-3 mb-5">
             <li>
               Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
+              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
                 converter
               </Link>{" "}
               in Firefox and drop your PDF on it.

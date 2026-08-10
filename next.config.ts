@@ -23,17 +23,45 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // /blog/invert-pdf-colors was retired in June, then the "images keep
-      // their colors" capability actually shipped (July 2026) and the topic
-      // came back at a more specific slug — point the legacy links there.
+      // August 2026: /converter and /invert-pdf-colors were the same tool —
+      // drop a PDF, download the rewritten file — differing only in which
+      // defaults they opened on. They are now one page at /invert-pdf-colors.
+      //
+      // Why that URL survived rather than /converter:
+      //   · Both were "URL is unknown to Google" in Search Console, so the
+      //     merge cost nothing either way.
+      //   · Word volume: invert pdf (11K) + pdf inverter (5K) against
+      //     convert pdf to dark mode (500).
+      //   · SERP overlap: `convert pdf to dark mode` shares 58% of its
+      //     results with `pdf dark mode`, which the homepage already targets
+      //     — so /converter was competing with the homepage. `invert pdf
+      //     colors` shares 0% with it, i.e. a genuinely separate need.
+      //   · /invert-pdf-colors reached pos 7.2 in June before being retired.
+      //
+      // Every legacy URL below lands on the tool directly — no chains.
       {
-        source: "/invert-pdf-colors",
-        destination: "/blog/invert-pdf-colors-without-inverting-images",
+        source: "/converter",
+        destination: "/invert-pdf-colors",
         permanent: true,
       },
       {
         source: "/blog/invert-pdf-colors",
-        destination: "/blog/invert-pdf-colors-without-inverting-images",
+        destination: "/invert-pdf-colors",
+        permanent: true,
+      },
+      {
+        source: "/blog/invert-pdf-colors-without-inverting-images",
+        destination: "/invert-pdf-colors",
+        permanent: true,
+      },
+      {
+        source: "/convert-pdf-to-dark-mode",
+        destination: "/invert-pdf-colors",
+        permanent: true,
+      },
+      {
+        source: "/blog/convert-pdf-to-dark-mode",
+        destination: "/invert-pdf-colors",
         permanent: true,
       },
       {
@@ -44,20 +72,6 @@ const nextConfig: NextConfig = {
       {
         source: "/pdf-dark-mode-firefox",
         destination: "/blog/pdf-dark-mode-firefox",
-        permanent: true,
-      },
-      // The convert-pdf-to-dark-mode blog post was merged into /converter
-      // (July 2026) — same H1, same target query, and the tool page is the
-      // better answer. Both the legacy top-level URL and the blog URL land
-      // there directly (no chains).
-      {
-        source: "/convert-pdf-to-dark-mode",
-        destination: "/converter",
-        permanent: true,
-      },
-      {
-        source: "/blog/convert-pdf-to-dark-mode",
-        destination: "/converter",
         permanent: true,
       },
     ];

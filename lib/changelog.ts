@@ -12,6 +12,13 @@ export type ChangelogEntry = {
 // and analytics tweaks don't belong here.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-08-10",
+    tag: "Improved",
+    title: "The converter moved to /invert-pdf-colors",
+    description:
+      "Same tool, clearer name: the page that converts and downloads your PDF now lives at /invert-pdf-colors, with the write-up focused on what the inversion actually does to text, backgrounds, and images. Old links redirect automatically and nothing about the conversion itself changed.",
+  },
+  {
     date: "2026-08-08",
     tag: "Improved",
     title: "Blocked third-party embedding",

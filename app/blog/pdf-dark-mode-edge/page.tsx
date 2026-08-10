@@ -146,7 +146,7 @@ export default function EdgeVariantPage() {
             </Link>{" "}
             in an Edge tab and drop your file on it. To keep a dark copy —
             or to annotate it with Edge&apos;s own tools — use the{" "}
-            <Link href="/converter" className="text-amber-400 hover:underline">
+            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
               converter
             </Link>{" "}
             first, then open the downloaded file in Edge. Both run entirely
@@ -227,7 +227,7 @@ export default function EdgeVariantPage() {
           <ol className="list-decimal pl-6 space-y-3 mb-5">
             <li>
               Open the{" "}
-              <Link href="/converter" className="text-amber-400 hover:underline">
+              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
                 converter
               </Link>{" "}
               in Edge and drop your PDF on it. The file is parsed right in

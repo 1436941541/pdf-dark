@@ -50,13 +50,6 @@ export const VARIANTS: Variant[] = [
     updatedAt: "2026-07-30",
   },
   {
-    slug: "invert-pdf-colors-without-inverting-images",
-    title: "Invert PDF Colors, Keep Your Images",
-    blurb:
-      "Basic inverters turn photos into negatives. Here photos keep their colors — automatically, or under your control.",
-    updatedAt: "2026-07-30",
-  },
-  {
     slug: "how-pdf-dark-mode-conversion-works",
     title: "How the Conversion Works",
     blurb:
