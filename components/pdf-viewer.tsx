@@ -14,6 +14,7 @@ import {
   type ImageMode,
 } from "@/lib/build-dark-pdf";
 import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
+import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
 
 type PageImage = {
   /** Full-color rendered PDF page (source of truth, never modified). */
@@ -73,6 +74,7 @@ export function PdfViewer({ file, onReset }: Props) {
     return () => clearTimeout(t);
   }, [darkness, appliedDarkness, warmth, appliedWarmth]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [errorText, setErrorText] = useState<string | null>(null);
   const [progress, setProgress] = useState<{ done: number; total: number }>({
     done: 0,
     total: 0,
@@ -321,6 +323,7 @@ export function PdfViewer({ file, onReset }: Props) {
   useEffect(() => {
     cancelledRef.current = false;
     setStatus("loading");
+    setErrorText(null);
     setPages([]);
     setProgress({ done: 0, total: 0 });
 
@@ -439,8 +442,16 @@ export function PdfViewer({ file, onReset }: Props) {
         }
       } catch (e) {
         console.error("[pdf-dark] render failed", e);
-        Sentry.captureException(e, { tags: { stage: "render" } });
-        if (!cancelledRef.current) setStatus("error");
+        const kind = classifyPdfLoadError(e);
+        // Encrypted / empty / corrupt uploads are user input, not bugs —
+        // keep them out of Sentry error alerts.
+        if (kind === "other") {
+          Sentry.captureException(e, { tags: { stage: "render" } });
+        }
+        if (!cancelledRef.current) {
+          setErrorText(pdfLoadErrorText(kind));
+          setStatus("error");
+        }
       }
     })();
 
@@ -913,7 +924,7 @@ export function PdfViewer({ file, onReset }: Props) {
 
       {status === "error" && (
         <div className="text-center py-16 text-red-400">
-          Couldn&apos;t read that PDF. Try another file?
+          {errorText ?? "Couldn't read that PDF. Try another file?"}
         </div>
       )}
 

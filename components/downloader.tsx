@@ -13,6 +13,7 @@ import {
   type PageRender,
 } from "@/lib/build-dark-pdf";
 import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
+import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
 import { DropZone } from "./drop-zone";
 
 /** effectiveThemeBg result → CSS color. */
@@ -23,7 +24,7 @@ type Status =
   | { kind: "config" }
   | { kind: "processing"; phase: "render" | "build"; done: number; total: number }
   | { kind: "done"; filename: string }
-  | { kind: "error" };
+  | { kind: "error"; message?: string };
 
 /**
  * The converter-page flow: pick theme/image/darkness/warmth up front, then
@@ -250,8 +251,15 @@ export function Downloader() {
         setStatus({ kind: "done", filename });
       } catch (e) {
         console.error("[pdf-dark] convert failed", e);
-        Sentry.captureException(e, { tags: { stage: "downloader" } });
-        if (!cancelledRef.current) setStatus({ kind: "error" });
+        const kind = classifyPdfLoadError(e);
+        // Encrypted / empty / corrupt uploads are user input, not bugs —
+        // keep them out of Sentry error alerts.
+        if (kind === "other") {
+          Sentry.captureException(e, { tags: { stage: "downloader" } });
+        }
+        if (!cancelledRef.current) {
+          setStatus({ kind: "error", message: pdfLoadErrorText(kind) ?? undefined });
+        }
       }
     },
     [theme, imageMode, darkness, warmth, darkify],
@@ -470,7 +478,7 @@ export function Downloader() {
         {status.kind === "error" && (
           <div className="rounded-2xl border-2 border-neutral-800 bg-neutral-900/90 p-10 text-center">
             <div className="text-lg text-red-400">
-              Couldn&apos;t convert that PDF. Try another file?
+              {status.message ?? "Couldn't convert that PDF. Try another file?"}
             </div>
             <button
               onClick={() => setStatus({ kind: "config" })}
