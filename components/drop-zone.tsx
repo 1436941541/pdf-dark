@@ -1,13 +1,16 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { T, type Locale } from "@/lib/i18n";
 
 type Props = {
   onFile: (file: File) => void;
+  locale?: Locale;
 };
 
-export function DropZone({ onFile }: Props) {
+export function DropZone({ onFile, locale = "en" }: Props) {
   const [isOver, setIsOver] = useState(false);
+  const t = T[locale].dropzone;
 
   const accept = useCallback(
     (file: File | null | undefined) => {
@@ -16,12 +19,12 @@ export function DropZone({ onFile }: Props) {
         file.type !== "application/pdf" &&
         !file.name.toLowerCase().endsWith(".pdf")
       ) {
-        alert("Please drop a PDF file.");
+        alert(t.notPdf);
         return;
       }
       onFile(file);
     },
-    [onFile],
+    [onFile, t.notPdf],
   );
 
   return (
@@ -53,10 +56,10 @@ export function DropZone({ onFile }: Props) {
         />
         <div className="text-5xl mb-4 transition-transform group-hover:scale-110">📄</div>
         <div className="text-xl font-semibold text-neutral-50">
-          Drop your PDF here or click to browse
+          {t.title}
         </div>
         <div className="text-sm text-neutral-300 mt-2">
-          No size limit · Never leaves your browser
+          {t.subtitle}
         </div>
       </label>
     </div>

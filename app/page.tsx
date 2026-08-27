@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { IconLock, IconPalette, IconSmartphone } from "@/components/icons";
 import { getSiteUrl } from "@/lib/site";
 import { VARIANTS } from "@/lib/variants";
@@ -164,6 +165,7 @@ export default function Home() {
             <Link href="/invert-pdf-colors" className="hover:text-neutral-100">Invert &amp; Download</Link>
             <Link href="/blog" className="hover:text-neutral-100">Blog</Link>
             <a href="#faq" className="hover:text-neutral-100">FAQ</a>
+            <LanguageSwitcher page="home" current="en" />
           </nav>
         </div>
       </header>

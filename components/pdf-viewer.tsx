@@ -15,6 +15,7 @@ import {
 } from "@/lib/build-dark-pdf";
 import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
 import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
+import { T, type Locale } from "@/lib/i18n";
 
 type PageImage = {
   /** Full-color rendered PDF page (source of truth, never modified). */
@@ -40,6 +41,7 @@ type PageImage = {
 type Props = {
   file: File;
   onReset: () => void;
+  locale?: Locale;
 };
 
 /** Cache key for one theme + image-mode + darkness + warmth combination. */
@@ -50,7 +52,8 @@ const variantKey = (t: ThemeId, m: ImageMode, d: number, w: number) =>
 const bgCss = (c: { r: number; g: number; b: number }) =>
   `rgb(${Math.round(c.r)}, ${Math.round(c.g)}, ${Math.round(c.b)})`;
 
-export function PdfViewer({ file, onReset }: Props) {
+export function PdfViewer({ file, onReset, locale = "en" }: Props) {
+  const t = T[locale];
   const [pages, setPages] = useState<PageImage[]>([]);
   const [theme, setTheme] = useState<ThemeId>("midnight");
   // How preserved images are shown: smart auto-dim (default) or untouched.
@@ -449,7 +452,7 @@ export function PdfViewer({ file, onReset }: Props) {
           Sentry.captureException(e, { tags: { stage: "render" } });
         }
         if (!cancelledRef.current) {
-          setErrorText(pdfLoadErrorText(kind));
+          setErrorText(pdfLoadErrorText(kind, locale));
           setStatus("error");
         }
       }
@@ -460,7 +463,7 @@ export function PdfViewer({ file, onReset }: Props) {
     };
     // theme intentionally omitted — initial pass uses whatever theme is live.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file, darkifyViaWorker]);
+  }, [file, darkifyViaWorker, locale]);
 
   // Variant switch (theme or image mode): re-darkify pages, starting from
   // whatever the user is looking at. Fast path: if every page already has
@@ -602,8 +605,8 @@ export function PdfViewer({ file, onReset }: Props) {
         className="fixed top-16 right-4 z-20 w-11 h-11 rounded-full border border-neutral-700 bg-neutral-900/90 backdrop-blur text-neutral-200 hover:text-neutral-50 hover:border-neutral-500 transition-colors flex items-center justify-center shadow-lg"
         aria-haspopup="dialog"
         aria-expanded={settingsOpen}
-        aria-label="Reader settings"
-        title="Settings"
+        aria-label={t.viewer.settingsAria}
+        title={t.viewer.settingsTitle}
       >
         <svg
           width="18"
@@ -625,8 +628,12 @@ export function PdfViewer({ file, onReset }: Props) {
       {(isInitialRendering || (status === "ready" && themeApplying)) && (
         <div className="fixed top-16 left-4 z-20 max-w-[60vw] rounded-full border border-neutral-700 bg-neutral-900/90 backdrop-blur px-3 py-1.5 text-xs text-amber-400 truncate shadow-lg">
           {isInitialRendering
-            ? `Rendering ${progress.done} / ${progress.total} pages`
-            : `Applying ${THEMES[theme].label} · ${themeProgress.current} / ${themeProgress.total}`}
+            ? t.viewer.renderingProgress(progress.done, progress.total)
+            : t.viewer.applyingTheme(
+                THEMES[theme].label,
+                themeProgress.current,
+                themeProgress.total,
+              )}
         </div>
       )}
 
@@ -637,8 +644,8 @@ export function PdfViewer({ file, onReset }: Props) {
             onClick={() => scrollToPage(currentPage - 1)}
             disabled={currentPage <= 1}
             className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-            aria-label="Previous page"
-            title="Previous page (←)"
+            aria-label={t.viewer.previousPage}
+            title={t.viewer.previousPageTitle}
           >
             ‹
           </button>
@@ -659,7 +666,7 @@ export function PdfViewer({ file, onReset }: Props) {
                 }
               }}
               className="w-12 px-2 py-1 rounded bg-neutral-800 text-center text-neutral-100 focus:outline-none focus:ring-1 focus:ring-amber-400"
-              aria-label="Jump to page"
+              aria-label={t.viewer.jumpToPage}
             />
             <span className="text-neutral-500">/ {totalPages}</span>
           </div>
@@ -667,8 +674,8 @@ export function PdfViewer({ file, onReset }: Props) {
             onClick={() => scrollToPage(currentPage + 1)}
             disabled={currentPage >= totalPages}
             className="w-8 h-8 rounded-full text-neutral-300 hover:text-neutral-50 hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-            aria-label="Next page"
-            title="Next page (→)"
+            aria-label={t.viewer.nextPage}
+            title={t.viewer.nextPageTitle}
           >
             ›
           </button>
@@ -689,17 +696,17 @@ export function PdfViewer({ file, onReset }: Props) {
           settingsOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
-        aria-label="Reader settings"
+        aria-label={t.viewer.settingsAria}
         aria-hidden={!settingsOpen}
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-semibold text-neutral-100 uppercase tracking-wide">
-            Settings
+            {t.viewer.settingsTitle}
           </span>
           <button
             onClick={() => setSettingsOpen(false)}
             className="w-8 h-8 rounded-full text-neutral-400 hover:text-neutral-100 hover:bg-neutral-800 transition-colors"
-            aria-label="Close settings"
+            aria-label={t.viewer.closeSettings}
           >
             ✕
           </button>
@@ -708,7 +715,7 @@ export function PdfViewer({ file, onReset }: Props) {
 
         {/* Theme */}
         <div className="text-[11px] uppercase tracking-wide text-neutral-500 mb-2">
-          Theme
+          {t.viewer.theme}
         </div>
         <div className="grid grid-cols-2 gap-2 mb-6">
           {THEME_IDS.map((id) => {
@@ -725,9 +732,7 @@ export function PdfViewer({ file, onReset }: Props) {
                 }`}
                 aria-pressed={active}
                 title={
-                  isInitialRendering
-                    ? "Wait until the first pass finishes"
-                    : undefined
+                  isInitialRendering ? t.viewer.waitFirstPass : undefined
                 }
               >
                 <span
@@ -746,28 +751,16 @@ export function PdfViewer({ file, onReset }: Props) {
         {/* Image handling: three explicit treatments, scans included */}
         <div
           className="text-[11px] uppercase tracking-wide text-neutral-500 mb-2"
-          title="How photos, figures and scanned pages are treated"
+          title={t.imageMode.imagesTitleAttr}
         >
-          Images
+          {t.imageMode.label}
         </div>
         <div className="grid grid-cols-3 gap-2 mb-6">
           {(
             [
-              [
-                "original",
-                "Original",
-                "Photos, figures and scanned pages stay exactly as in the source — only text and background are darkened",
-              ],
-              [
-                "smart",
-                "Auto",
-                "Recommended: each image gets the best treatment — white screenshots/diagrams are inverted with the page, photos stay original, bright colorful images are gently dimmed",
-              ],
-              [
-                "invert",
-                "Invert",
-                "Invert everything, images included — deepest dark, best for scanned documents",
-              ],
+              ["original", t.imageMode.original, t.imageMode.originalTip],
+              ["smart", t.imageMode.auto, t.imageMode.autoTip],
+              ["invert", t.imageMode.invert, t.imageMode.invertTip],
             ] as [ImageMode, string, string][]
           ).map(([m, label, tip]) => {
             const active = imageMode === m;
@@ -791,13 +784,10 @@ export function PdfViewer({ file, onReset }: Props) {
         </div>
 
         {/* Darkness slider — drag left if full dark feels too black */}
-        <div
-          className="mb-5"
-          title="How dark the page gets — drag left for a softer, lighter background"
-        >
+        <div className="mb-5" title={t.sliders.darknessTitle}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] uppercase tracking-wide text-neutral-500">
-              Darkness
+              {t.sliders.darkness}
             </span>
             <span className="text-xs tabular-nums text-neutral-300">
               {darkness}%
@@ -813,18 +803,15 @@ export function PdfViewer({ file, onReset }: Props) {
             disabled={isInitialRendering}
             className="slider-preview w-full disabled:opacity-40"
             style={{ background: darknessTrack }}
-            aria-label="Darkness"
+            aria-label={t.sliders.darkness}
           />
         </div>
 
         {/* Warmth slider — color-temperature shift for night reading */}
-        <div
-          className="mb-6"
-          title="Background color temperature — drag right for a warmer, candle-light tint that's easier on the eyes at night"
-        >
+        <div className="mb-6" title={t.sliders.warmthTitleLong}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] uppercase tracking-wide text-neutral-500">
-              Warmth
+              {t.sliders.warmth}
             </span>
             <span className="text-xs tabular-nums text-neutral-300">
               {warmth}%
@@ -840,7 +827,7 @@ export function PdfViewer({ file, onReset }: Props) {
             disabled={isInitialRendering}
             className="slider-preview w-full disabled:opacity-40"
             style={{ background: warmthTrack }}
-            aria-label="Warmth"
+            aria-label={t.sliders.warmth}
           />
         </div>
 
@@ -848,7 +835,7 @@ export function PdfViewer({ file, onReset }: Props) {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] uppercase tracking-wide text-neutral-500">
-              Zoom
+              {t.viewer.zoom}
             </span>
             <span className="text-xs tabular-nums text-neutral-300">
               {Math.round(zoom * 100)}%
@@ -861,17 +848,17 @@ export function PdfViewer({ file, onReset }: Props) {
               }
               disabled={zoom <= 0.5}
               className="w-9 h-9 rounded-lg border border-neutral-800 text-neutral-300 hover:text-neutral-50 hover:border-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-              aria-label="Zoom out"
-              title="Zoom out (−)"
+              aria-label={t.viewer.zoomOut}
+              title={t.viewer.zoomOutTitle}
             >
               −
             </button>
             <button
               onClick={() => setZoom(1)}
               className="flex-1 h-9 rounded-lg border border-neutral-800 text-xs text-neutral-300 hover:text-neutral-50 hover:border-neutral-600 transition-colors"
-              title="Reset zoom (0)"
+              title={t.viewer.resetTitle}
             >
-              Reset
+              {t.viewer.reset}
             </button>
             <button
               onClick={() =>
@@ -879,8 +866,8 @@ export function PdfViewer({ file, onReset }: Props) {
               }
               disabled={zoom >= 2}
               className="w-9 h-9 rounded-lg border border-neutral-800 text-neutral-300 hover:text-neutral-50 hover:border-neutral-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
-              aria-label="Zoom in"
-              title="Zoom in (+)"
+              aria-label={t.viewer.zoomIn}
+              title={t.viewer.zoomInTitle}
             >
               +
             </button>
@@ -890,24 +877,24 @@ export function PdfViewer({ file, onReset }: Props) {
         <div className="border-t border-neutral-800 my-6" />
 
         <a
-          href="/invert-pdf-colors"
+          href={t.viewer.invertHref}
           className="block text-center px-4 py-2 rounded-full text-sm text-neutral-300 hover:text-neutral-100 border border-neutral-800 hover:border-neutral-600 transition-colors"
-          title="Invert the colors and save a copy of this PDF"
+          title={t.viewer.invertAndDownloadTitle}
         >
-          Invert &amp; download →
+          {t.viewer.invertAndDownload}
         </a>
         <button
           onClick={onReset}
           className="mt-3 w-full px-4 py-2 rounded-full text-sm text-neutral-400 hover:text-neutral-100 border border-neutral-800 hover:border-neutral-600 transition-colors"
         >
-          New file
+          {t.viewer.newFile}
         </button>
       </aside>
 
       {status === "loading" && (
         <div className="text-center py-16 text-neutral-400">
           <div className="text-lg">
-            Rendering page {progress.done} / {progress.total || "?"}…
+            {t.viewer.renderingLoading(progress.done, progress.total || "?")}
           </div>
           <div className="mt-3 w-64 mx-auto h-1 bg-neutral-800 rounded-full overflow-hidden">
             <div
@@ -924,7 +911,7 @@ export function PdfViewer({ file, onReset }: Props) {
 
       {status === "error" && (
         <div className="text-center py-16 text-red-400">
-          {errorText ?? "Couldn't read that PDF. Try another file?"}
+          {errorText ?? t.viewer.readErrorFallback}
         </div>
       )}
 
@@ -943,7 +930,7 @@ export function PdfViewer({ file, onReset }: Props) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={p.displayDataUrl}
-                alt={`Page ${i + 1} of your PDF, rendered in dark mode`}
+                alt={t.viewer.pageAlt(i + 1)}
                 width={p.width}
                 height={p.height}
                 className="block w-full h-auto"

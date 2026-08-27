@@ -1,4 +1,5 @@
 import { THEMES, THEME_IDS } from "@/lib/themes";
+import { T, type Locale } from "@/lib/i18n";
 
 /**
  * Static mock-document swatch per theme. Mirrors the actual conversion
@@ -6,11 +7,11 @@ import { THEMES, THEME_IDS } from "@/lib/themes";
  * theme, only the page background changes — so the bars here are white/
  * translucent-white on each theme's background color.
  */
-export function ThemePreview() {
+export function ThemePreview({ locale = "en" }: { locale?: Locale }) {
   return (
     <div className="mt-6">
       <div className="text-xs text-neutral-500 mb-3">
-        4 themes — see the colors before you drop a file
+        {T[locale].themePreview.caption}
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-xl mx-auto">
         {THEME_IDS.map((id) => (

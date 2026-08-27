@@ -12,6 +12,13 @@ export type ChangelogEntry = {
 // and analytics tweaks don't belong here.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-08-27",
+    tag: "New",
+    title: "Spanish and Portuguese versions",
+    description:
+      "PDF Dark is now available in Spanish (/es) and Portuguese (/pt), reader and converter both — same free, browser-only tool, translated interface. Also added a heads-up during conversion: switching tabs or minimizing the browser can pause or interrupt an in-progress conversion, since it all runs locally in your browser.",
+  },
+  {
     date: "2026-08-10",
     tag: "Improved",
     title: "The converter moved to /invert-pdf-colors",

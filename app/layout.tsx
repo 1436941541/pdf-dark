@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@/components/analytics";
 import { getSiteUrl } from "@/lib/site";
@@ -29,6 +30,12 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: "/",
+    languages: {
+      en: "/",
+      es: "/es",
+      pt: "/pt",
+      "x-default": "/",
+    },
   },
   openGraph: {
     // title + description inherit from root metadata above — single source of truth.
@@ -42,14 +49,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Set by middleware.ts from the URL's first path segment ("es"/"pt"),
+  // "en" for everything else including the unprefixed English routes.
+  const htmlLang = (await headers()).get("x-html-lang") ?? "en";
+
   return (
     <html
-      lang="en"
+      lang={htmlLang}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100">

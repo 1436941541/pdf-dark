@@ -9,6 +9,10 @@ const INVERT_UPDATED_AT = "2026-08-10";
 const ABOUT_UPDATED_AT = "2026-06-26";
 const PRIVACY_UPDATED_AT = "2026-07-25";
 const TERMS_UPDATED_AT = "2026-07-21";
+const ES_HOME_UPDATED_AT = "2026-08-27";
+const ES_INVERT_UPDATED_AT = "2026-08-27";
+const PT_HOME_UPDATED_AT = "2026-08-27";
+const PT_INVERT_UPDATED_AT = "2026-08-27";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteUrl();
@@ -24,6 +28,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: INVERT_UPDATED_AT,
       changeFrequency: "monthly",
       priority: 0.9,
+    },
+    {
+      url: `${base}/es`,
+      lastModified: ES_HOME_UPDATED_AT,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${base}/es/invert-pdf-colors`,
+      lastModified: ES_INVERT_UPDATED_AT,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${base}/pt`,
+      lastModified: PT_HOME_UPDATED_AT,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${base}/pt/invert-pdf-colors`,
+      lastModified: PT_INVERT_UPDATED_AT,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
       url: `${base}/blog`,

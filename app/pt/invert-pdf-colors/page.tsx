@@ -7,10 +7,10 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/components/icons";
 import { getSiteUrl } from "@/lib/site";
 
-const SLUG = "/invert-pdf-colors";
-const TITLE = "Invert PDF Colors — Free Online PDF Inverter, No Upload";
+const SLUG = "/pt/invert-pdf-colors";
+const TITLE = "Inverter Cores de PDF Online — Conversor Grátis, Sem Enviar Arquivos";
 const DESCRIPTION =
-  "Invert the colors of a PDF and download the inverted file. Photos can keep their own colors instead of turning into negatives. Free, browser-side, no upload.";
+  "Inverta as cores de um PDF e baixe o arquivo invertido. As fotos podem manter as próprias cores em vez de virar negativo. Grátis, roda no navegador, sem enviar arquivos.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -18,10 +18,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SLUG,
     languages: {
-      en: SLUG,
+      en: "/invert-pdf-colors",
       es: "/es/invert-pdf-colors",
-      pt: "/pt/invert-pdf-colors",
-      "x-default": SLUG,
+      pt: SLUG,
+      "x-default": "/invert-pdf-colors",
     },
   },
   openGraph: {
@@ -39,61 +39,59 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "What exactly does inverting a PDF produce?",
-    a: "A brand-new PDF file with the colors flipped inside the page content itself — background and text swapped, images handled per your Images setting. Open it in Acrobat, Preview, a browser, or an e-reader and it looks the same everywhere, because the change is in the file rather than in a viewer setting.",
+    q: "O que exatamente inverter um PDF produz?",
+    a: "Um PDF novinho em folha com as cores invertidas dentro do próprio conteúdo da página — fundo e texto trocados, imagens tratadas conforme sua configuração de Imagens. Abra em Acrobat, Preview, navegador ou e-reader e vai parecer igual em todos, porque a mudança está no arquivo, não numa preferência do visualizador.",
   },
   {
-    q: "Which setting gives a true, exact inversion?",
-    a: "The OLED theme. With OLED the mapping is exactly out = 255 − in for grayscale content: pure white becomes pure black, pure black becomes pure white, and running the output back through returns the original. Midnight, Sepia and Solarized land white on a tinted background instead — easier to read for long sessions, but not a mathematically exact inversion.",
+    q: "Qual configuração dá uma inversão exata de verdade?",
+    a: "O tema OLED. Com o OLED o mapeamento é exatamente saída = 255 − entrada para conteúdo em escala de cinza: branco puro vira preto puro, preto puro vira branco puro, e passar a saída de volta pelo processo retorna o original. Midnight, Sepia e Solarized colocam o branco sobre um fundo com tonalidade em vez de uma inversão matematicamente exata — mais fácil de ler em sessões longas, mas não é a mesma coisa.",
   },
   {
-    q: "Can it turn a black background PDF back to white?",
-    a: "Yes. Because the OLED mapping is symmetric, a dark document run through it comes out light: black backgrounds become white and light text becomes black. That is usually why people want it — a dark-themed handout is expensive to print, and inverting it first saves toner.",
+    q: "Consegue transformar um PDF com fundo preto de volta em branco?",
+    a: "Sim. Como o mapeamento do OLED é simétrico, um documento escuro que passa por ele sai claro: fundos pretos viram brancos e texto claro vira preto. Geralmente é por isso que as pessoas querem isso — um material com tema escuro sai caríssimo pra imprimir, e invertê-lo antes economiza tinta.",
   },
   {
-    q: "Will photos turn into negatives?",
-    a: "Only if you want them to. The default Auto mode keeps photos in their original colors, inverts white screenshots and diagrams so they blend with the page, and gently dims very bright images. Set Images to Invert for a literal flip of everything, or Original to leave every picture untouched.",
+    q: "As fotos também vão virar negativo?",
+    a: "Só se você quiser. O modo Auto padrão mantém as fotos nas cores originais, inverte capturas de tela e diagramas brancos para combinar com a página, e escurece levemente imagens muito claras. O interruptor Imagens na barra de ferramentas deixa você forçar tudo para Original ou tudo para Inverter.",
   },
   {
-    q: "Can I invert the text and background but leave images alone?",
-    a: "Yes — set Images to Original. Every embedded image stays pixel-identical to the source, including full-page scans, and only text and background are flipped. Round-cropped images such as resume headshots are restored through their circular frame, so no bright corners leak onto the dark page.",
+    q: "Consigo inverter o texto e o fundo mas deixar as imagens intactas?",
+    a: "Sim — coloque Imagens em Original. Cada imagem embutida fica idêntica pixel a pixel à fonte, incluindo digitalizações de página inteira, e só o texto e o fundo são invertidos. Imagens recortadas em círculo, como fotos de perfil, são restauradas dentro da moldura circular, então nenhum canto claro sobra na página escura.",
   },
   {
-    q: "Does the inverted PDF keep selectable text?",
-    a: "Yes, wherever the source page allows it. Text-based pages are recolored as vector objects, so the output text stays selectable and searchable. Scanned pages are images to begin with, so they are inverted as images.",
+    q: "O PDF invertido continua com o texto selecionável?",
+    a: "Sim, onde a página de origem permitir. Páginas com texto são recoloridas como objetos vetoriais, então o texto de saída continua selecionável e pesquisável. Páginas digitalizadas já são imagens desde o início, então são invertidas como imagens.",
   },
   {
-    q: "Can I print the inverted version?",
-    a: "Yes — that's one of the main reasons to invert the file instead of using a viewer theme. Print the downloaded file from any reader and the page comes out exactly as you see it.",
+    q: "Posso imprimir a versão invertida?",
+    a: "Sim — esse é um dos principais motivos para inverter o arquivo em vez de usar um tema do visualizador. Imprima o arquivo baixado em qualquer leitor e a página sai exatamente como você vê na tela.",
   },
   {
-    q: "Is there a file size limit?",
-    a: "No hard limit. The conversion runs entirely on your device, so the practical ceiling is your browser's memory — large documents just take longer.",
+    q: "Existe um limite de tamanho de arquivo?",
+    a: "Não há um limite fixo. A conversão roda inteiramente no seu dispositivo, então o limite prático é a memória do seu navegador — documentos grandes só demoram mais.",
   },
   {
-    q: "Is my PDF uploaded to a server?",
-    a: "No. Rendering, inverting, and rebuilding the PDF all happen inside your browser tab. The downloaded file is assembled locally — there's no server that ever sees your document.",
+    q: "Meu PDF é enviado para um servidor?",
+    a: "Não. Renderizar, inverter e reconstruir o PDF acontece tudo dentro da aba do seu navegador. O arquivo baixado é montado localmente — não existe servidor que chegue a ver o seu documento.",
   },
   {
-    q: "Can I share the inverted file with someone else?",
-    a: "Yes. Email it, AirDrop it, upload it to Google Drive or Dropbox — the recipient sees the inverted version automatically. No setup on their end.",
+    q: "Posso compartilhar o arquivo invertido com outra pessoa?",
+    a: "Sim. Envie por e-mail, AirDrop, suba pro Google Drive ou Dropbox — quem receber verá a versão invertida automaticamente. Sem nenhuma configuração do lado dela.",
   },
 ];
 
-/** Conversion steps — single source of truth for the visible "How it works"
- *  cards and the HowTo JSON-LD, so the two can never drift apart. */
 const STEPS = [
   {
-    t: "Pick your settings",
-    d: "Choose how far the inversion goes — Images: Original, Auto, or full Invert — plus the background it lands on, darkness, and warmth.",
+    t: "Escolha suas configurações",
+    d: "Defina até onde vai a inversão — Imagens: Original, Auto ou Inverter tudo — mais o fundo, a escuridão e a temperatura.",
   },
   {
-    t: "Drop your PDF",
-    d: "Drag & drop or click to browse. Never leaves your browser.",
+    t: "Solte seu PDF",
+    d: "Arraste e solte, ou clique para procurar. Nunca sai do seu navegador.",
   },
   {
-    t: "Get the inverted PDF",
-    d: "Conversion starts immediately and the new file downloads itself — colors written into the document, ready to share, print, or read anywhere.",
+    t: "Baixe o PDF invertido",
+    d: "A conversão começa na hora e o novo arquivo se baixa sozinho — com as cores gravadas no documento, pronto para compartilhar, imprimir ou ler em qualquer lugar.",
   },
 ];
 
@@ -113,7 +111,7 @@ function StructuredData() {
   const howTo = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: "How to invert the colors of a PDF",
+    name: "Como inverter as cores de um PDF",
     totalTime: "PT1M",
     estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: 0 },
     step: STEPS.map((s, i) => ({
@@ -150,7 +148,7 @@ function StructuredData() {
   );
 }
 
-export default function InvertPdfColorsPage() {
+export default function InvertPdfColorsPtPage() {
   return (
     <div className="flex flex-col flex-1 w-full">
       <StructuredData />
@@ -158,7 +156,7 @@ export default function InvertPdfColorsPage() {
       <header className="w-full border-b border-neutral-800">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
-            href="/"
+            href="/pt"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <span className="text-2xl">🌙</span>
@@ -167,8 +165,8 @@ export default function InvertPdfColorsPage() {
             </span>
           </Link>
           <nav className="text-sm text-neutral-400 flex gap-5">
-            <Link href="/" className="hover:text-neutral-100">
-              Reader
+            <Link href="/pt" className="hover:text-neutral-100">
+              Leitor
             </Link>
             <Link href="/blog" className="hover:text-neutral-100">
               Blog
@@ -176,7 +174,7 @@ export default function InvertPdfColorsPage() {
             <a href="#faq" className="hover:text-neutral-100">
               FAQ
             </a>
-            <LanguageSwitcher page="invert" current="en" />
+            <LanguageSwitcher page="invert" current="pt" />
           </nav>
         </div>
       </header>
@@ -185,39 +183,39 @@ export default function InvertPdfColorsPage() {
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Invert PDF Colors
+            Inverter cores de PDF
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Pick your settings, drop your PDF, and the inverted copy downloads
-            automatically. The colors are written into the file itself, so it
-            stays that way in every viewer — Acrobat, Preview, browsers,
-            e-readers. Free, and your file never leaves the browser.
+            Escolha suas configurações, solte seu PDF, e a cópia invertida se
+            baixa sozinha. As cores ficam gravadas no próprio arquivo, então
+            ele continua assim em qualquer visualizador — Acrobat, Preview,
+            navegadores, e-readers. Grátis, e seu arquivo nunca sai do
+            navegador.
           </p>
 
           <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconDownload className="text-neutral-500" /> Download Inverted PDF
+              <IconDownload className="text-neutral-500" /> Baixar PDF invertido
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconLock className="text-neutral-500" /> 100% Browser-side
+              <IconLock className="text-neutral-500" /> 100% no navegador
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconPalette className="text-neutral-500" /> 3 Image Modes
+              <IconPalette className="text-neutral-500" /> 3 modos de imagem
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconSmartphone className="text-neutral-500" /> Works on Mobile
+              <IconSmartphone className="text-neutral-500" /> Funciona no celular
             </span>
           </div>
 
-          {/* Downloader — settings first, then drop → convert → auto-download */}
           <div className="mt-8">
-            <Downloader />
+            <Downloader locale="pt" />
           </div>
 
           <p className="mt-6 text-sm text-neutral-500">
-            Just here to read, not to save a file?{" "}
-            <Link href="/" className="text-amber-400 hover:underline">
-              Open the dark mode PDF reader
+            Só veio para ler, não para salvar um arquivo?{" "}
+            <Link href="/pt" className="text-amber-400 hover:underline">
+              Abra o leitor de PDF em modo escuro
             </Link>
             .
           </p>
@@ -230,18 +228,19 @@ export default function InvertPdfColorsPage() {
         >
           <div className="max-w-4xl mx-auto px-6">
             <h2 className="text-2xl font-bold mb-3 text-center">
-              How to invert the colors of a PDF
+              Como inverter as cores de um PDF
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              Text and background are always flipped. What happens to the
-              pictures is your call — that&apos;s what the Images control is
-              for: leave them untouched, flip them with the page, or let each
-              one be judged separately. Curious how that detection decides?{" "}
+              O texto e o fundo sempre são invertidos. O que acontece com as
+              imagens depende de você — é pra isso que serve o controle
+              Imagens: deixe intactas, inverta junto com a página, ou deixe
+              cada uma ser avaliada separadamente. Curioso sobre como essa
+              detecção decide?{" "}
               <Link
                 href="/blog/how-pdf-dark-mode-conversion-works"
                 className="text-amber-400 hover:underline"
               >
-                Here&apos;s how the conversion works
+                Veja como funciona a conversão
               </Link>
               .
             </p>
@@ -258,168 +257,167 @@ export default function InvertPdfColorsPage() {
               ))}
             </div>
 
-            {/* What the output looks like — same real assets as the home page */}
             <div className="mt-14">
               <h3 className="text-lg font-semibold text-neutral-50 text-center m-0">
-                What the Images setting changes
+                O que a configuração Imagens muda
               </h3>
               <p className="mt-2 mb-6 text-sm text-neutral-400 text-center max-w-xl mx-auto">
-                Text and background flip either way. The photograph is where
-                the difference shows up — and where flipping every pixel
-                blindly falls down.
+                O texto e o fundo se invertem de qualquer forma. A foto é onde
+                a diferença aparece — e onde inverter cada pixel às cegas falha.
               </p>
               <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 <figure className="m-0">
                   <div className="rounded-lg overflow-hidden border border-neutral-800">
                     <Image
                       src="/compare/original.png"
-                      alt="PDF page before inversion: black text on a white background with a full-color sunset photo"
+                      alt="Página de PDF antes da inversão: texto preto sobre fundo branco com uma foto colorida de um pôr do sol"
                       width={720}
                       height={933}
                       sizes="33vw"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-neutral-500">
-                    Source PDF
+                    PDF original
                   </figcaption>
                 </figure>
                 <figure className="m-0">
                   <div className="rounded-lg overflow-hidden border border-neutral-800">
                     <Image
                       src="/compare/naive-invert.png"
-                      alt="The same page after a raw pixel inversion — the sunset photo becomes a false-color negative"
+                      alt="A mesma página depois de uma inversão simples de pixels — a foto do pôr do sol vira um negativo de cor falsa"
                       width={720}
                       height={933}
                       sizes="33vw"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-neutral-500">
-                    Every pixel flipped
+                    Todo pixel invertido
                   </figcaption>
                 </figure>
                 <figure className="m-0">
                   <div className="rounded-lg overflow-hidden border border-amber-400/40">
                     <Image
                       src="/compare/pdf-dark.png"
-                      alt="The same page inverted here — flipped background and text, photo keeps its original colors"
+                      alt="A mesma página invertida aqui — fundo e texto invertidos, a foto mantém as cores originais"
                       width={720}
                       height={933}
                       sizes="33vw"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-amber-400">
-                    Inverted here, Images: Auto
+                    Invertido aqui, Imagens: Auto
                   </figcaption>
                 </figure>
               </div>
               <p className="mt-3 text-xs text-neutral-600 text-center">
-                Real output, not a mockup: left is the source page, middle a
-                plain RGB inversion of every pixel, right this tool on Auto
-                (Midnight theme). Choosing Images: Invert flips photos along
-                with the page too — which is what a scan or a whiteboard shot
-                needs.
+                Resultado real, não um mockup: à esquerda a página de origem,
+                no centro uma inversão RGB simples de cada pixel, à direita
+                esta ferramenta no Auto (tema Midnight). Escolher Imagens:
+                Inverter também inverte as fotos junto com a página — que é o
+                que uma digitalização ou foto de quadro branco precisa.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Why invert the file instead of the viewer */}
+        {/* Why invert the file */}
         <section className="max-w-3xl mx-auto px-6 py-16">
           <h2 className="text-2xl font-bold mb-8 text-center">
-            Why invert the file instead of flipping a viewer setting?
+            Por que inverter o arquivo em vez de mudar uma configuração do visualizador?
           </h2>
           <p className="text-neutral-300 leading-relaxed">
-            Viewer themes, browser extensions, and the system-wide invert switch
-            only change how a PDF looks while it&apos;s open in that one app —
-            the file itself is unchanged. Inverting produces a{" "}
-            <strong className="text-neutral-100">new PDF</strong>: send it to
-            your phone or e-reader, share it with a classmate, print it, or
-            archive it, and the colors travel with the file.
+            Temas de visualizador, extensões do navegador e o inversor do
+            sistema só mudam a aparência de um PDF enquanto ele está aberto
+            naquele app — o arquivo em si não muda. Inverter gera um{" "}
+            <strong className="text-neutral-100">novo PDF</strong>: envie para
+            o celular ou e-reader, compartilhe com um colega, imprima ou
+            arquive, e as cores viajam junto com o arquivo.
           </p>
           <p className="text-neutral-300 leading-relaxed mt-4">
-            There&apos;s one more difference that matters: a system-level invert
-            has no idea what it&apos;s flipping, so every photo, chart, and
-            screenshot comes out as a negative. Working on the file means each
-            image can be judged separately — or left alone entirely. If you
-            only need to get through a document tonight, skip the download and{" "}
-            <Link href="/" className="text-amber-400 hover:underline">
-              read it dark in the browser
+            Tem mais uma diferença que importa: uma inversão a nível de
+            sistema não sabe o que está invertendo, então toda foto, gráfico e
+            captura de tela sai como negativo. Trabalhar no arquivo permite
+            que cada imagem seja avaliada separadamente — ou deixada intacta.
+            Se você só precisa terminar um documento hoje à noite, pule o
+            download e{" "}
+            <Link href="/pt" className="text-amber-400 hover:underline">
+              leia em modo escuro no navegador
             </Link>{" "}
-            instead.
+            em vez disso.
           </p>
 
           <div className="grid sm:grid-cols-2 gap-5 mt-10">
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
               <h3 className="text-sm font-semibold text-neutral-400 mb-3 m-0">
-                Viewer / extension / OS invert
+                Visualizador / extensão / inversão do sistema
               </h3>
               <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
-                <li>Inverted only while that app/extension is running</li>
-                <li>Reopen in another reader → back to the original</li>
-                <li>Can&apos;t share or print the inverted version</li>
+                <li>Invertido só enquanto aquele app/extensão está rodando</li>
+                <li>Reabra em outro leitor e volta ao original</li>
+                <li>Não dá pra compartilhar ou imprimir a versão invertida</li>
                 <li>
-                  Flips photos, screenshots, and charts with no way to exempt
-                  them
+                  Inverte fotos, capturas de tela e gráficos sem como excluir
+                  nenhum
                 </li>
-                <li>Breaks when you update or switch device</li>
+                <li>Quebra quando você atualiza ou troca de dispositivo</li>
               </ul>
             </div>
 
             <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
               <h3 className="text-sm font-semibold text-amber-400 mb-3 m-0">
-                An inverted PDF file
+                Um arquivo PDF invertido
               </h3>
               <ul className="space-y-2 text-sm text-neutral-300 list-disc pl-5">
                 <li>
-                  <strong className="text-neutral-100">Permanent</strong> — the
-                  colors are in the file
+                  <strong className="text-neutral-100">Permanente</strong> — as
+                  cores estão no arquivo
                 </li>
                 <li>
-                  Looks the same in <strong className="text-neutral-100">every</strong> PDF
-                  reader, on every device
+                  Aparece igual em <strong className="text-neutral-100">qualquer</strong> leitor
+                  de PDF, em qualquer dispositivo
                 </li>
                 <li>
-                  Shareable — email, AirDrop, Drive, anything; recipient sees
-                  the inverted version with zero setup
+                  Compartilhável — e-mail, AirDrop, Drive, qualquer coisa; quem
+                  recebe vê a versão invertida sem configurar nada
                 </li>
                 <li>
-                  Per-image control — photos keep their colors while the page
-                  around them flips
+                  Controle por imagem — as fotos mantêm as cores enquanto a
+                  página ao redor inverte
                 </li>
                 <li>
-                  Hue-preserving color mapping — a dark-blue heading becomes
-                  light-blue, not gray
+                  Mapeamento de cor que preserva o tom — um título azul escuro
+                  vira azul claro, não cinza
                 </li>
               </ul>
             </div>
           </div>
 
           <p className="text-xs text-neutral-500 text-center mt-8">
-            Think of it this way: an extension is lipstick on the PDF. Inverting
-            is a new PDF.
+            Pense assim: uma extensão é maquiagem no PDF. Inverter é um PDF novo.
           </p>
         </section>
 
         {/* Use cases */}
         <section className="max-w-3xl mx-auto px-6 pb-16">
           <h2 className="text-2xl font-bold mb-10 text-center">
-            When inverting a PDF is the right move
+            Quando inverter um PDF é a melhor opção
           </h2>
 
           <div className="space-y-6">
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Scanned documents and handwritten notes
+                Documentos digitalizados e anotações manuscritas
               </h3>
               <p className="text-sm text-neutral-400">
-                On a scan there is no text layer — the writing <em>is</em> the
-                image. Set Images to Invert and the whole page flips, so
-                handwriting becomes light on dark.{" "}
+                Numa digitalização não existe camada de texto — a escrita{" "}
+                <em>é</em> a imagem. Coloque Imagens em Inverter e a página
+                inteira vira, então a letra manuscrita fica clara sobre
+                escuro.{" "}
                 <Link
                   href="/blog/scanned-pdf-dark-mode"
                   className="text-amber-400 hover:underline"
                 >
-                  More on scanned PDFs
+                  Mais sobre PDFs digitalizados
                 </Link>
                 .
               </p>
@@ -427,36 +425,37 @@ export default function InvertPdfColorsPage() {
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                A dark PDF you need to print
+                Um PDF escuro que você precisa imprimir
               </h3>
               <p className="text-sm text-neutral-400">
-                Dark-themed handouts and slide exports are brutal on a printer.
-                Run one through on OLED and it comes back to black text on
-                white, ready to print without redesigning anything — the
-                inversion works in both directions.
+                Materiais com tema escuro e slides exportados são brutais para
+                a impressora. Passe pelo OLED e ele volta a ser texto preto
+                sobre branco, pronto para imprimir sem redesenhar nada — a
+                inversão funciona nos dois sentidos.
               </p>
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Papers and slide decks full of figures
+                Artigos e apresentações cheios de figuras
               </h3>
               <p className="text-sm text-neutral-400">
-                Line charts, circuit diagrams, sheet music, technical drawings —
-                black-on-white artwork inverts cleanly and stays legible. Auto
-                handles the mixed case, where a paper has both diagrams and
-                photographs on the same page.
+                Gráficos de linha, diagramas de circuito, partituras, desenhos
+                técnicos — arte preto no branco inverte limpo e continua
+                legível. O Auto lida com o caso misto, quando um artigo tem
+                diagramas e fotografias na mesma página.
               </p>
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Reading at night without wrecking the pictures
+                Ler à noite sem estragar as imagens
               </h3>
               <p className="text-sm text-neutral-400">
-                The usual reason to invert a PDF is a bright page in a dim room.
-                The usual reason people give up on it is that the pictures come
-                out as negatives — which is exactly the case Auto exists for.
+                O motivo mais comum para inverter um PDF é uma página clara em
+                um quarto escuro. O motivo mais comum para desistir é as
+                imagens saírem como negativo — que é exatamente o caso para o
+                qual o Auto existe.
               </p>
             </div>
           </div>
@@ -465,7 +464,7 @@ export default function InvertPdfColorsPage() {
         {/* FAQ */}
         <section id="faq" className="max-w-3xl mx-auto px-6 pb-20">
           <h2 className="text-2xl font-bold mb-10 text-center">
-            Frequently Asked Questions
+            Perguntas frequentes
           </h2>
           <div className="space-y-3">
             {FAQ.map((f) => (
@@ -491,7 +490,7 @@ export default function InvertPdfColorsPage() {
         </section>
       </main>
 
-      <Footer />
+      <Footer locale="pt" />
     </div>
   );
 }
