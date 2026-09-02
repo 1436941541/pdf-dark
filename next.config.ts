@@ -64,6 +64,47 @@ const nextConfig: NextConfig = {
         destination: "/invert-pdf-colors",
         permanent: true,
       },
+      // September 2026: URLs that real sessions landed on but that 404'd.
+      // Found by cross-checking GA4 landing pages against live HTTP status —
+      // every entry below has recorded traffic, none is speculative.
+      //
+      // /convert and /invert are guesses: assistants citing the tool
+      // sometimes shorten the path. The third is /invert-pdf-colors spelled
+      // with U+2011 NON-BREAKING HYPHEN instead of U+002D — what a text
+      // formatter produces when it decides the URL shouldn't wrap.
+      //
+      // That source has to be written percent-encoded: matching happens on
+      // the raw pathname, so a literal "\u2011" in the source never fires
+      // (verified both ways against a dev server).
+      //
+      // Deliberately NOT a catch-all 404 -> /invert-pdf-colors rule: that
+      // would read as a soft 404 to Google, and would silently swallow real
+      // broken links (random scanner paths already show up in GA4).
+      {
+        source: "/convert",
+        destination: "/invert-pdf-colors",
+        permanent: true,
+      },
+      {
+        source: "/invert",
+        destination: "/invert-pdf-colors",
+        permanent: true,
+      },
+      {
+        source: "/invert%E2%80%91pdf%E2%80%91colors",
+        destination: "/invert-pdf-colors",
+        permanent: true,
+      },
+      // Restores a redirect dropped in a007410 (2026-07-30). That call was
+      // right on the evidence then — neither old slug was indexed. GA4 now
+      // shows this URL still taking real direct traffic, so it earns its
+      // entry back. Note the target is the retargeted post, not the tool:
+      // sending a blog URL to the tool page would be its own soft 404.
+      {
+        source: "/blog/how-to-darken-a-pdf",
+        destination: "/blog/how-to-put-a-pdf-in-dark-mode",
+        permanent: true,
+      },
       {
         source: "/pdf-dark-mode-chrome",
         destination: "/blog/pdf-dark-mode-chrome",
