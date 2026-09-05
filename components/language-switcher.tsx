@@ -1,16 +1,19 @@
 import Link from "next/link";
 
-type Locale = "en" | "es" | "pt";
+type Locale = "en" | "es" | "pt" | "tr" | "id" | "de";
 type PageKind = "home" | "invert";
 
 // Add a new language by adding one entry here (and to LABELS below) — the
 // dropdown and every page's <LanguageSwitcher> pick it up automatically.
 const HREFS: Record<PageKind, Record<Locale, string>> = {
-  home: { en: "/", es: "/es", pt: "/pt" },
+  home: { en: "/", es: "/es", pt: "/pt", tr: "/tr", id: "/id", de: "/de" },
   invert: {
     en: "/invert-pdf-colors",
     es: "/es/invert-pdf-colors",
     pt: "/pt/invert-pdf-colors",
+    tr: "/tr/invert-pdf-colors",
+    id: "/id/invert-pdf-colors",
+    de: "/de/invert-pdf-colors",
   },
 };
 
@@ -18,6 +21,9 @@ const LABELS: Record<Locale, string> = {
   en: "English",
   es: "Español",
   pt: "Português",
+  tr: "Türkçe",
+  id: "Bahasa Indonesia",
+  de: "Deutsch",
 };
 
 const LOCALES = Object.keys(HREFS.home) as Locale[];

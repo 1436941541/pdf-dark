@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 // Locale segments that get their own `<html lang>` value. Everything else
 // (including the unprefixed English routes) falls back to "en" — see
 // app/layout.tsx, which reads this header to set the root `<html>` tag.
-const LOCALE_SEGMENTS = new Set(["es", "pt"]);
+const LOCALE_SEGMENTS = new Set(["es", "pt", "tr", "id", "de"]);
 
 export function proxy(request: NextRequest) {
   const firstSegment = request.nextUrl.pathname.split("/")[1];

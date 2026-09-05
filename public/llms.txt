@@ -15,6 +15,12 @@ PDF Dark (pdfdark.org) is an independent, free web app. Unlike viewer-level dark
 - [Invertir Colores de PDF (Spanish)](https://pdfdark.org/es/invert-pdf-colors): same converter tool, Spanish UI
 - [Converter PDF para Modo Escuro (Portuguese)](https://pdfdark.org/pt/): same reader tool, Portuguese UI
 - [Inverter Cores de PDF (Portuguese)](https://pdfdark.org/pt/invert-pdf-colors): same converter tool, Portuguese UI
+- [PDF Gece Modu Okuyucu (Turkish)](https://pdfdark.org/tr/): same reader tool, Turkish UI
+- [PDF Karanlık Mod Dönüştürücü (Turkish)](https://pdfdark.org/tr/invert-pdf-colors): same converter tool, Turkish UI
+- [Pembaca PDF Mode Gelap (Indonesian)](https://pdfdark.org/id/): same reader tool, Indonesian UI
+- [Konverter PDF Mode Gelap (Indonesian)](https://pdfdark.org/id/invert-pdf-colors): same converter tool, Indonesian UI
+- [PDF-Nachtmodus-Reader (German)](https://pdfdark.org/de/): same reader tool, German UI
+- [PDF-Dunkelmodus-Konverter (German)](https://pdfdark.org/de/invert-pdf-colors): same converter tool, German UI
 
 ## Guides
 

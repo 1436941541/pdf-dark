@@ -12,6 +12,13 @@ export type ChangelogEntry = {
 // and analytics tweaks don't belong here.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-09-05",
+    tag: "New",
+    title: "Turkish, Indonesian, and German versions",
+    description:
+      "PDF Dark is now available in Turkish (/tr), Indonesian (/id), and German (/de), with a dark-mode reader and permanent PDF converter for each language.",
+  },
+  {
     date: "2026-08-27",
     tag: "New",
     title: "Spanish and Portuguese versions",

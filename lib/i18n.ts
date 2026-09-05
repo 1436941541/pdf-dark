@@ -6,7 +6,7 @@
 // Theme names (Midnight/Sepia/Solarized/OLED) are intentionally NOT
 // translated — kept as brand-like labels in every language.
 
-export type Locale = "en" | "es" | "pt";
+export type Locale = "en" | "es" | "pt" | "tr" | "id" | "de";
 
 type Dict = {
   dropzone: {
@@ -335,5 +335,172 @@ export const T: Record<Locale, Dict> = {
       invalid:
         "Esse arquivo não é um PDF legível — pode estar vazio ou corrompido. Tente selecioná-lo ou baixá-lo de novo.",
     },
+  },
+  tr: {
+    dropzone: {
+      title: "PDF'nizi buraya bırakın veya göz atmak için tıklayın",
+      subtitle: "Boyut sınırı yok · Dosyanız tarayıcınızdan çıkmaz",
+      notPdf: "Lütfen bir PDF dosyası bırakın.",
+    },
+    themePreview: {
+      caption: "4 tema — dosyanızı bırakmadan önce renkleri görün",
+    },
+    imageMode: {
+      label: "Görseller",
+      imagesTitleAttr: "Fotoğraflar, şekiller ve taranmış sayfalar nasıl işlenir",
+      original: "Orijinal",
+      originalTip:
+        "Fotoğraflar, şekiller ve taranmış sayfalar kaynakla aynı kalır — yalnızca metin ve arka plan koyulaştırılır",
+      auto: "Otomatik",
+      autoTip:
+        "Önerilen: her görsele uygun işlem uygulanır — beyaz ekran görüntüleri ve diyagramlar sayfayla birlikte ters çevrilir, fotoğraflar korunur",
+      invert: "Ters çevir",
+      invertTip:
+        "Görseller dahil her şeyi ters çevirir — taranmış belgeler için en koyu görünüm",
+    },
+    sliders: {
+      darkness: "Koyuluk",
+      darknessTitle:
+        "Sayfanın ne kadar koyu olacağı — daha yumuşak ve açık bir arka plan için sola sürükleyin",
+      warmth: "Sıcaklık",
+      warmthTitle:
+        "Arka plan renk sıcaklığı — daha sıcak bir ton için sağa sürükleyin",
+      warmthTitleLong:
+        "Arka plan renk sıcaklığı — gece gözleri daha az yoran sıcak bir ton için sağa sürükleyin",
+    },
+    downloader: {
+      step1: "1 · Koyu temanızı seçin",
+      step2: "2 · PDF'nizi bırakın — koyu kopya otomatik olarak indirilir",
+      convertingPage: (done, total) => `Sayfa dönüştürülüyor ${done} / ${total}…`,
+      building: "Koyu PDF'niz oluşturuluyor…",
+      runsLocally: "Tamamen tarayıcınızda çalışır — hiçbir şey yüklenmez.",
+      stayActive:
+        "Bu sekmeyi açık ve etkin tutun — sekmeden ayrılmak veya pencereyi küçültmek dönüştürmeyi duraklatabilir ya da kesebilir.",
+      saved: (filename) => `${filename} kaydedildi`,
+      checkDownloads:
+        "İndirilenler klasörünüzü kontrol edin — koyu tema dosyaya işlendi.",
+      convertAnother: "Başka bir PDF dönüştür",
+      genericError: "Bu PDF dönüştürülemedi. Başka bir dosya deneyin.",
+      back: "Geri",
+    },
+    viewer: {
+      settingsAria: "Okuyucu ayarları",
+      settingsTitle: "Ayarlar",
+      renderingProgress: (done, total) => `${done} / ${total} sayfa işleniyor`,
+      applyingTheme: (themeLabel, cur, total) =>
+        `${themeLabel} uygulanıyor · ${cur} / ${total}`,
+      previousPage: "Önceki sayfa",
+      previousPageTitle: "Önceki sayfa (←)",
+      nextPage: "Sonraki sayfa",
+      nextPageTitle: "Sonraki sayfa (→)",
+      jumpToPage: "Sayfaya git",
+      closeSettings: "Ayarları kapat",
+      theme: "Tema",
+      waitFirstPass: "İlk işlemin tamamlanmasını bekleyin",
+      zoom: "Yakınlaştırma",
+      zoomOut: "Uzaklaştır",
+      zoomOutTitle: "Uzaklaştır (−)",
+      reset: "Sıfırla",
+      resetTitle: "Yakınlaştırmayı sıfırla (0)",
+      zoomIn: "Yakınlaştır",
+      zoomInTitle: "Yakınlaştır (+)",
+      invertAndDownload: "Ters çevir ve indir →",
+      invertAndDownloadTitle: "Renkleri ters çevirip bu PDF'nin bir kopyasını kaydet",
+      invertHref: "/tr/invert-pdf-colors",
+      newFile: "Yeni dosya",
+      renderingLoading: (done, total) => `${done} / ${total}. sayfa işleniyor…`,
+      readErrorFallback: "Bu PDF okunamadı. Başka bir dosya deneyin.",
+      pageAlt: (n) => `Koyu modda işlenmiş PDF'nizin ${n}. sayfası`,
+    },
+    errors: {
+      password:
+        "Bu PDF parola korumalı. Parolayı kaldırıp (örneğin yeni bir PDF'ye yazdırarak) tekrar deneyin.",
+      invalid:
+        "Bu dosya okunabilir bir PDF değil — boş veya bozuk olabilir. Dosyayı yeniden seçmeyi ya da indirmeyi deneyin.",
+    },
+  },
+  id: {
+    dropzone: { title: "Letakkan PDF di sini atau klik untuk memilih", subtitle: "Tanpa batas ukuran · File tidak pernah meninggalkan browser", notPdf: "Silakan letakkan file PDF." },
+    themePreview: { caption: "4 tema — lihat warnanya sebelum memilih file" },
+    imageMode: {
+      label: "Gambar",
+      imagesTitleAttr: "Cara foto, gambar, dan halaman pindaian diproses",
+      original: "Asli",
+      originalTip: "Foto, gambar, dan halaman pindaian tetap seperti sumbernya — hanya teks dan latar yang digelapkan",
+      auto: "Otomatis",
+      autoTip: "Disarankan: setiap gambar mendapat perlakuan yang sesuai — foto tetap berwarna dan diagram putih mengikuti halaman",
+      invert: "Balik warna",
+      invertTip: "Balik semuanya, termasuk gambar — paling gelap untuk dokumen pindaian",
+    },
+    sliders: {
+      darkness: "Kegelapan",
+      darknessTitle: "Seberapa gelap halaman ini — geser ke kiri untuk latar yang lebih lembut",
+      warmth: "Kehangatan",
+      warmthTitle: "Suhu warna latar — geser ke kanan untuk warna yang lebih hangat",
+      warmthTitleLong: "Suhu warna latar — geser ke kanan untuk warna hangat yang lebih nyaman di malam hari",
+    },
+    downloader: {
+      step1: "1 · Pilih tema gelap",
+      step2: "2 · Letakkan PDF — salinan gelap akan diunduh otomatis",
+      convertingPage: (done, total) => `Mengonversi halaman ${done} / ${total}…`,
+      building: "Membuat PDF gelap Anda…",
+      runsLocally: "Berjalan sepenuhnya di browser — tidak ada yang diunggah.",
+      stayActive: "Biarkan tab ini tetap terbuka dan aktif — berpindah tab atau meminimalkan jendela dapat menjeda konversi.",
+      saved: (filename) => `${filename} tersimpan`,
+      checkDownloads: "Periksa folder unduhan — tema gelap sudah tertanam di file.",
+      convertAnother: "Konversi PDF lain",
+      genericError: "PDF itu tidak dapat dikonversi. Coba file lain?",
+      back: "Kembali",
+    },
+    viewer: {
+      settingsAria: "Pengaturan pembaca",
+      settingsTitle: "Pengaturan",
+      renderingProgress: (done, total) => `Merender ${done} / ${total} halaman`,
+      applyingTheme: (themeLabel, cur, total) => `Menerapkan ${themeLabel} · ${cur} / ${total}`,
+      previousPage: "Halaman sebelumnya", previousPageTitle: "Halaman sebelumnya (←)", nextPage: "Halaman berikutnya", nextPageTitle: "Halaman berikutnya (→)", jumpToPage: "Ke halaman", closeSettings: "Tutup pengaturan", theme: "Tema", waitFirstPass: "Tunggu proses pertama selesai", zoom: "Zoom", zoomOut: "Perkecil", zoomOutTitle: "Perkecil (−)", reset: "Atur ulang", resetTitle: "Atur ulang zoom (0)", zoomIn: "Perbesar", zoomInTitle: "Perbesar (+)", invertAndDownload: "Balik warna dan unduh →", invertAndDownloadTitle: "Balik warna dan simpan salinan PDF ini", invertHref: "/id/invert-pdf-colors", newFile: "File baru", renderingLoading: (done, total) => `Merender halaman ${done} / ${total}…`, readErrorFallback: "PDF ini tidak dapat dibaca. Coba file lain?", pageAlt: (n) => `Halaman ${n} dari PDF Anda dalam mode gelap`,
+    },
+    errors: { password: "PDF ini dilindungi kata sandi. Hapus kata sandinya lalu coba lagi.", invalid: "File ini bukan PDF yang dapat dibaca — mungkin kosong atau rusak. Coba pilih atau unduh ulang." },
+  },
+  de: {
+    dropzone: { title: "PDF hier ablegen oder zum Auswählen klicken", subtitle: "Keine Größenbegrenzung · Verlässt niemals Ihren Browser", notPdf: "Bitte legen Sie eine PDF-Datei ab." },
+    themePreview: { caption: "4 Designs — sehen Sie die Farben vor dem Öffnen einer Datei" },
+    imageMode: {
+      label: "Bilder",
+      imagesTitleAttr: "So werden Fotos, Grafiken und gescannte Seiten behandelt",
+      original: "Original",
+      originalTip: "Fotos, Grafiken und gescannte Seiten bleiben wie in der Quelle — nur Text und Hintergrund werden abgedunkelt",
+      auto: "Auto",
+      autoTip: "Empfohlen: Jedes Bild erhält die passende Behandlung — Fotos bleiben farbig, weiße Screenshots und Diagramme werden mit der Seite umgekehrt",
+      invert: "Umkehren",
+      invertTip: "Alles umkehren, einschließlich Bilder — besonders dunkel für gescannte Dokumente",
+    },
+    sliders: {
+      darkness: "Dunkelheit",
+      darknessTitle: "Wie dunkel die Seite wird — nach links für einen weicheren Hintergrund ziehen",
+      warmth: "Wärme",
+      warmthTitle: "Farbtemperatur des Hintergrunds — nach rechts für einen wärmeren Ton ziehen",
+      warmthTitleLong: "Farbtemperatur des Hintergrunds — nach rechts für einen warmen, nachts angenehmen Ton ziehen",
+    },
+    downloader: {
+      step1: "1 · Wählen Sie Ihr dunkles Design",
+      step2: "2 · PDF ablegen — die dunkle Kopie wird automatisch heruntergeladen",
+      convertingPage: (done, total) => `Seite wird konvertiert ${done} / ${total}…`,
+      building: "Ihre dunkle PDF wird erstellt…",
+      runsLocally: "Läuft vollständig in Ihrem Browser — nichts wird hochgeladen.",
+      stayActive: "Lassen Sie diesen Tab geöffnet und aktiv — ein Tab-Wechsel oder Minimieren kann die Konvertierung unterbrechen.",
+      saved: (filename) => `${filename} gespeichert`,
+      checkDownloads: "Prüfen Sie Ihren Download-Ordner — das dunkle Design ist in der Datei enthalten.",
+      convertAnother: "Weitere PDF konvertieren",
+      genericError: "Diese PDF konnte nicht konvertiert werden. Andere Datei versuchen?",
+      back: "Zurück",
+    },
+    viewer: {
+      settingsAria: "Lesereinstellungen",
+      settingsTitle: "Einstellungen",
+      renderingProgress: (done, total) => `Rendern ${done} / ${total} Seiten`,
+      applyingTheme: (themeLabel, cur, total) => `${themeLabel} wird angewendet · ${cur} / ${total}`,
+      previousPage: "Vorherige Seite", previousPageTitle: "Vorherige Seite (←)", nextPage: "Nächste Seite", nextPageTitle: "Nächste Seite (→)", jumpToPage: "Zu Seite", closeSettings: "Einstellungen schließen", theme: "Design", waitFirstPass: "Warten Sie, bis der erste Durchlauf abgeschlossen ist", zoom: "Zoom", zoomOut: "Verkleinern", zoomOutTitle: "Verkleinern (−)", reset: "Zurücksetzen", resetTitle: "Zoom zurücksetzen (0)", zoomIn: "Vergrößern", zoomInTitle: "Vergrößern (+)", invertAndDownload: "Umkehren und herunterladen →", invertAndDownloadTitle: "Farben umkehren und eine Kopie dieser PDF speichern", invertHref: "/de/invert-pdf-colors", newFile: "Neue Datei", renderingLoading: (done, total) => `Seite wird gerendert ${done} / ${total}…`, readErrorFallback: "Diese PDF konnte nicht gelesen werden. Andere Datei versuchen?", pageAlt: (n) => `Seite ${n} Ihrer PDF im dunklen Modus`,
+    },
+    errors: { password: "Diese PDF ist passwortgeschützt. Entfernen Sie das Passwort und versuchen Sie es erneut.", invalid: "Diese Datei ist keine lesbare PDF — sie ist möglicherweise leer oder beschädigt. Wählen oder laden Sie sie erneut." },
   },
 };

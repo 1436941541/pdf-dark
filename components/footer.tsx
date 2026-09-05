@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const GITHUB_URL = "https://github.com/1436941541/pdf-dark";
 
-type Locale = "en" | "es" | "pt";
+type Locale = "en" | "es" | "pt" | "tr" | "id" | "de";
 
 // Home / Invert PDF Colors link to the locale's own pages. The trust pages
 // (About/Changelog/Privacy/Terms) aren't translated yet, so es/pt labels
@@ -38,13 +38,43 @@ const COPY: Record<
     privacy: "Privacidade",
     terms: "Termos",
   },
+  tr: {
+    home: "Ana sayfa",
+    invert: "PDF Renklerini Ters Çevir",
+    about: "Hakkında",
+    changelog: "Yenilikler",
+    contact: "İletişim",
+    privacy: "Gizlilik",
+    terms: "Koşullar",
+  },
+  id: {
+    home: "Beranda",
+    invert: "Balik Warna PDF",
+    about: "Tentang",
+    changelog: "Pembaruan",
+    contact: "Kontak",
+    privacy: "Privasi",
+    terms: "Ketentuan",
+  },
+  de: {
+    home: "Startseite",
+    invert: "PDF-Farben umkehren",
+    about: "Über uns",
+    changelog: "Änderungen",
+    contact: "Kontakt",
+    privacy: "Datenschutz",
+    terms: "Nutzungsbedingungen",
+  },
 };
 
-const HOME_HREF: Record<Locale, string> = { en: "/", es: "/es", pt: "/pt" };
+const HOME_HREF: Record<Locale, string> = { en: "/", es: "/es", pt: "/pt", tr: "/tr", id: "/id", de: "/de" };
 const INVERT_HREF: Record<Locale, string> = {
   en: "/invert-pdf-colors",
   es: "/es/invert-pdf-colors",
   pt: "/pt/invert-pdf-colors",
+  tr: "/tr/invert-pdf-colors",
+  id: "/id/invert-pdf-colors",
+  de: "/de/invert-pdf-colors",
 };
 
 export function Footer({ locale = "en" }: { locale?: Locale }) {
