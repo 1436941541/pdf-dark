@@ -383,7 +383,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
               disabled={processing}
               className="slider-preview w-24 disabled:opacity-50"
               style={{ background: darknessTrack }}
-              aria-label="Darkness"
+              aria-label={t.sliders.darkness}
             />
             <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
               {darkness}%
@@ -406,7 +406,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
               disabled={processing}
               className="slider-preview w-24 disabled:opacity-50"
               style={{ background: warmthTrack }}
-              aria-label="Warmth"
+              aria-label={t.sliders.warmth}
             />
             <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
               {warmth}%

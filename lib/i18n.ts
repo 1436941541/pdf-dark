@@ -462,7 +462,7 @@ export const T: Record<Locale, Dict> = {
     errors: { password: "PDF ini dilindungi kata sandi. Hapus kata sandinya lalu coba lagi.", invalid: "File ini bukan PDF yang dapat dibaca — mungkin kosong atau rusak. Coba pilih atau unduh ulang." },
   },
   de: {
-    dropzone: { title: "PDF hier ablegen oder zum Auswählen klicken", subtitle: "Keine Größenbegrenzung · Verlässt niemals Ihren Browser", notPdf: "Bitte legen Sie eine PDF-Datei ab." },
+    dropzone: { title: "PDF hier ablegen oder zum Auswählen klicken", subtitle: "Keine Größenbegrenzung · Ihre Datei verlässt niemals Ihren Browser", notPdf: "Bitte legen Sie eine PDF-Datei ab." },
     themePreview: { caption: "4 Designs — sehen Sie die Farben vor dem Öffnen einer Datei" },
     imageMode: {
       label: "Bilder",
