@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
+import { HomeComparison } from "@/components/home-comparison";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { IconLock, IconPalette, IconSmartphone } from "@/components/icons";
 import { getSiteUrl } from "@/lib/site";
@@ -135,6 +136,8 @@ export default function TurkishHome() {
             ].map(([src, title, caption]) => <figure key={src} className="m-0"><div className="rounded-xl overflow-hidden border border-neutral-800"><Image src={src} alt={title} width={720} height={933} sizes="(min-width: 640px) 33vw, 100vw" /></div><figcaption className="mt-3 text-center"><div className="font-semibold text-neutral-100 text-sm">{title}</div><div className="mt-1 text-xs text-neutral-500">{caption}</div></figcaption></figure>)}
           </div>
         </section>
+
+        <HomeComparison locale="tr" />
 
         <section id="why" className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"><div className="max-w-3xl mx-auto px-6"><h2 className="text-2xl font-bold mb-6 text-center">PDF gece modu nedir?</h2><p className="text-neutral-300 leading-relaxed">PDF gece modu, parlak beyaz sayfa yerine koyu arka plan ve açık metinle okumayı sağlar. Tarayıcı eklentileri yalnızca görüntüyü değiştirir; PDF Dark ise dosyanızı yüklemeden tarayıcınızda işler. Böylece PDF&apos;yi gece okurken gözleriniz daha az parlaklıkla karşılaşır.</p><h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">Dosyanız gizli kalır</h3><p className="text-neutral-300 leading-relaxed">PDF Dark&apos;ın dosyanızı alacak bir sunucusu yoktur. Okuma ve dönüştürme işlemleri Web Worker kullanılarak cihazınızda gerçekleşir. Hassas belgeleriniz tarayıcı sekmesinden çıkmaz.</p><h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">Geçici okuma veya kalıcı dosya</h3><p className="text-neutral-300 leading-relaxed">Sadece okumak istiyorsanız bu sayfayı kullanın. Başka bir okuyucuda açabileceğiniz, paylaşabileceğiniz veya yazdırabileceğiniz yeni bir koyu PDF oluşturmak için <Link href="/tr/invert-pdf-colors" className="text-amber-400 hover:underline">PDF dönüştürücüye</Link> geçin.</p></div></section>
 
