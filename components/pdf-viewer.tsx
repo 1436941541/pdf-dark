@@ -52,6 +52,18 @@ const variantKey = (t: ThemeId, m: ImageMode, d: number, w: number) =>
 const bgCss = (c: { r: number; g: number; b: number }) =>
   `rgb(${Math.round(c.r)}, ${Math.round(c.g)}, ${Math.round(c.b)})`;
 
+function cancelledError() {
+  return new DOMException("PDF rendering was cancelled", "AbortError");
+}
+
+function throwIfCancelled(cancelled: () => boolean) {
+  if (cancelled()) throw cancelledError();
+}
+
+function isCancellationError(error: unknown) {
+  return error instanceof DOMException && error.name === "AbortError";
+}
+
 export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   const t = T[locale];
   const [pages, setPages] = useState<PageImage[]>([]);
@@ -98,7 +110,6 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   const [zoom, setZoom] = useState(1);
   const [pageInput, setPageInput] = useState("1");
   const themeVersionRef = useRef(0);
-  const cancelledRef = useRef(false);
   const lastAppliedThemeRef = useRef<string | null>(null);
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
@@ -111,20 +122,22 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   );
 
   useEffect(() => {
+    const pending = pendingRef.current;
     const w = new Worker(new URL("../lib/dark-worker.ts", import.meta.url), {
       type: "module",
     });
     w.onmessage = (e: MessageEvent<DarkifyResponse>) => {
       const { id } = e.data;
-      const cb = pendingRef.current.get(id);
+      const cb = pending.get(id);
       if (!cb) return;
-      pendingRef.current.delete(id);
+      pending.delete(id);
       if ("error" in e.data) cb.reject(new Error(e.data.error));
       else cb.resolve(e.data.blob);
     };
     workerRef.current = w;
     return () => {
-      pendingRef.current.clear();
+      for (const { reject } of pending.values()) reject(cancelledError());
+      pending.clear();
       w.terminate();
       workerRef.current = null;
     };
@@ -244,7 +257,9 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       nextMode: ImageMode,
       nextDarkness: number,
       nextWarmth: number,
+      cancelled: () => boolean,
     ): Promise<string> => {
+      throwIfCancelled(cancelled);
       // "Original" mode treats a scanned page (page == one big image) as an
       // image: the page stays exactly as in the source, no darkening at all.
       if (nextMode === "original" && p.scannedPage) return p.originalDataUrl;
@@ -252,8 +267,11 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       const w = workerRef.current;
       if (!w) throw new Error("worker not ready");
       const res = await fetch(p.originalDataUrl);
+      throwIfCancelled(cancelled);
       const srcBlob = await res.blob();
+      throwIfCancelled(cancelled);
       const bitmap = await createImageBitmap(srcBlob);
+      throwIfCancelled(cancelled);
 
       // Per-image treatment (keep / dim / invert) — images slated for
       // inversion simply aren't pasted back, the dark mapping handles them.
@@ -324,7 +342,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
   // Initial render: load PDF, render each page, darkify with starting theme via worker
   useEffect(() => {
-    cancelledRef.current = false;
+    let cancelled = false;
     setStatus("loading");
     setErrorText(null);
     setPages([]);
@@ -340,7 +358,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
-        if (cancelledRef.current) return;
+        if (cancelled) return;
         setProgress({ done: 0, total: pdf.numPages });
 
         // Stream pages to React as soon as each finishes. The user can start
@@ -361,7 +379,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         scratch.height = 32;
         const scratchCtx = scratch.getContext("2d", { willReadFrequently: true });
         for (let i = 1; i <= pdf.numPages; i++) {
-          if (cancelledRef.current) return;
+          if (cancelled) return;
           const page = await pdf.getPage(i);
           const viewport = page.getViewport({ scale: RENDER_SCALE });
 
@@ -386,6 +404,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           const ctx = canvas.getContext("2d");
           if (!ctx) throw new Error("2D canvas not supported");
           await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+          throwIfCancelled(() => cancelled);
 
           // Average luminance + saturation per image (drives the Auto
           // classifier): squash the region into the 32×32 scratch canvas
@@ -428,8 +447,9 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             imageMode,
             appliedDarkness,
             appliedWarmth,
+            () => cancelled,
           );
-          if (cancelledRef.current) return;
+          if (cancelled) return;
 
           rendered.push({
             ...stub,
@@ -444,14 +464,16 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           if (i === 1) setStatus("ready");
         }
       } catch (e) {
-        console.error("[pdf-dark] render failed", e);
+        if (!cancelled && !isCancellationError(e)) {
+          console.error("[pdf-dark] render failed", e);
+        }
         const kind = classifyPdfLoadError(e);
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
-        if (kind === "other") {
+        if (kind === "other" && !cancelled && !isCancellationError(e)) {
           Sentry.captureException(e, { tags: { stage: "render" } });
         }
-        if (!cancelledRef.current) {
+        if (!cancelled) {
           setErrorText(pdfLoadErrorText(kind, locale));
           setStatus("error");
         }
@@ -459,7 +481,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     })();
 
     return () => {
-      cancelledRef.current = true;
+      cancelled = true;
     };
     // theme intentionally omitted — initial pass uses whatever theme is live.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -535,6 +557,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
               imageMode,
               appliedDarkness,
               appliedWarmth,
+              () => aborted,
             );
             if (aborted || themeVersionRef.current !== version) return;
             next[idx] = {
@@ -545,8 +568,10 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             computed++;
             setThemeProgress({ current: computed, total: toCompute });
           } catch (err) {
-            console.error("[pdf-dark] darkify failed", err);
-            Sentry.captureException(err, { tags: { stage: "darkify" } });
+            if (!aborted && !isCancellationError(err)) {
+              console.error("[pdf-dark] darkify failed", err);
+              Sentry.captureException(err, { tags: { stage: "darkify" } });
+            }
           }
         }
         // Commit frequently near the user's view; batch later pages.

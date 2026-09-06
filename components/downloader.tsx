@@ -27,6 +27,14 @@ type Status =
   | { kind: "done"; filename: string }
   | { kind: "error"; message?: string };
 
+function cancelledError() {
+  return new DOMException("PDF conversion was cancelled", "AbortError");
+}
+
+function throwIfCancelled(cancelled: () => boolean) {
+  if (cancelled()) throw cancelledError();
+}
+
 /**
  * The converter-page flow: pick theme/image/darkness/warmth up front, then
  * drop a PDF and the darkened file is built and downloaded straight away —
@@ -50,21 +58,23 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
   );
 
   useEffect(() => {
+    const pending = pendingRef.current;
     const w = new Worker(new URL("../lib/dark-worker.ts", import.meta.url), {
       type: "module",
     });
     w.onmessage = (e: MessageEvent<DarkifyResponse>) => {
       const { id } = e.data;
-      const cb = pendingRef.current.get(id);
+      const cb = pending.get(id);
       if (!cb) return;
-      pendingRef.current.delete(id);
+      pending.delete(id);
       if ("error" in e.data) cb.reject(new Error(e.data.error));
       else cb.resolve(e.data.blob);
     };
     workerRef.current = w;
     return () => {
       cancelledRef.current = true;
-      pendingRef.current.clear();
+      for (const { reject } of pending.values()) reject(cancelledError());
+      pending.clear();
       w.terminate();
       workerRef.current = null;
     };
@@ -77,12 +87,17 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
       width: number,
       height: number,
       imageRects: ImageRect[],
+      cancelled: () => boolean,
     ): Promise<string> => {
+      throwIfCancelled(cancelled);
       const w = workerRef.current;
       if (!w) throw new Error("worker not ready");
       const res = await fetch(originalDataUrl);
+      throwIfCancelled(cancelled);
       const srcBlob = await res.blob();
+      throwIfCancelled(cancelled);
       const bitmap = await createImageBitmap(srcBlob);
+      throwIfCancelled(cancelled);
 
       const rects = imageRects.filter(
         (r) => imageTreatment(imageMode, r) !== "invert",
@@ -169,6 +184,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           const ctx = canvas.getContext("2d");
           if (!ctx) throw new Error("2D canvas not supported");
           await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+          throwIfCancelled(() => cancelledRef.current);
 
           if (scratchCtx) {
             for (const r of imageRects) {
@@ -202,6 +218,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
                   canvas.width,
                   canvas.height,
                   imageRects,
+                  () => cancelledRef.current,
                 );
           if (cancelledRef.current) return;
 
@@ -248,15 +265,19 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         const a = document.createElement("a");
         a.href = url;
         a.download = filename;
+        // Safari can start the download after click() returns. Keep the Blob
+        // URL alive until then, and attach the anchor for its download path.
+        document.body.appendChild(a);
         a.click();
-        URL.revokeObjectURL(url);
+        a.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 0);
         setStatus({ kind: "done", filename });
       } catch (e) {
-        console.error("[pdf-dark] convert failed", e);
+        if (!cancelledRef.current) console.error("[pdf-dark] convert failed", e);
         const kind = classifyPdfLoadError(e);
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
-        if (kind === "other") {
+        if (kind === "other" && !cancelledRef.current) {
           Sentry.captureException(e, { tags: { stage: "downloader" } });
         }
         if (!cancelledRef.current) {
