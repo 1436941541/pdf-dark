@@ -9,8 +9,8 @@
 //    overlays and an invisible text layer. Used for scanned pages and pages
 //    whose content the recolorer doesn't fully understand.
 //
-// If the document can't be loaded by pdf-lib at all (encryption, exotic
-// structure), the whole file is built raster-only from scratch — the
+// If the document can't be loaded by pdf-lib at all (a real user password,
+// exotic structure), the whole file is built raster-only from scratch — the
 // original always-works path.
 
 import type { PDFDocumentProxy } from "pdfjs-dist";
@@ -71,10 +71,18 @@ export async function buildDarkPdf(
   const pdfLib = await import("pdf-lib");
 
   // --- Try object mode on the original document -------------------------
+  // `password: ""` unlocks the permissions-only encryption vendor manuals
+  // routinely ship with: an owner password that disables copying, user
+  // password left empty so readers open the file silently. Users never see a
+  // prompt and don't know the file is encrypted — but pdf-lib refuses it on
+  // sight, so every such document used to lose ALL its pages to the raster
+  // path (a 610-page camera manual: 608 pages that recolor perfectly as
+  // vector, rasterized at RENDER_SCALE and blurry). Files with a real user
+  // password still throw here and take the raster fallback, as before.
   let doc: PDFDocument | null = null;
   const objectOk: boolean[] = pages.map(() => false);
   try {
-    doc = await pdfLib.PDFDocument.load(srcBytes);
+    doc = await pdfLib.PDFDocument.load(srcBytes, { password: "" });
     if (doc.getPageCount() !== pages.length) doc = null;
   } catch {
     doc = null;
