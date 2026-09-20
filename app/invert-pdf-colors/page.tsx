@@ -10,7 +10,7 @@ import { getSiteUrl } from "@/lib/site";
 const SLUG = "/invert-pdf-colors";
 const TITLE = "Invert PDF Colors — Free Online PDF Inverter, No Upload";
 const DESCRIPTION =
-  "Invert the colors of a PDF and download the inverted file. Photos can keep their own colors instead of turning into negatives. Free, browser-side, no upload.";
+  "Invert PDF colors and download the new file. Keep photos in their original colors instead of turning them into negatives. Free, browser-side, no upload.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "What exactly does inverting a PDF produce?",
-    a: "A brand-new PDF file with the colors flipped inside the page content itself — background and text swapped, images handled per your Images setting. Open it in Acrobat, Preview, a browser, or an e-reader and it looks the same everywhere, because the change is in the file rather than in a viewer setting.",
+    q: "What happens when I invert a PDF?",
+    a: "The tool creates a new PDF with the color changes saved inside each page. Background and text swap, while images follow your Images setting. Open the result in Acrobat, Preview, a browser, or an e-reader and it looks the same everywhere because the change is in the file, not the viewer.",
   },
   {
     q: "Which setting gives a true, exact inversion?",
@@ -51,7 +51,7 @@ const FAQ = [
   },
   {
     q: "Can it turn a black background PDF back to white?",
-    a: "Yes. Because the OLED mapping is symmetric, a dark document run through it comes out light: black backgrounds become white and light text becomes black. That is usually why people want it — a dark-themed handout is expensive to print, and inverting it first saves toner.",
+    a: "Yes. Because the OLED mapping is symmetric, a dark document run through it comes out light: black backgrounds become white and light text becomes black. A dark-themed handout is expensive to print, so flipping its colors first can save toner.",
   },
   {
     q: "Will photos turn into negatives?",
@@ -62,12 +62,12 @@ const FAQ = [
     a: "Yes — set Images to Original. Every embedded image stays pixel-identical to the source, including full-page scans, and only text and background are flipped. Round-cropped images such as resume headshots are restored through their circular frame, so no bright corners leak onto the dark page.",
   },
   {
-    q: "Does the inverted PDF keep selectable text?",
-    a: "Yes, wherever the source page allows it. Text-based pages are recolored as vector objects, so the output text stays selectable and searchable. Scanned pages are images to begin with, so they are inverted as images.",
+    q: "Does the downloaded PDF keep selectable text?",
+    a: "Yes, wherever the source page allows it. Text-based pages are recolored as vector objects, so the output text stays selectable and searchable. Scanned pages are images to begin with, so their pixels are color-mapped instead.",
   },
   {
-    q: "Can I print the inverted version?",
-    a: "Yes — that's one of the main reasons to invert the file instead of using a viewer theme. Print the downloaded file from any reader and the page comes out exactly as you see it.",
+    q: "Can I print the result?",
+    a: "Yes. That is one of the main reasons to invert PDF colors instead of using a viewer theme. Print the downloaded file from any reader and the page comes out exactly as you see it.",
   },
   {
     q: "Is there a file size limit?",
@@ -75,11 +75,11 @@ const FAQ = [
   },
   {
     q: "Is my PDF uploaded to a server?",
-    a: "No. Rendering, inverting, and rebuilding the PDF all happen inside your browser tab. The downloaded file is assembled locally — there's no server that ever sees your document.",
+    a: "No. Rendering, color mapping, and rebuilding the PDF all happen inside your browser tab. The downloaded file is assembled locally, so no server ever sees your document.",
   },
   {
-    q: "Can I share the inverted file with someone else?",
-    a: "Yes. Email it, AirDrop it, upload it to Google Drive or Dropbox — the recipient sees the inverted version automatically. No setup on their end.",
+    q: "Can I share the downloaded PDF with someone else?",
+    a: "Yes. Email it, AirDrop it, or upload it to Google Drive or Dropbox. The recipient sees the changed colors automatically, with no setup on their end.",
   },
 ];
 
@@ -88,14 +88,14 @@ const FAQ = [
 const STEPS = [
   {
     t: "Pick your settings",
-    d: "Choose how far the inversion goes — Images: Original, Auto, or full Invert — plus the background it lands on, darkness, and warmth.",
+    d: "Choose how colors are mapped: Images can stay Original, use Auto, or fully Invert. You can also set the background, darkness, and warmth.",
   },
   {
     t: "Drop your PDF",
     d: "Drag & drop or click to browse. Never leaves your browser.",
   },
   {
-    t: "Get the inverted PDF",
+    t: "Download your PDF",
     d: "Conversion starts immediately and the new file downloads itself — colors written into the document, ready to share, print, or read anywhere.",
   },
 ];
@@ -116,7 +116,7 @@ function StructuredData() {
   const howTo = {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    name: "How to invert the colors of a PDF",
+    name: "How to invert PDF colors",
     totalTime: "PT1M",
     estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: 0 },
     step: STEPS.map((s, i) => ({
@@ -191,15 +191,16 @@ export default function InvertPdfColorsPage() {
             Invert PDF Colors
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Pick your settings, drop your PDF, and the inverted copy downloads
-            automatically. The colors are written into the file itself, so it
-            stays that way in every viewer — Acrobat, Preview, browsers,
-            e-readers. Free, and your file never leaves the browser.
+            Choose how you want to invert PDF colors, then drop your file. The
+            new copy downloads automatically with the colors written into the
+            file itself, so it stays that way in every viewer — Acrobat,
+            Preview, browsers, e-readers. Free, and your file never leaves the
+            browser.
           </p>
 
           <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconDownload className="text-neutral-500" /> Download Inverted PDF
+              <IconDownload className="text-neutral-500" /> Invert PDF &amp; Download
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
               <IconLock className="text-neutral-500" /> 100% Browser-side
@@ -233,7 +234,7 @@ export default function InvertPdfColorsPage() {
         >
           <div className="max-w-4xl mx-auto px-6">
             <h2 className="text-2xl font-bold mb-3 text-center">
-              How to invert the colors of a PDF
+              How to invert PDF colors
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
               Text and background are always flipped. What happens to the
@@ -304,20 +305,20 @@ export default function InvertPdfColorsPage() {
                   <div className="rounded-lg overflow-hidden border border-amber-400/40">
                     <Image
                       src="/compare/pdf-dark.png"
-                      alt="The same page inverted here — flipped background and text, photo keeps its original colors"
+                      alt="The same page processed here — flipped background and text, photo keeps its original colors"
                       width={720}
                       height={933}
                       sizes="33vw"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-amber-400">
-                    Inverted here, Images: Auto
+                    Processed here, Images: Auto
                   </figcaption>
                 </figure>
               </div>
               <p className="mt-3 text-xs text-neutral-600 text-center">
                 Real output, not a mockup: left is the source page, middle a
-                plain RGB inversion of every pixel, right this tool on Auto
+                plain RGB reversal of every pixel, right this tool on Auto
                 (Midnight theme). Choosing Images: Invert flips photos along
                 with the page too — which is what a scan or a whiteboard shot
                 needs.
@@ -329,12 +330,12 @@ export default function InvertPdfColorsPage() {
         {/* Why invert the file instead of the viewer */}
         <section className="max-w-3xl mx-auto px-6 py-16">
           <h2 className="text-2xl font-bold mb-8 text-center">
-            Why invert the file instead of flipping a viewer setting?
+            Why invert PDF files instead of flipping a viewer setting?
           </h2>
           <p className="text-neutral-300 leading-relaxed">
             Viewer themes, browser extensions, and the system-wide invert switch
             only change how a PDF looks while it&apos;s open in that one app —
-            the file itself is unchanged. Inverting produces a{" "}
+            the file itself is unchanged. This tool produces a{" "}
             <strong className="text-neutral-100">new PDF</strong>: send it to
             your phone or e-reader, share it with a classmate, print it, or
             archive it, and the colors travel with the file.
@@ -357,9 +358,9 @@ export default function InvertPdfColorsPage() {
                 Viewer / extension / OS invert
               </h3>
               <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
-                <li>Inverted only while that app/extension is running</li>
+                <li>Effect lasts only while that app or extension is running</li>
                 <li>Reopen in another reader → back to the original</li>
-                <li>Can&apos;t share or print the inverted version</li>
+                <li>Can&apos;t share or print the changed colors</li>
                 <li>
                   Flips photos, screenshots, and charts with no way to exempt
                   them
@@ -370,7 +371,7 @@ export default function InvertPdfColorsPage() {
 
             <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
               <h3 className="text-sm font-semibold text-amber-400 mb-3 m-0">
-                An inverted PDF file
+                A PDF with saved color changes
               </h3>
               <ul className="space-y-2 text-sm text-neutral-300 list-disc pl-5">
                 <li>
@@ -383,7 +384,7 @@ export default function InvertPdfColorsPage() {
                 </li>
                 <li>
                   Shareable — email, AirDrop, Drive, anything; recipient sees
-                  the inverted version with zero setup
+                  the changed colors with zero setup
                 </li>
                 <li>
                   Per-image control — photos keep their colors while the page
@@ -398,15 +399,15 @@ export default function InvertPdfColorsPage() {
           </div>
 
           <p className="text-xs text-neutral-500 text-center mt-8">
-            Think of it this way: an extension is lipstick on the PDF. Inverting
-            is a new PDF.
+            Think of it this way: an extension changes the view. This tool
+            creates a new PDF.
           </p>
         </section>
 
         {/* Use cases */}
         <section className="max-w-3xl mx-auto px-6 pb-16">
           <h2 className="text-2xl font-bold mb-10 text-center">
-            When inverting a PDF is the right move
+            When to invert PDF colors
           </h2>
 
           <div className="space-y-6">
@@ -457,7 +458,7 @@ export default function InvertPdfColorsPage() {
                 Reading at night without wrecking the pictures
               </h3>
               <p className="text-sm text-neutral-400">
-                The usual reason to invert a PDF is a bright page in a dim room.
+                The usual reason to invert PDF colors is a bright page in a dim room.
                 The usual reason people give up on it is that the pictures come
                 out as negatives — which is exactly the case Auto exists for.
               </p>
