@@ -7,6 +7,17 @@ import { IconLock, IconPalette, IconSmartphone } from "@/components/icons";
 import { getSiteUrl } from "@/lib/site";
 import { VARIANTS } from "@/lib/variants";
 
+const FEATURED_BLOG_SLUGS = new Set([
+  "how-to-put-a-pdf-in-dark-mode",
+  "scanned-pdf-dark-mode",
+  "how-pdf-dark-mode-conversion-works",
+  "pdf-reader-dark-mode-comparison",
+]);
+
+const FEATURED_VARIANTS = VARIANTS.filter((variant) =>
+  FEATURED_BLOG_SLUGS.has(variant.slug),
+);
+
 const COMPARISON_ROWS: [string, string, string, string][] = [
   ["No install needed", "yes", "no", "yes"],
   ["Read in-browser before downloading", "yes", "no", "Varies"],
@@ -342,30 +353,52 @@ export default function Home() {
               </table>
             </div>
 
-            {/* Mobile: card stack per feature */}
-            <div className="sm:hidden space-y-3">
-              {COMPARISON_ROWS.map(([feat, a, b, c]) => (
-                <div
-                  key={feat}
-                  className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/40"
-                >
-                  <p className="font-medium text-base text-neutral-100 m-0 mb-3">{feat}</p>
-                  <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div className="flex flex-col items-center">
-                      <span className="text-amber-400 text-base"><Mark v={a} /></span>
-                      <span className="text-neutral-500 mt-1">PDF Dark</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-base"><Mark v={b} /></span>
-                      <span className="text-neutral-500 mt-1">Chrome Ext.</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-base"><Mark v={c} /></span>
-                      <span className="text-neutral-500 mt-1">Other tools</span>
+            {/* Mobile: shared column headers + one card per feature */}
+            <div className="sm:hidden" role="table" aria-label="PDF dark mode tool comparison">
+              <div
+                role="row"
+                className="grid grid-cols-3 gap-2 px-4 mb-3 text-center text-xs"
+              >
+                <span role="columnheader" className="sr-only">
+                  Feature
+                </span>
+                <span role="columnheader" className="font-medium text-amber-400">
+                  PDF Dark
+                </span>
+                <span role="columnheader" className="font-medium text-neutral-500">
+                  Chrome Ext.
+                </span>
+                <span role="columnheader" className="font-medium text-neutral-500">
+                  Other tools
+                </span>
+              </div>
+              <div role="rowgroup" className="space-y-3">
+                {COMPARISON_ROWS.map(([feat, a, b, c]) => (
+                  <div
+                    key={feat}
+                    role="row"
+                    className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/40"
+                  >
+                    <p
+                      role="rowheader"
+                      className="font-medium text-base text-neutral-100 m-0 mb-3"
+                    >
+                      {feat}
+                    </p>
+                    <div role="presentation" className="grid grid-cols-3 gap-2 text-center text-base">
+                      <span role="cell" aria-label={`PDF Dark: ${a}`}>
+                        <Mark v={a} />
+                      </span>
+                      <span role="cell" aria-label={`Chrome extensions: ${b}`}>
+                        <Mark v={b} />
+                      </span>
+                      <span role="cell" aria-label={`Other online tools: ${c}`}>
+                        <Mark v={c} />
+                      </span>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -450,7 +483,7 @@ export default function Home() {
         </section>
 
         {/* More tools — cross-links to variant landing pages */}
-        {VARIANTS.length > 0 && (
+        {FEATURED_VARIANTS.length > 0 && (
           <section
             id="tools"
             className="max-w-4xl mx-auto px-6 py-20 border-t border-neutral-900"
@@ -465,7 +498,7 @@ export default function Home() {
               just drop in a PDF.
             </p>
             <div className="grid sm:grid-cols-2 gap-4">
-              {VARIANTS.map((v) => (
+              {FEATURED_VARIANTS.map((v) => (
                 <Link
                   key={v.slug}
                   href={`/blog/${v.slug}`}
@@ -486,6 +519,11 @@ export default function Home() {
                 </Link>
               ))}
             </div>
+            <p className="mt-8 text-center text-sm">
+              <Link href="/blog" className="text-amber-400 hover:underline">
+                View all PDF dark mode guides →
+              </Link>
+            </p>
           </section>
         )}
 
