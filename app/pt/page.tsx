@@ -180,8 +180,9 @@ function StructuredData() {
 }
 
 function Mark({ v }: { v: "sim" | "não" | string }) {
-  if (v === "sim") return <span className="text-amber-400 font-semibold">✓</span>;
-  if (v === "não") return <span className="text-neutral-600">✗</span>;
+  // aria-label 让 ✓/✗ 对读屏可读（移动端列名已抽到吸顶行，卡片里不再有可见标签）
+  if (v === "sim") return <span className="text-amber-400 font-semibold" aria-label="sim">✓</span>;
+  if (v === "não") return <span className="text-neutral-600" aria-label="não">✗</span>;
   return <span>{v}</span>;
 }
 
@@ -371,26 +372,23 @@ export default function HomePt() {
               </table>
             </div>
 
+            {/* 移动端：列名只渲染一次并吸顶，避免每张卡片重复三个标签 */}
             <div className="sm:hidden space-y-3">
+              <div className="sticky top-0 z-10 grid grid-cols-3 gap-2 px-4 py-2 text-xs bg-[#0e0e0e] border-b border-neutral-800">
+                <span className="text-center text-amber-400">PDF Dark</span>
+                <span className="text-center text-neutral-500">Ext. Chrome</span>
+                <span className="text-center text-neutral-500">Outras</span>
+              </div>
               {COMPARISON_ROWS.map(([feat, a, b, c]) => (
                 <div
                   key={feat}
                   className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/40"
                 >
                   <p className="font-medium text-base text-neutral-100 m-0 mb-3">{feat}</p>
-                  <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div className="flex flex-col items-center">
-                      <span className="text-amber-400 text-base"><Mark v={a} /></span>
-                      <span className="text-neutral-500 mt-1">PDF Dark</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-base"><Mark v={b} /></span>
-                      <span className="text-neutral-500 mt-1">Ext. Chrome</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-base"><Mark v={c} /></span>
-                      <span className="text-neutral-500 mt-1">Outras</span>
-                    </div>
+                  <div className="grid grid-cols-3 gap-2 text-base text-center">
+                    <span className="text-amber-400"><Mark v={a} /></span>
+                    <span><Mark v={b} /></span>
+                    <span><Mark v={c} /></span>
                   </div>
                 </div>
               ))}
