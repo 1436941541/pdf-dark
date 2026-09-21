@@ -15,13 +15,6 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  keywords: [
-    "pdf modo oscuro",
-    "pdfdark",
-    "pdf modo nocturno",
-    "lector pdf modo oscuro",
-    "convertidor pdf modo oscuro",
-  ],
   alternates: {
     canonical: SLUG,
     languages: {

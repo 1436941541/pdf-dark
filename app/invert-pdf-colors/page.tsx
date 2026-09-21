@@ -11,6 +11,8 @@ const SLUG = "/invert-pdf-colors";
 const TITLE = "Invert PDF Colors — Free Online PDF Inverter, No Upload";
 const DESCRIPTION =
   "Invert PDF colors and download the new file. Keep photos in their original colors instead of turning them into negatives. Free, browser-side, no upload.";
+const SOCIAL_IMAGE_ALT =
+  "Invert PDF Colors with PDF Dark — free browser-side PDF inverter";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -32,11 +34,13 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     type: "website",
     url: SLUG,
+    siteName: "PDF Dark",
   },
   twitter: {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
+    images: [{ url: `${SLUG}/opengraph-image`, alt: SOCIAL_IMAGE_ALT }],
   },
 };
 

@@ -14,7 +14,6 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  keywords: ["pdf karanlık moda dönüştürme", "pdf dark mode converter", "pdf'yi karanlık moda çevir", "pdf renklerini ters çevirme", "invert pdf colors"],
   alternates: { canonical: SLUG, languages: { en: "/invert-pdf-colors", es: "/es/invert-pdf-colors", pt: "/pt/invert-pdf-colors", tr: SLUG, id: "/id/invert-pdf-colors", de: "/de/invert-pdf-colors", "x-default": "/invert-pdf-colors" } },
   openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: SLUG, siteName: "PDF Dark" },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },

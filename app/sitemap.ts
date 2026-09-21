@@ -4,8 +4,8 @@ import { VARIANTS } from "@/lib/variants";
 import { CHANGELOG_UPDATED_AT } from "@/lib/changelog";
 
 // Last real content change per static route, YYYY-MM-DD. Bump when that page's content actually changes.
-const HOME_UPDATED_AT = "2026-07-29";
-const INVERT_UPDATED_AT = "2026-08-10";
+const HOME_UPDATED_AT = "2026-09-20";
+const INVERT_UPDATED_AT = "2026-09-21";
 const ABOUT_UPDATED_AT = "2026-06-26";
 const PRIVACY_UPDATED_AT = "2026-07-25";
 const TERMS_UPDATED_AT = "2026-07-21";
