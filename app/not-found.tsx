@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   description:
     "The page you requested does not exist. Return to PDF Dark to read or convert a PDF in dark mode.",
   alternates: { canonical: null },
+  robots: { index: false, follow: true },
   openGraph: null,
   twitter: null,
 };
