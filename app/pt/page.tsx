@@ -10,7 +10,7 @@ import { getSiteUrl } from "@/lib/site";
 const SLUG = "/pt";
 const TITLE = "PDF Modo Escuro — Leitor de PDF Grátis Online | PDF Dark";
 const DESCRIPTION =
-  "Leia qualquer PDF em modo escuro direto no seu navegador. Grátis, sem enviar arquivos, sem cadastro. Quer manter o resultado? Converta e baixe um PDF escuro permanente.";
+  "Leia qualquer PDF em modo escuro direto no seu navegador. Grátis, sem enviar arquivos nem cadastro. Quer guardar? Converta e baixe um PDF escuro permanente.";
 
 export const metadata: Metadata = {
   title: TITLE,
