@@ -180,8 +180,9 @@ function StructuredData() {
 }
 
 function Mark({ v }: { v: "sí" | "no" | string }) {
-  if (v === "sí") return <span className="text-amber-400 font-semibold">✓</span>;
-  if (v === "no") return <span className="text-neutral-600">✗</span>;
+  // aria-label 让 ✓/✗ 对读屏可读（移动端列名已抽到吸顶行，卡片里不再有可见标签）
+  if (v === "sí") return <span className="text-amber-400 font-semibold" aria-label="sí">✓</span>;
+  if (v === "no") return <span className="text-neutral-600" aria-label="no">✗</span>;
   return <span>{v}</span>;
 }
 
@@ -208,7 +209,7 @@ export default function HomeEs() {
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Lee PDFs en modo oscuro
+            PDF modo oscuro, gratis y en tu navegador
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
             Suelta un PDF y léelo aquí mismo sobre un fondo oscuro — elige un
@@ -371,26 +372,23 @@ export default function HomeEs() {
               </table>
             </div>
 
+            {/* 移动端：列名只渲染一次并吸顶，避免每张卡片重复三个标签 */}
             <div className="sm:hidden space-y-3">
+              <div className="sticky top-0 z-10 grid grid-cols-3 gap-2 px-4 py-2 text-xs bg-[#0e0e0e] border-b border-neutral-800">
+                <span className="text-center text-amber-400">PDF Dark</span>
+                <span className="text-center text-neutral-500">Ext. Chrome</span>
+                <span className="text-center text-neutral-500">Otras</span>
+              </div>
               {COMPARISON_ROWS.map(([feat, a, b, c]) => (
                 <div
                   key={feat}
                   className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/40"
                 >
                   <p className="font-medium text-base text-neutral-100 m-0 mb-3">{feat}</p>
-                  <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div className="flex flex-col items-center">
-                      <span className="text-amber-400 text-base"><Mark v={a} /></span>
-                      <span className="text-neutral-500 mt-1">PDF Dark</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-base"><Mark v={b} /></span>
-                      <span className="text-neutral-500 mt-1">Ext. Chrome</span>
-                    </div>
-                    <div className="flex flex-col items-center">
-                      <span className="text-base"><Mark v={c} /></span>
-                      <span className="text-neutral-500 mt-1">Otras</span>
-                    </div>
+                  <div className="grid grid-cols-3 gap-2 text-base text-center">
+                    <span className="text-amber-400"><Mark v={a} /></span>
+                    <span><Mark v={b} /></span>
+                    <span><Mark v={c} /></span>
                   </div>
                 </div>
               ))}
@@ -413,9 +411,10 @@ export default function HomeEs() {
           <p className="text-neutral-300 leading-relaxed">
             Es una forma de leer documentos PDF con fondo oscuro y texto claro
             en lugar de la página blanca por defecto. También se lo conoce como
-            PDF modo nocturno, lector de PDF oscuro o PDF invertido — distintos
-            nombres para lo mismo: un tema de poca luz incorporado en el archivo,
-            así se mantiene oscuro en cualquier visor, no solo en el que lo abriste.
+            PDF modo oscuro, PDF modo nocturno, lector de PDF oscuro o PDF
+            invertido — distintos nombres para lo mismo: un tema de poca luz
+            incorporado en el archivo, así se mantiene oscuro en cualquier
+            visor, no solo en el que lo abriste.
           </p>
 
           <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
