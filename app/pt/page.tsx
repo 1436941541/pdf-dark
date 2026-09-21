@@ -364,26 +364,53 @@ export default function HomePt() {
               </table>
             </div>
 
-            {/* 移动端：列名只渲染一次并吸顶，避免每张卡片重复三个标签 */}
-            <div className="sm:hidden space-y-3">
-              <div className="sticky top-0 z-10 grid grid-cols-3 gap-2 px-4 py-2 text-xs bg-[#0e0e0e] border-b border-neutral-800">
-                <span className="text-center text-amber-400">PDF Dark</span>
-                <span className="text-center text-neutral-500">Ext. Chrome</span>
-                <span className="text-center text-neutral-500">Outras</span>
+            {/* Mobile: shared column headers + one card per feature — same ARIA
+                table structure as the English homepage, with the header pinned. */}
+            <div className="sm:hidden" role="table" aria-label="Comparação de ferramentas de PDF em modo escuro">
+              <div
+                role="row"
+                className="sticky top-0 z-10 grid grid-cols-3 gap-2 px-4 py-2 mb-3 text-center text-xs bg-[#0e0e0e] border-b border-neutral-800"
+              >
+                <span role="columnheader" className="sr-only">
+                  Recurso
+                </span>
+                <span role="columnheader" className="font-medium text-amber-400">
+                  PDF Dark
+                </span>
+                <span role="columnheader" className="font-medium text-neutral-500">
+                  Ext. Chrome
+                </span>
+                <span role="columnheader" className="font-medium text-neutral-500">
+                  Outras
+                </span>
               </div>
-              {COMPARISON_ROWS.map(([feat, a, b, c]) => (
-                <div
-                  key={feat}
-                  className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/40"
-                >
-                  <p className="font-medium text-base text-neutral-100 m-0 mb-3">{feat}</p>
-                  <div className="grid grid-cols-3 gap-2 text-base text-center">
-                    <span className="text-amber-400"><Mark v={a} /></span>
-                    <span><Mark v={b} /></span>
-                    <span><Mark v={c} /></span>
+              <div role="rowgroup" className="space-y-3">
+                {COMPARISON_ROWS.map(([feat, a, b, c]) => (
+                  <div
+                    key={feat}
+                    role="row"
+                    className="p-4 rounded-xl border border-neutral-800 bg-neutral-900/40"
+                  >
+                    <p
+                      role="rowheader"
+                      className="font-medium text-base text-neutral-100 m-0 mb-3"
+                    >
+                      {feat}
+                    </p>
+                    <div role="presentation" className="grid grid-cols-3 gap-2 text-center text-base">
+                      <span role="cell" aria-label={`PDF Dark: ${a}`}>
+                        <Mark v={a} />
+                      </span>
+                      <span role="cell" aria-label={`Extensões do Chrome: ${b}`}>
+                        <Mark v={b} />
+                      </span>
+                      <span role="cell" aria-label={`Outras ferramentas online: ${c}`}>
+                        <Mark v={c} />
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </section>
