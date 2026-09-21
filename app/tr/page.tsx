@@ -98,7 +98,6 @@ export default function TurkishHome() {
           <Link href="/tr" className="flex items-center gap-2 hover:opacity-80 transition-opacity"><span className="text-2xl">🌙</span><span className="text-lg font-semibold hidden sm:inline">PDF Dark</span></Link>
           <nav className="text-sm text-neutral-400 flex gap-5 items-center">
             <Link href="/tr/invert-pdf-colors" className="hover:text-neutral-100">Dönüştür ve indir</Link>
-            <Link href="/blog" className="hover:text-neutral-100">Blog</Link>
             <a href="#faq" className="hover:text-neutral-100">SSS</a>
             <LanguageSwitcher page="home" current="tr" />
           </nav>
@@ -107,7 +106,7 @@ export default function TurkishHome() {
 
       <main className="flex-1 w-full">
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">PDF&apos;leri karanlık modda okuyun</h1>
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">PDF gece modu — ücretsiz ve tarayıcınızda</h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">PDF&apos;nizi bırakın ve gece modu ile doğrudan burada okuyun. Tema, koyuluk ve sıcaklığı ayarlayın. Her şey tarayıcınızda çalışır: yükleme yok, kayıt yok, kurulum yok.</p>
           <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800"><IconLock className="text-neutral-500" /> %100 tarayıcıda</span>
