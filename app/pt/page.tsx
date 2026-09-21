@@ -209,7 +209,7 @@ export default function HomePt() {
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Leia PDFs em modo escuro
+            PDF modo escuro, grátis e no seu navegador
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
             Solte um PDF e leia aqui mesmo sobre um fundo escuro — escolha um
@@ -410,10 +410,11 @@ export default function HomePt() {
           </h3>
           <p className="text-neutral-300 leading-relaxed">
             É uma forma de ler documentos PDF com fundo escuro e texto claro em
-            vez da página branca padrão. Também é chamado de PDF modo noturno,
-            leitor de PDF escuro, ou PDF invertido — nomes diferentes para a
-            mesma coisa: um tema de pouca luz embutido no arquivo, então ele
-            continua escuro em qualquer visualizador, não só no que você abriu.
+            vez da página branca padrão. Também é chamado de PDF modo escuro,
+            PDF modo noturno, leitor de PDF escuro, ou PDF invertido — nomes
+            diferentes para a mesma coisa: um tema de pouca luz embutido no
+            arquivo, então ele continua escuro em qualquer visualizador, não só
+            no que você abriu.
           </p>
 
           <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
