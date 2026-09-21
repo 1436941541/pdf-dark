@@ -21,8 +21,6 @@ export const metadata: Metadata = {
       en: "/",
       es: SLUG,
       pt: "/pt",
-      tr: "/tr",
-      id: "/id",
       de: "/de",
       "x-default": "/",
     },
@@ -75,14 +73,14 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "¿Funciona en iPhone o iPad?",
-    a: "Sí. Safari en iOS puede abrir PDFs directamente en esta página, sin instalar ninguna app, y el archivo nunca sale de tu dispositivo.",
+    a: "Sí. Safari en iOS puede abrir archivos PDF directamente en esta página, sin instalar ninguna app, y el archivo nunca sale de tu dispositivo.",
   },
   {
     q: "¿En qué se diferencia de una extensión de modo oscuro del navegador?",
     a: "Las extensiones solo cambian el estilo de la página mientras está abierta en tu navegador — cierra la pestaña o pásale el archivo a otra persona y vuelve a verse claro. PDF Dark reescribe el PDF de verdad: el texto y el fondo se recolorean según el tema elegido, las imágenes se tratan según tu configuración, y el resultado queda guardado en el archivo. El tema oscuro se mantiene esté donde esté el PDF.",
   },
   {
-    q: "¿Funciona con PDFs escaneados?",
+    q: "¿Funciona con archivos PDF escaneados?",
     a: "Sí. Las páginas escaneadas se tratan como lo que son — imágenes — y se invierten de forma uniforme, así que la letra manuscrita y el texto escaneado quedan en claro sobre oscuro automáticamente. Incluso los escaneos amarillentos y antiguos se normalizan al fondo de tu tema.",
   },
   {
@@ -99,7 +97,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "¿Puedo poner el fondo de un PDF en negro?",
-    a: "Sí. El tema OLED renderiza el fondo en negro puro (#000) y el texto en tonos claros — casi blanco para el texto normal — que es el modo oscuro más agresivo para PDFs. También puedes descargar el PDF con ese fondo negro ya escrito en el archivo.",
+    a: "Sí. El tema OLED renderiza el fondo en negro puro (#000) y el texto en tonos claros — casi blanco para el texto normal — que es el modo oscuro más agresivo para archivos PDF. También puedes descargar el PDF con ese fondo negro ya escrito en el archivo.",
   },
   {
     q: "¿Es esto un modo oscuro para Adobe Acrobat?",
@@ -132,7 +130,7 @@ function StructuredData() {
     operatingSystem: "Any (browser-based)",
     screenshot: `${site}/compare/pdf-dark.png`,
     description:
-      "Convertidor y lector de PDF en modo oscuro, gratis y del lado del navegador. Lee PDFs sobre un fondo oscuro directamente en el navegador o descarga el archivo con el tema aplicado. Funciona 100% en local — pensado para leer PDFs de noche.",
+      "Convertidor y lector de PDF en modo oscuro, gratis y del lado del navegador. Lee archivos PDF sobre un fondo oscuro directamente en el navegador o descarga el archivo con el tema aplicado. Funciona 100% en local — pensado para leer archivos PDF de noche.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -201,7 +199,7 @@ export default function HomeEs() {
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            PDF modo oscuro, gratis y en tu navegador
+            Lee cualquier PDF en modo oscuro
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
             Suelta un PDF y léelo aquí mismo sobre un fondo oscuro — elige un
@@ -330,7 +328,7 @@ export default function HomeEs() {
               PDF Dark vs. extensiones de Chrome vs. otras herramientas online
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              Hay varias formas de leer PDFs en modo oscuro o modo nocturno
+              Hay varias formas de leer archivos PDF en modo oscuro o modo nocturno
               hoy en día — extensiones del navegador, otros convertidores online,
               lectores nativos. Así se comparan para el uso diario.
             </p>

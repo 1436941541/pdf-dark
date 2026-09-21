@@ -21,8 +21,6 @@ export const metadata: Metadata = {
       en: "/",
       es: "/es",
       pt: SLUG,
-      tr: "/tr",
-      id: "/id",
       de: "/de",
       "x-default": "/",
     },
@@ -201,7 +199,7 @@ export default function HomePt() {
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            PDF modo escuro, grátis e no seu navegador
+            Leia qualquer PDF em modo escuro
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
             Solte um PDF e leia aqui mesmo sobre um fundo escuro — escolha um

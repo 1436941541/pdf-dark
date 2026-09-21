@@ -21,8 +21,6 @@ export const metadata: Metadata = {
       en: "/invert-pdf-colors",
       es: "/es/invert-pdf-colors",
       pt: SLUG,
-      tr: "/tr/invert-pdf-colors",
-      id: "/id/invert-pdf-colors",
       de: "/de/invert-pdf-colors",
       "x-default": "/invert-pdf-colors",
     },

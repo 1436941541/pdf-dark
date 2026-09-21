@@ -16,17 +16,11 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
+  // 2026-09-21 暂时下线：Google 尚未收录，先把抓取预算集中到 es/pt/de。
+  // noindex + 从 sitemap 和 hreflang 集群摘出；follow 保留，站内链接照常传递。
+  robots: { index: false, follow: true },
   alternates: {
     canonical: SLUG,
-    languages: {
-      en: "/",
-      es: "/es",
-      pt: "/pt",
-      tr: SLUG,
-      id: "/id",
-      de: "/de",
-      "x-default": "/",
-    },
   },
   openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: SLUG, siteName: "PDF Dark" },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },

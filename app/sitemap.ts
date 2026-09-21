@@ -4,6 +4,7 @@ import { VARIANTS } from "@/lib/variants";
 import { CHANGELOG_UPDATED_AT } from "@/lib/changelog";
 
 // Last real content change per static route, YYYY-MM-DD. Bump when that page's content actually changes.
+// /tr and /id are noindex since 2026-09-21 and deliberately absent below.
 const HOME_UPDATED_AT = "2026-09-20";
 const INVERT_UPDATED_AT = "2026-09-21";
 const ABOUT_UPDATED_AT = "2026-06-26";
@@ -13,10 +14,6 @@ const ES_HOME_UPDATED_AT = "2026-09-21";
 const ES_INVERT_UPDATED_AT = "2026-08-27";
 const PT_HOME_UPDATED_AT = "2026-09-21";
 const PT_INVERT_UPDATED_AT = "2026-08-27";
-const TR_HOME_UPDATED_AT = "2026-09-21";
-const TR_INVERT_UPDATED_AT = "2026-09-05";
-const ID_HOME_UPDATED_AT = "2026-09-21";
-const ID_INVERT_UPDATED_AT = "2026-09-05";
 const DE_HOME_UPDATED_AT = "2026-09-21";
 const DE_INVERT_UPDATED_AT = "2026-09-05";
 
@@ -56,30 +53,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: `${base}/pt/invert-pdf-colors`,
       lastModified: PT_INVERT_UPDATED_AT,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${base}/tr`,
-      lastModified: TR_HOME_UPDATED_AT,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${base}/tr/invert-pdf-colors`,
-      lastModified: TR_INVERT_UPDATED_AT,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${base}/id`,
-      lastModified: ID_HOME_UPDATED_AT,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${base}/id/invert-pdf-colors`,
-      lastModified: ID_INVERT_UPDATED_AT,
       changeFrequency: "monthly",
       priority: 0.8,
     },

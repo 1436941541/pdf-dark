@@ -14,7 +14,8 @@ const DESCRIPTION =
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  alternates: { canonical: SLUG, languages: { en: "/invert-pdf-colors", es: "/es/invert-pdf-colors", pt: "/pt/invert-pdf-colors", tr: SLUG, id: "/id/invert-pdf-colors", de: "/de/invert-pdf-colors", "x-default": "/invert-pdf-colors" } },
+  /* 2026-09-21 暂时下线，见 app/tr/page.tsx 注释 */ robots: { index: false, follow: true },
+  alternates: { canonical: SLUG },
   openGraph: { title: TITLE, description: DESCRIPTION, type: "website", url: SLUG, siteName: "PDF Dark" },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
