@@ -115,6 +115,24 @@ const nextConfig: NextConfig = {
         destination: "/blog/pdf-dark-mode-firefox",
         permanent: true,
       },
+      // September 2026: the Indonesian and Turkish locales are retired —
+      // deliberately with no redirect. /id was indexed ("Submitted and indexed", last crawled
+      // 2026-09-20) yet took zero impressions in 90 days, and the evidence
+      // says it never could:
+      //   · Autocomplete (hl=id&gl=ID) gives the Indonesian phrasings no
+      //     query family at all — `pdf mode gelap` returns only itself,
+      //     `pdf mode malam` and `pembaca pdf gelap` return nothing.
+      //   · Indonesia does search this topic, but in English: all 24
+      //     impressions from IDN in 90 days are English queries
+      //     (`make pdf dark mode`, `dark mode pdf`, `darkmode pdf reader`),
+      //     and they already land on / at position 5-9.
+      // The market is real and already served by the English pages; only the
+      // Indonesian-language duplicates were dead weight. They carried no
+      // traffic and no inbound links, so a 404 is the honest signal — a
+      // redirect would just claim equity that was never there.
+      //
+      // /tr and /tr/invert-pdf-colors go with them: never indexed at all,
+      // zero impressions, and their primaries were never verified either.
     ];
   },
 };

@@ -4,7 +4,7 @@ import { VARIANTS } from "@/lib/variants";
 import { CHANGELOG_UPDATED_AT } from "@/lib/changelog";
 
 // Last real content change per static route, YYYY-MM-DD. Bump when that page's content actually changes.
-// /tr and /id are noindex since 2026-09-21 and deliberately absent below.
+// The /tr and /id locales were retired 2026-09-21 (their pages 404 now).
 const HOME_UPDATED_AT = "2026-09-20";
 const INVERT_UPDATED_AT = "2026-09-21";
 const ABOUT_UPDATED_AT = "2026-06-26";
