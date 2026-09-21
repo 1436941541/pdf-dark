@@ -80,15 +80,10 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     q: "¿En qué se diferencia de una extensión de modo oscuro del navegador?",
     a: "Las extensiones solo cambian el estilo de la página mientras está abierta en tu navegador — cierra la pestaña o pásale el archivo a otra persona y vuelve a verse claro. PDF Dark reescribe el PDF de verdad: el texto y el fondo se recolorean según el tema elegido, las imágenes se tratan según tu configuración, y el resultado queda guardado en el archivo. El tema oscuro se mantiene esté donde esté el PDF.",
-    link: { href: "/blog/pdf-dark-mode-chrome", text: "PDF en modo oscuro en Chrome" },
   },
   {
     q: "¿Funciona con PDFs escaneados?",
     a: "Sí. Las páginas escaneadas se tratan como lo que son — imágenes — y se invierten de forma uniforme, así que la letra manuscrita y el texto escaneado quedan en claro sobre oscuro automáticamente. Incluso los escaneos amarillentos y antiguos se normalizan al fondo de tu tema.",
-    link: {
-      href: "/blog/scanned-pdf-dark-mode",
-      text: "PDF escaneado en modo oscuro",
-    },
   },
   {
     q: "¿Cómo leo un PDF de noche sin cansar la vista?",
@@ -109,12 +104,10 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     q: "¿Es esto un modo oscuro para Adobe Acrobat?",
     a: "No exactamente. Acrobat tiene su propio modo oscuro interno, pero solo cambia cómo ves el PDF dentro de Acrobat — el archivo en sí sigue siendo claro. PDF Dark produce un archivo PDF con modo oscuro de verdad, que puedes abrir en cualquier lector (Acrobat, Preview, navegador) y se mantiene oscuro.",
-    link: { href: "/blog/pdf-dark-mode-adobe-acrobat", text: "PDF en modo oscuro en Adobe Acrobat" },
   },
   {
     q: "¿El modo oscuro de PDF funciona en Firefox?",
     a: "Sí. El visor PDF.js integrado de Firefox solo oscurece la barra de herramientas, no el contenido de la página. PDF Dark convierte el contenido real de la página, así que el archivo se ve oscuro en cualquier visor, incluido Firefox.",
-    link: { href: "/blog/pdf-dark-mode-firefox", text: "PDF en modo oscuro en Firefox" },
   },
 ];
 
@@ -198,7 +191,6 @@ export default function HomeEs() {
           </div>
           <nav className="text-sm text-neutral-400 flex gap-5">
             <Link href="/es/invert-pdf-colors" className="hover:text-neutral-100">Invertir y descargar</Link>
-            <Link href="/blog" className="hover:text-neutral-100">Blog</Link>
             <a href="#faq" className="hover:text-neutral-100">FAQ</a>
             <LanguageSwitcher page="home" current="es" />
           </nav>
