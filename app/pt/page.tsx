@@ -80,15 +80,10 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     q: "Qual a diferença para uma extensão de modo escuro do navegador?",
     a: "As extensões só mudam o estilo da página enquanto ela está aberta no navegador — feche a aba ou passe o arquivo para outra pessoa e ele volta a ficar claro. O PDF Dark reescreve o PDF de verdade: o texto e o fundo são recoloridos no tema escolhido, as imagens são tratadas conforme sua configuração, e o resultado fica salvo no próprio arquivo. O tema escuro acompanha o PDF onde quer que ele seja aberto.",
-    link: { href: "/blog/pdf-dark-mode-chrome", text: "PDF em modo escuro no Chrome" },
   },
   {
     q: "Funciona com PDFs escaneados?",
     a: "Sim. As páginas escaneadas são tratadas como o que são — imagens — e invertidas de forma uniforme, então a letra manuscrita e o texto escaneado ficam claros sobre fundo escuro automaticamente. Até escaneamentos antigos e amarelados se normalizam para o fundo do seu tema.",
-    link: {
-      href: "/blog/scanned-pdf-dark-mode",
-      text: "PDF escaneado em modo escuro",
-    },
   },
   {
     q: "Como ler um PDF à noite sem cansar a vista?",
@@ -109,12 +104,10 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     q: "Isso é um modo escuro para o Adobe Acrobat?",
     a: "Não exatamente. O Acrobat tem seu próprio modo escuro interno, mas ele só muda como você vê o PDF dentro do Acrobat — o arquivo em si continua claro. O PDF Dark gera um arquivo PDF com modo escuro de verdade, que abre em qualquer leitor (Acrobat, Preview, navegador) e continua escuro.",
-    link: { href: "/blog/pdf-dark-mode-adobe-acrobat", text: "PDF em modo escuro no Adobe Acrobat" },
   },
   {
     q: "O modo escuro do PDF funciona no Firefox?",
     a: "Sim. O visualizador PDF.js embutido do Firefox só escurece a barra de ferramentas, não o conteúdo da página. O PDF Dark converte o conteúdo real da página, então o arquivo fica escuro em qualquer leitor, incluindo o Firefox.",
-    link: { href: "/blog/pdf-dark-mode-firefox", text: "PDF em modo escuro no Firefox" },
   },
 ];
 
@@ -198,7 +191,6 @@ export default function HomePt() {
           </div>
           <nav className="text-sm text-neutral-400 flex gap-5">
             <Link href="/pt/invert-pdf-colors" className="hover:text-neutral-100">Inverter e baixar</Link>
-            <Link href="/blog" className="hover:text-neutral-100">Blog</Link>
             <a href="#faq" className="hover:text-neutral-100">FAQ</a>
             <LanguageSwitcher page="home" current="pt" />
           </nav>
