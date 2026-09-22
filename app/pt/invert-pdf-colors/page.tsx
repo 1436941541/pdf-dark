@@ -101,26 +101,13 @@ function StructuredData() {
   const app = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "PDF Color Inverter",
+    name: "Inverter cores PDF",
     url: `${site}${SLUG}`,
     applicationCategory: "UtilityApplication",
     operatingSystem: "Any (browser-based)",
     screenshot: `${site}/compare/pdf-dark.png`,
     description: DESCRIPTION,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  };
-  const howTo = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "Como inverter as cores de um PDF",
-    totalTime: "PT1M",
-    estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: 0 },
-    step: STEPS.map((s, i) => ({
-      "@type": "HowToStep",
-      position: i + 1,
-      name: s.t,
-      text: s.d,
-    })),
   };
   const faq = {
     "@context": "https://schema.org",
@@ -140,10 +127,6 @@ function StructuredData() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }}
       />
     </>
   );

@@ -50,11 +50,11 @@ const FAQ = [
   },
   {
     q: "Kann eine PDF mit schwarzem Hintergrund wieder weiß werden?",
-    a: "Ja. Weil die OLED-Abbildung symmetrisch ist, kommt ein dunkles Dokument hell wieder heraus: schwarze Flächen werden weiß, heller Text wird schwarz. Genau danach wird häufig gesucht — ein Dokument mit dunklem Design ist beim Drucken sehr teuer, und vorheriges Invertieren spart Toner.",
+    a: "Ja. Weil die OLED-Abbildung symmetrisch ist, kommt ein dunkles Dokument hell wieder heraus: schwarze Flächen werden weiß, heller Text wird schwarz. Für den Druck ist das praktisch: ein dunkler Hintergrund frisst viel Toner, invertieren Sie ihn vorher weg.",
   },
   {
     q: "Werden Fotos zu Negativen?",
-    a: "Nur wenn Sie es wollen. Der Auto-Modus belässt Fotos in ihren Originalfarben, kehrt weiße Screenshots und Diagramme um, damit sie zur Seite passen, und dunkelt sehr helle Bilder leicht ab. Stellen Sie Bilder auf Umkehren, um wirklich alles zu spiegeln, oder auf Original, um jedes Bild unangetastet zu lassen.",
+    a: "Nur wenn Sie es wollen. Der Auto-Modus belässt Fotos in ihren Originalfarben, kehrt weiße Screenshots und Diagramme um, damit sie zur Seite passen, und dunkelt sehr helle Bilder leicht ab. Stellen Sie Bilder auf Umkehren, um wirklich alles mit umzukehren, oder auf Original, um jedes Bild unangetastet zu lassen.",
   },
   {
     q: "Kann ich Text und Hintergrund invertieren, Bilder aber unangetastet lassen?",
@@ -110,19 +110,6 @@ function StructuredData() {
     description: DESCRIPTION,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
-  const howTo = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "PDF-Farben invertieren",
-    totalTime: "PT1M",
-    estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: 0 },
-    step: STEPS.map((s, i) => ({
-      "@type": "HowToStep",
-      position: i + 1,
-      name: s.t,
-      text: s.d,
-    })),
-  };
   const faq = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -137,10 +124,6 @@ function StructuredData() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(app) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }}
       />
       <script
         type="application/ld+json"
@@ -291,7 +274,7 @@ export default function GermanInvertPage() {
                 Echtes Ergebnis, kein Mockup: links die Quellseite, in der Mitte
                 eine simple RGB-Umkehr jedes Pixels, rechts dieses Werkzeug im
                 Auto-Modus (Design Midnight). Mit Bilder: Umkehren werden auch
-                die Fotos mit der Seite gespiegelt — genau das, was ein Scan
+                die Fotos zusammen mit der Seite invertiert — genau das, was ein Scan
                 oder ein abfotografiertes Whiteboard braucht.
               </p>
             </div>

@@ -22,7 +22,7 @@ const COPY: Record<
   },
   es: {
     home: "Inicio",
-    invert: "Invertir Colores de PDF",
+    invert: "Invertir Colores PDF",
     about: "Acerca de",
     changelog: "Novedades",
     contact: "Contacto",
@@ -31,7 +31,7 @@ const COPY: Record<
   },
   pt: {
     home: "Início",
-    invert: "Inverter Cores de PDF",
+    invert: "Inverter Cores PDF",
     about: "Sobre",
     changelog: "Novidades",
     contact: "Contato",
@@ -40,7 +40,7 @@ const COPY: Record<
   },
   de: {
     home: "Startseite",
-    invert: "PDF-Farben umkehren",
+    invert: "PDF-Farben invertieren",
     about: "Über uns",
     changelog: "Änderungen",
     contact: "Kontakt",

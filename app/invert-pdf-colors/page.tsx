@@ -115,19 +115,6 @@ function StructuredData() {
     description: DESCRIPTION,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
-  const howTo = {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    name: "How to invert PDF colors",
-    totalTime: "PT1M",
-    estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: 0 },
-    step: STEPS.map((s, i) => ({
-      "@type": "HowToStep",
-      position: i + 1,
-      name: s.t,
-      text: s.d,
-    })),
-  };
   const faq = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -146,10 +133,6 @@ function StructuredData() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }}
       />
     </>
   );
