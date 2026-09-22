@@ -8,9 +8,9 @@ import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/component
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/es/invert-pdf-colors";
-const TITLE = "Invertir Colores de PDF — Convertidor Online Gratis, Sin Subir Archivos";
+const TITLE = "Invertir Colores de PDF — Convertidor Online Gratis";
 const DESCRIPTION =
-  "Invierte los colores de un PDF y descarga el archivo invertido. Las fotos pueden mantener sus propios colores en vez de convertirse en negativos. Gratis, del lado del navegador, sin subir archivos.";
+  "Invierte los colores de un PDF y descarga el archivo invertido. Las fotos pueden mantener sus colores en vez de volverse negativos. Gratis, sin subir nada.";
 
 export const metadata: Metadata = {
   title: TITLE,

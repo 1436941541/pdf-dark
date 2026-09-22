@@ -8,9 +8,9 @@ import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/component
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/pt/invert-pdf-colors";
-const TITLE = "Inverter Cores de PDF Online — Conversor Grátis, Sem Enviar Arquivos";
+const TITLE = "Inverter Cores de PDF — Conversor Online Grátis";
 const DESCRIPTION =
-  "Inverta as cores de um PDF e baixe o arquivo invertido. As fotos podem manter as próprias cores em vez de virar negativo. Grátis, roda no navegador, sem enviar arquivos.";
+  "Inverta as cores de um PDF e baixe o arquivo invertido. As fotos podem manter as próprias cores em vez de virar negativo. Grátis, sem enviar arquivos.";
 
 export const metadata: Metadata = {
   title: TITLE,

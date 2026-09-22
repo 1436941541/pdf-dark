@@ -5,7 +5,7 @@ import { RelatedVariants } from "@/components/related-variants";
 import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-reader-dark-mode-comparison";
-const TITLE = "PDF Readers with Dark Mode: What Actually Works (2026 Comparison)";
+const TITLE = "PDF Readers with Dark Mode: What Actually Works in 2026";
 const DESCRIPTION =
   "Acrobat, Foxit, Sumatra, Preview, Chrome, Edge, Firefox, mobile apps — a straight comparison of which PDF readers really have dark mode, and which fake it.";
 const PUBLISHED = "2026-07-29";

@@ -8,7 +8,7 @@ import { formatPostDate, getSiteUrl } from "@/lib/site";
 const SLUG = "/blog/how-pdf-dark-mode-conversion-works";
 const TITLE = "How PDF Dark Mode Conversion Works — Under the Hood";
 const DESCRIPTION =
-  "Vector recoloring, per-image detection, hue-preserving color mapping, and a per-page fallback chain — how PDF Dark actually converts a PDF to dark mode, explained.";
+  "Vector recoloring, per-image detection, hue-preserving color mapping and a per-page fallback chain — how PDF Dark actually converts a PDF to dark mode.";
 const PUBLISHED = "2026-07-17";
 const UPDATED = "2026-07-30";
 

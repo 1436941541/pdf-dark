@@ -6,9 +6,9 @@ import { RelatedVariants } from "@/components/related-variants";
 import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/sumatra-pdf-dark-mode";
-const TITLE = "PDF Dark Mode in Sumatra PDF — the i Key vs. Editing settings.txt";
+const TITLE = "PDF Dark Mode in Sumatra PDF — the i Key vs. settings.txt";
 const DESCRIPTION =
-  "Sumatra PDF can darken pages three ways — the i key, the built-in Dark theme, and a settings.txt edit. How each works, where they fall short, and a fix that sticks.";
+  "Sumatra PDF can darken pages three ways — the i key, the Dark theme, and a settings.txt edit. How each works, where they fall short, and a fix that sticks.";
 const PUBLISHED = "2026-07-29";
 const UPDATED = "2026-07-30";
 

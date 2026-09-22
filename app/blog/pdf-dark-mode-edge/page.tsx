@@ -8,7 +8,7 @@ import { formatPostDate, getSiteUrl } from "@/lib/site";
 const SLUG = "/blog/pdf-dark-mode-edge";
 const TITLE = "PDF Dark Mode in Microsoft Edge — Beyond the Flags Page Hack";
 const DESCRIPTION =
-  "Turning on Edge's dark theme doesn't touch your PDFs — the page stays white. There's a flag that can force it dark, but it wrecks your images. Here's a cleaner fix.";
+  "Turning on Edge's dark theme doesn't touch your PDFs — the page stays white. A flag can force it dark, but it wrecks your images. Here's a cleaner fix.";
 const PUBLISHED = "2026-07-29";
 const UPDATED = "2026-07-30";
 
