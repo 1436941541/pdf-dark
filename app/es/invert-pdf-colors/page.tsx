@@ -169,9 +169,6 @@ export default function InvertPdfColorsEsPage() {
             <Link href="/es" className="hover:text-neutral-100">
               Lector
             </Link>
-            <Link href="/blog" className="hover:text-neutral-100">
-              Blog
-            </Link>
             <a href="#faq" className="hover:text-neutral-100">
               FAQ
             </a>
@@ -235,15 +232,7 @@ export default function InvertPdfColorsEsPage() {
               El texto y el fondo siempre se invierten. Qué pasa con las
               imágenes depende de ti — para eso está el control de Imágenes:
               déjalas intactas, invierte con la página, o deja que cada una se
-              evalúe por separado. ¿Curioso por saber cómo decide esa
-              detección?{" "}
-              <Link
-                href="/blog/how-pdf-dark-mode-conversion-works"
-                className="text-amber-400 hover:underline"
-              >
-                Así funciona la conversión
-              </Link>
-              .
+              evalúe por separado.
             </p>
             <div className="grid sm:grid-cols-3 gap-6">
               {STEPS.map((s, i) => (
@@ -413,14 +402,7 @@ export default function InvertPdfColorsEsPage() {
               <p className="text-sm text-neutral-400">
                 En un escaneo no hay capa de texto — la escritura <em>es</em> la
                 imagen. Pon Imágenes en Invertir y toda la página se voltea, así
-                la letra manuscrita queda clara sobre oscuro.{" "}
-                <Link
-                  href="/blog/scanned-pdf-dark-mode"
-                  className="text-amber-400 hover:underline"
-                >
-                  Más sobre PDFs escaneados
-                </Link>
-                .
+                la letra manuscrita queda clara sobre oscuro.
               </p>
             </div>
 

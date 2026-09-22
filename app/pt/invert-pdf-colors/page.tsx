@@ -169,9 +169,6 @@ export default function InvertPdfColorsPtPage() {
             <Link href="/pt" className="hover:text-neutral-100">
               Leitor
             </Link>
-            <Link href="/blog" className="hover:text-neutral-100">
-              Blog
-            </Link>
             <a href="#faq" className="hover:text-neutral-100">
               FAQ
             </a>
@@ -235,15 +232,7 @@ export default function InvertPdfColorsPtPage() {
               O texto e o fundo sempre são invertidos. O que acontece com as
               imagens depende de você — é pra isso que serve o controle
               Imagens: deixe intactas, inverta junto com a página, ou deixe
-              cada uma ser avaliada separadamente. Curioso sobre como essa
-              detecção decide?{" "}
-              <Link
-                href="/blog/how-pdf-dark-mode-conversion-works"
-                className="text-amber-400 hover:underline"
-              >
-                Veja como funciona a conversão
-              </Link>
-              .
+              cada uma ser avaliada separadamente.
             </p>
             <div className="grid sm:grid-cols-3 gap-6">
               {STEPS.map((s, i) => (
@@ -413,14 +402,7 @@ export default function InvertPdfColorsPtPage() {
                 Numa digitalização não existe camada de texto — a escrita{" "}
                 <em>é</em> a imagem. Coloque Imagens em Inverter e a página
                 inteira vira, então a letra manuscrita fica clara sobre
-                escuro.{" "}
-                <Link
-                  href="/blog/scanned-pdf-dark-mode"
-                  className="text-amber-400 hover:underline"
-                >
-                  Mais sobre PDFs digitalizados
-                </Link>
-                .
+                escuro.
               </p>
             </div>
 
