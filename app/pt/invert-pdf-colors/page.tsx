@@ -8,7 +8,7 @@ import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/component
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/pt/invert-pdf-colors";
-const TITLE = "Inverter Cores de PDF — Conversor Online Grátis";
+const TITLE = "Inverter Cores PDF — Conversor Online Grátis";
 const DESCRIPTION =
   "Inverta as cores de um PDF e baixe o arquivo invertido. As fotos podem manter as próprias cores em vez de virar negativo. Grátis, sem enviar arquivos.";
 
@@ -180,12 +180,16 @@ export default function InvertPdfColorsPtPage() {
       <main className="flex-1 w-full">
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
+          {/* Sem preposição de propósito: é a forma como se busca, e a que
+              os sites de ferramentas em português usam num rótulo («Inversor
+              de Cores PDF», «Conversor PDF Online»). No texto corrido, mais
+              abaixo, mantém-se a forma completa «cores de um PDF». */}
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Inverter cores de PDF
+            Inverter cores PDF
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Escolha suas configurações, solte seu PDF, e a cópia invertida se
-            baixa sozinha. As cores ficam gravadas no próprio arquivo, então
+            Inverter cores de PDF aqui é direto: escolha suas configurações,
+            solte seu PDF, e a cópia invertida se baixa sozinha. As cores ficam gravadas no próprio arquivo, então
             ele continua assim em qualquer visualizador — Acrobat, Preview,
             navegadores, e-readers. Grátis, e seu arquivo nunca sai do
             navegador.
@@ -313,7 +317,7 @@ export default function InvertPdfColorsPtPage() {
         {/* Why invert the file */}
         <section className="max-w-3xl mx-auto px-6 py-16">
           <h2 className="text-2xl font-bold mb-8 text-center">
-            Por que inverter o arquivo em vez de mudar uma configuração do visualizador?
+            Por que inverter cores de PDF no arquivo e não no visualizador?
           </h2>
           <p className="text-neutral-300 leading-relaxed">
             Temas de visualizador, extensões do navegador e o inversor do
@@ -390,7 +394,7 @@ export default function InvertPdfColorsPtPage() {
         {/* Use cases */}
         <section className="max-w-3xl mx-auto px-6 pb-16">
           <h2 className="text-2xl font-bold mb-10 text-center">
-            Quando inverter um PDF é a melhor opção
+            Quando vale a pena inverter cores de PDF
           </h2>
 
           <div className="space-y-6">

@@ -8,7 +8,7 @@ import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/component
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/es/invert-pdf-colors";
-const TITLE = "Invertir Colores de PDF — Convertidor Online Gratis";
+const TITLE = "Invertir Colores PDF — Convertidor Online Gratis";
 const DESCRIPTION =
   "Invierte los colores de un PDF y descarga el archivo invertido. Las fotos pueden mantener sus colores en vez de volverse negativos. Gratis, sin subir nada.";
 
@@ -180,12 +180,16 @@ export default function InvertPdfColorsEsPage() {
       <main className="flex-1 w-full">
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
+          {/* Sin preposición a propósito: es la forma en que se busca, y la
+              que usan las webs de herramientas en español para un rótulo
+              («Inversor de colores PDF», «Conversor PDF»). En prosa, más
+              abajo, se mantiene la forma completa «colores de un PDF». */}
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            Invertir colores de PDF
+            Invertir colores PDF
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Elige tu configuración, suelta tu PDF, y la copia invertida se
-            descarga sola. Los colores quedan escritos en el propio archivo,
+            Invertir colores de PDF aquí es directo: elige tu configuración,
+            suelta tu PDF, y la copia invertida se descarga sola. Los colores quedan escritos en el propio archivo,
             así que se mantiene así en cualquier visor — Acrobat, Preview,
             navegadores, e-readers. Gratis, y tu archivo nunca sale del
             navegador.
@@ -314,7 +318,7 @@ export default function InvertPdfColorsEsPage() {
         {/* Why invert the file */}
         <section className="max-w-3xl mx-auto px-6 py-16">
           <h2 className="text-2xl font-bold mb-8 text-center">
-            ¿Por qué invertir el archivo en vez de una preferencia del visor?
+            ¿Por qué invertir colores de PDF en el archivo y no en el visor?
           </h2>
           <p className="text-neutral-300 leading-relaxed">
             Los temas del visor, las extensiones del navegador y el interruptor
@@ -323,6 +327,19 @@ export default function InvertPdfColorsEsPage() {
             produce un <strong className="text-neutral-100">nuevo PDF</strong>:
             envíalo a tu teléfono o e-reader, compártelo con un compañero,
             imprímelo o archívalo, y los colores viajan con el archivo.
+          </p>
+          <p className="text-neutral-300 leading-relaxed mt-4">
+            Vale para los lectores que ya traen algo parecido.{" "}
+            <strong className="text-neutral-100">Adobe Acrobat y Adobe Reader</strong>{" "}
+            tienen un modo oscuro propio, pero solo cambia cómo se ve el
+            documento dentro de Acrobat — mándaselo a otra persona y le llega
+            blanco.{" "}
+            <strong className="text-neutral-100">Sumatra PDF</strong> puede
+            invertir con la tecla <kbd className="px-1.5 py-0.5 rounded border border-neutral-700 bg-neutral-900 text-xs">i</kbd>{" "}
+            o editando <code className="text-xs text-neutral-400">settings.txt</code>,
+            y eso dura lo que dure la sesión. Ninguno de los dos toca el
+            archivo, así que ninguno sirve si lo que necesitas es imprimirlo,
+            archivarlo o pasárselo a alguien.
           </p>
           <p className="text-neutral-300 leading-relaxed mt-4">
             Hay otra diferencia que importa: una inversión a nivel de sistema no
@@ -340,7 +357,7 @@ export default function InvertPdfColorsEsPage() {
           <div className="grid sm:grid-cols-2 gap-5 mt-10">
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
               <h3 className="text-sm font-semibold text-neutral-400 mb-3 m-0">
-                Visor / extensión / inversión del sistema
+                Acrobat / Sumatra / extensión / inversión del sistema
               </h3>
               <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
                 <li>Invertido solo mientras esa app/extensión está activa</li>
@@ -391,7 +408,7 @@ export default function InvertPdfColorsEsPage() {
         {/* Use cases */}
         <section className="max-w-3xl mx-auto px-6 pb-16">
           <h2 className="text-2xl font-bold mb-10 text-center">
-            Cuándo invertir un PDF es la mejor opción
+            Cuándo conviene invertir colores de PDF
           </h2>
 
           <div className="space-y-6">

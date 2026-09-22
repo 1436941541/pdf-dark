@@ -175,8 +175,8 @@ export default function GermanInvertPage() {
             PDF-Farben invertieren
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Einstellungen wählen, PDF ablegen — die invertierte Kopie lädt von
-            selbst herunter. Die Farben stehen in der Datei selbst, sie bleibt
+            PDF-Farben invertieren geht hier direkt: Einstellungen wählen,
+            PDF ablegen — die invertierte Kopie lädt von selbst herunter. Die Farben stehen in der Datei selbst, sie bleibt
             also in jedem Viewer so: Acrobat, Vorschau, Browser, E-Reader.
             Kostenlos, und Ihre Datei verlässt den Browser nie.
           </p>
@@ -216,7 +216,7 @@ export default function GermanInvertPage() {
         >
           <div className="max-w-4xl mx-auto px-6">
             <h2 className="text-2xl font-bold mb-3 text-center">
-              So invertieren Sie die Farben einer PDF
+              So invertieren Sie die PDF-Farben
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
               Text und Hintergrund werden immer umgekehrt. Was mit den Bildern
@@ -301,7 +301,7 @@ export default function GermanInvertPage() {
         {/* Why invert the file */}
         <section className="max-w-3xl mx-auto px-6 py-16">
           <h2 className="text-2xl font-bold mb-8 text-center">
-            Warum die Datei invertieren statt einer Einstellung im Viewer?
+            Warum die PDF-Farben invertieren statt den Viewer umzustellen?
           </h2>
           <p className="text-neutral-300 leading-relaxed">
             Viewer-Designs, Browser-Erweiterungen und die Farbumkehr des
@@ -314,8 +314,9 @@ export default function GermanInvertPage() {
             Datei.
           </p>
           <p className="text-neutral-300 leading-relaxed mt-4">
-            Es gibt noch einen Unterschied, der zählt: eine Umkehr auf
-            Systemebene weiß nicht, was sie da umkehrt, also kommt jedes Foto,
+            Es gibt noch einen Unterschied, der zählt: wer eine PDF invertieren
+            will, meint fast nie „alles umkehren“ — eine Umkehr auf Systemebene
+            weiß aber nicht, was sie da umkehrt, also kommt jedes Foto,
             jede Grafik und jeder Screenshot als Negativ heraus. An der Datei zu
             arbeiten erlaubt es, jedes Bild einzeln zu bewerten — oder es ganz
             in Ruhe zu lassen. Wenn Sie nur heute Abend ein Dokument
@@ -370,15 +371,15 @@ export default function GermanInvertPage() {
           </div>
 
           <p className="text-xs text-neutral-500 text-center mt-8">
-            Anders gesagt: eine Erweiterung ist Schminke auf der PDF. Invertieren
-            ergibt eine neue PDF.
+            Anders gesagt: eine Erweiterung ist Schminke auf der PDF.
+            PDF-Farben invertieren ergibt eine neue PDF.
           </p>
         </section>
 
         {/* Use cases */}
         <section className="max-w-3xl mx-auto px-6 pb-16">
           <h2 className="text-2xl font-bold mb-10 text-center">
-            Wann sich das Invertieren am meisten lohnt
+            Wann sich das Invertieren der PDF-Farben lohnt
           </h2>
 
           <div className="space-y-6">
