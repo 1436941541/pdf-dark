@@ -15,7 +15,7 @@ const ES_INVERT_UPDATED_AT = "2026-08-27";
 const PT_HOME_UPDATED_AT = "2026-09-21";
 const PT_INVERT_UPDATED_AT = "2026-08-27";
 const DE_HOME_UPDATED_AT = "2026-09-21";
-const DE_INVERT_UPDATED_AT = "2026-09-05";
+const DE_INVERT_UPDATED_AT = "2026-09-22";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteUrl();
