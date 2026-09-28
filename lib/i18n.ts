@@ -46,6 +46,11 @@ type Dict = {
     checkDownloads: string;
     convertAnother: string;
     genericError: string;
+    errorHelp: string;
+    copyEmail: string;
+    emailCopied: string;
+    emailCopyFailed: string;
+    emailAddressLabel: string;
     back: string;
   };
   viewer: {
@@ -128,6 +133,12 @@ export const T: Record<Locale, Dict> = {
         "Check your downloads folder — the dark theme is baked into the file.",
       convertAnother: "Convert another PDF",
       genericError: "Couldn't convert that PDF. Try another file?",
+      errorHelp:
+        "Your PDF stays in your browser, so we can't see what caused this error. If you'd like us to investigate, you can email us and attach a copy yourself. Please don't send sensitive documents.",
+      copyEmail: "Copy email address",
+      emailCopied: "Email address copied",
+      emailCopyFailed: "Couldn't copy the address. Select it below instead.",
+      emailAddressLabel: "Email:",
       back: "Back",
     },
     viewer: {
@@ -212,6 +223,12 @@ export const T: Record<Locale, Dict> = {
         "Revisa tu carpeta de descargas — el tema oscuro queda incorporado en el archivo.",
       convertAnother: "Convertir otro PDF",
       genericError: "No se pudo convertir ese PDF. ¿Probamos con otro archivo?",
+      errorHelp:
+        "Tu PDF permanece en tu navegador, así que no podemos ver qué causó este error. Si quieres que lo investiguemos, puedes escribirnos y adjuntar una copia tú mismo. No envíes documentos confidenciales.",
+      copyEmail: "Copiar dirección de correo",
+      emailCopied: "Dirección de correo copiada",
+      emailCopyFailed: "No se pudo copiar. Selecciona la dirección de abajo.",
+      emailAddressLabel: "Correo:",
       back: "Volver",
     },
     viewer: {
@@ -297,6 +314,12 @@ export const T: Record<Locale, Dict> = {
         "Confira sua pasta de downloads — o tema escuro já está gravado no arquivo.",
       convertAnother: "Converter outro PDF",
       genericError: "Não deu para converter esse PDF. Tentar outro arquivo?",
+      errorHelp:
+        "Seu PDF fica no seu navegador, então não conseguimos ver o que causou este erro. Se quiser que investiguemos, você pode nos enviar um e-mail e anexar uma cópia por conta própria. Não envie documentos confidenciais.",
+      copyEmail: "Copiar endereço de e-mail",
+      emailCopied: "Endereço de e-mail copiado",
+      emailCopyFailed: "Não foi possível copiar. Selecione o endereço abaixo.",
+      emailAddressLabel: "E-mail:",
       back: "Voltar",
     },
     viewer: {
@@ -368,6 +391,12 @@ export const T: Record<Locale, Dict> = {
       checkDownloads: "Prüfen Sie Ihren Download-Ordner — das dunkle Design ist in der Datei enthalten.",
       convertAnother: "Weitere PDF konvertieren",
       genericError: "Diese PDF konnte nicht konvertiert werden. Andere Datei versuchen?",
+      errorHelp:
+        "Ihre PDF bleibt in Ihrem Browser. Deshalb können wir nicht sehen, was diesen Fehler verursacht hat. Wenn Sie möchten, können Sie uns eine E-Mail schreiben und selbst eine Kopie anhängen. Bitte senden Sie keine vertraulichen Dokumente.",
+      copyEmail: "E-Mail-Adresse kopieren",
+      emailCopied: "E-Mail-Adresse kopiert",
+      emailCopyFailed: "Kopieren fehlgeschlagen. Wählen Sie die Adresse unten aus.",
+      emailAddressLabel: "E-Mail:",
       back: "Zurück",
     },
     viewer: {

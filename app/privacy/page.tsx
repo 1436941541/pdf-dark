@@ -4,7 +4,7 @@ import { LegalFrame } from "@/components/legal-frame";
 export const metadata: Metadata = {
   title: "Privacy — PDF Dark",
   description:
-    "Your PDF file never leaves your browser. No accounts, no signup. Here's exactly what we do and don't collect on the site itself, including analytics and ads.",
+    "Your PDF stays in your browser during conversion. No accounts, no signup. Here's what the site collects and how optional support emails work.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -14,13 +14,13 @@ export default function PrivacyPage() {
       <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
         <h1 className="text-3xl font-bold text-neutral-50 mb-2">Privacy</h1>
         <p className="text-sm text-neutral-500 mb-10">
-          Last updated: July 25, 2026
+          Last updated: September 28, 2026
         </p>
 
         <p className="text-lg mb-8">
           PDF Dark is built around one core promise:{" "}
           <strong className="text-amber-400">
-            your PDF file never leaves your browser.
+            your PDF file never leaves your browser during conversion.
           </strong>{" "}
           The file you drop in — its name, content, text, and images — stays
           on your device. The site itself (this page, page-view analytics,
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
           </li>
         </ol>
         <p>
-          At no point is your PDF uploaded to a server. You can verify this by
+          At no point during conversion is your PDF uploaded to a server. You can verify this by
           opening the browser&apos;s Network tab during use — you&apos;ll see
           no file upload request. The file name, content, text, and images
           inside the PDF all stay on your device.
@@ -61,17 +61,19 @@ export default function PrivacyPage() {
         </h2>
         <ul className="space-y-2 list-disc pl-6 text-neutral-300">
           <li>
-            We don&apos;t upload, store, or read your PDF file — name, content,
-            and extracted text all stay on your device.
+            We don&apos;t upload, store, or read your PDF file during conversion —
+            its name, content, and extracted text stay on your device. You can
+            choose to email us a copy for support, as explained below.
           </li>
           <li>
-            We don&apos;t ask for your email, log you in, or build a long-term
+            We don&apos;t require your email, log you in, or build a long-term
             profile tied to you.
           </li>
           <li>
             We don&apos;t correlate the file you converted with anything else
             — not with the analytics events, not with the ads, not with any
-            third party. Your file is processed locally and forgotten.
+            third party. Your file is processed locally unless you choose to
+            send a copy to us for support.
           </li>
           <li>
             We don&apos;t sell your data. We don&apos;t have a database of
@@ -182,6 +184,18 @@ export default function PrivacyPage() {
           .
         </p>
 
+        <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
+          Optional support emails
+        </h2>
+        <p>
+          If a conversion fails, you can choose to contact us by email and
+          attach a copy of the PDF for troubleshooting. The site never attaches
+          or sends your file automatically. If you send a copy, your email
+          provider transmits it to our inbox and we may read it to investigate
+          the problem. You can contact us without attaching a file, and please
+          don&apos;t send sensitive documents.
+        </p>
+
         {/* Hosting */}
         <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
           Hosting
@@ -223,7 +237,8 @@ export default function PrivacyPage() {
           nothing tied to you personally — the traces we have are aggregate
           Google Analytics and Clarity events, ad-network cookies (once ads
           are live), short-term Vercel access logs, and (if something
-          crashes) a masked Sentry error report. If you want to check,
+          crashes) a masked Sentry error report, plus any support email you
+          choose to send. If you want to check,
           correct, or delete anything under GDPR / UK / CCPA, or just have a
           question, email{" "}
           <a

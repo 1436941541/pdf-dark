@@ -21,6 +21,36 @@ import { DropZone } from "./drop-zone";
 const bgCss = (c: { r: number; g: number; b: number }) =>
   `rgb(${Math.round(c.r)}, ${Math.round(c.g)}, ${Math.round(c.b)})`;
 
+const SUPPORT_EMAIL = "hello@pdfdark.org";
+
+async function copySupportEmail(): Promise<boolean> {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(SUPPORT_EMAIL);
+      return true;
+    } catch {
+      // Fall back to selection-based copying below.
+    }
+  }
+
+  const previousFocus = document.activeElement;
+  const input = document.createElement("textarea");
+  input.value = SUPPORT_EMAIL;
+  input.readOnly = true;
+  input.style.position = "fixed";
+  input.style.opacity = "0";
+  document.body.appendChild(input);
+  try {
+    input.select();
+    return document.execCommand("copy");
+  } catch {
+    return false;
+  } finally {
+    input.remove();
+    if (previousFocus instanceof HTMLElement) previousFocus.focus();
+  }
+}
+
 type Status =
   | { kind: "config" }
   | { kind: "processing"; phase: "render" | "build"; done: number; total: number }
@@ -47,6 +77,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
   const [darkness, setDarkness] = useState(100);
   const [warmth, setWarmth] = useState(0);
   const [status, setStatus] = useState<Status>({ kind: "config" });
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   const cancelledRef = useRef(false);
 
@@ -137,6 +168,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
   const processFile = useCallback(
     async (file: File) => {
       cancelledRef.current = false;
+      setCopyStatus("idle");
       setStatus({ kind: "processing", phase: "render", done: 0, total: 0 });
       try {
         const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
@@ -498,12 +530,48 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             <div className="text-lg text-red-400">
               {status.message ?? t.downloader.genericError}
             </div>
-            <button
-              onClick={() => setStatus({ kind: "config" })}
-              className="mt-5 px-4 py-1.5 rounded-full text-sm text-neutral-300 border border-neutral-800 hover:text-neutral-100 transition-colors"
-            >
-              {t.downloader.back}
-            </button>
+            {!status.message && (
+              <p className="mt-4 text-sm leading-relaxed text-neutral-400">
+                {t.downloader.errorHelp}
+              </p>
+            )}
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              {!status.message && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const copied = await copySupportEmail();
+                    setCopyStatus(copied ? "copied" : "failed");
+                  }}
+                  className="px-4 py-1.5 rounded-full text-sm font-medium bg-amber-400 text-neutral-950 hover:bg-amber-300 transition-colors"
+                >
+                  <span aria-live="polite">
+                    {copyStatus === "copied" ? t.downloader.emailCopied : t.downloader.copyEmail}
+                  </span>
+                </button>
+              )}
+              <button
+                onClick={() => setStatus({ kind: "config" })}
+                className="px-4 py-1.5 rounded-full text-sm text-neutral-300 border border-neutral-800 hover:text-neutral-100 transition-colors"
+              >
+                {t.downloader.back}
+              </button>
+            </div>
+            {!status.message && (
+              <>
+                {copyStatus === "failed" && (
+                  <p role="status" className="mt-3 text-xs text-amber-400">
+                    {t.downloader.emailCopyFailed}
+                  </p>
+                )}
+                <p className="mt-3 text-xs leading-relaxed text-neutral-500">
+                  {t.downloader.emailAddressLabel}{" "}
+                  <span className="select-all font-medium text-neutral-300">
+                    {SUPPORT_EMAIL}
+                  </span>
+                </p>
+              </>
+            )}
           </div>
         )}
       </div>
