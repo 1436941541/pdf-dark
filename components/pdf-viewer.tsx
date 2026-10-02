@@ -8,6 +8,7 @@ import type {
   DarkifyResponse,
 } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
+import { canvasToJpegDataUrl, yieldToMain } from "@/lib/main-thread";
 import {
   imageTreatment,
   RENDER_SCALE,
@@ -108,6 +109,13 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   // "jump to page" text field.
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(1);
+  // Page 1's rendered size, known as soon as the PDF parses — long before the
+  // first page finishes. The loading box takes this size so the page drops
+  // into the same space instead of pushing the rest of the page down.
+  const [firstPageSize, setFirstPageSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const [pageInput, setPageInput] = useState("1");
   const themeVersionRef = useRef(0);
   const lastAppliedThemeRef = useRef<string | null>(null);
@@ -346,6 +354,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     setStatus("loading");
     setErrorText(null);
     setPages([]);
+    setFirstPageSize(null);
     setProgress({ done: 0, total: 0 });
 
     (async () => {
@@ -360,6 +369,13 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
         if (cancelled) return;
         setProgress({ done: 0, total: pdf.numPages });
+        {
+          const first = (await pdf.getPage(1)).getViewport({
+            scale: RENDER_SCALE,
+          });
+          if (cancelled) return;
+          setFirstPageSize({ width: first.width, height: first.height });
+        }
 
         // Stream pages to React as soon as each finishes. The user can start
         // reading after page 1 — they don't have to wait for the whole PDF.
@@ -397,6 +413,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           } catch (err) {
             console.warn("[pdf-dark] image-region scan failed", err);
           }
+          await yieldToMain();
 
           const canvas = document.createElement("canvas");
           canvas.width = viewport.width;
@@ -405,6 +422,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           if (!ctx) throw new Error("2D canvas not supported");
           await page.render({ canvas, canvasContext: ctx, viewport }).promise;
           throwIfCancelled(() => cancelled);
+          await yieldToMain();
 
           // Average luminance + saturation per image (drives the Auto
           // classifier): squash the region into the 32×32 scratch canvas
@@ -431,7 +449,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             }
           }
 
-          const originalDataUrl = canvas.toDataURL("image/jpeg", 0.88);
+          await yieldToMain();
+          const originalDataUrl = await canvasToJpegDataUrl(canvas, 0.88);
           const stub: PageImage = {
             originalDataUrl,
             width: canvas.width,
@@ -601,6 +620,12 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
   // Page-frame background follows the sliders so the frame never mismatches
   // the darkened bitmaps it surrounds.
+  // Until page 1 has been measured, assume US Letter (612×792 pt), the most
+  // common page size, so the placeholder starts close to the final height.
+  const placeholderSize = firstPageSize ?? {
+    width: 612 * RENDER_SCALE,
+    height: 792 * RENDER_SCALE,
+  };
   const themeBg = bgCss(
     effectiveThemeBg(theme, appliedDarkness / 100, appliedWarmth / 100),
   );
@@ -917,7 +942,14 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       </aside>
 
       {status === "loading" && (
-        <div className="text-center py-16 text-neutral-400">
+        <div
+          className="mx-auto flex flex-col items-center justify-center overflow-hidden rounded-lg text-center text-neutral-400"
+          style={{
+            maxWidth: placeholderSize.width * zoom,
+            aspectRatio: `${placeholderSize.width} / ${placeholderSize.height}`,
+            background: themeBg,
+          }}
+        >
           <div className="text-lg">
             {t.viewer.renderingLoading(progress.done, progress.total || "?")}
           </div>
@@ -962,6 +994,21 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
               />
             </div>
           ))}
+          {/* While later pages are still rendering, hold the next page's
+              space (sized like page 1) so each new page lands where the
+              placeholder was rather than pushing the content below it. */}
+          {pages.length < progress.total && (
+            <div
+              aria-hidden="true"
+              className="mx-auto rounded-lg"
+              style={{
+                maxWidth: placeholderSize.width * zoom,
+                aspectRatio: `${placeholderSize.width} / ${placeholderSize.height}`,
+                background: themeBg,
+                opacity: 0.5,
+              }}
+            />
+          )}
         </div>
       )}
     </div>

@@ -5,6 +5,7 @@ import * as Sentry from "@sentry/nextjs";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type { DarkifyRequest, DarkifyResponse } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
+import { canvasToJpegDataUrl, yieldToMain } from "@/lib/main-thread";
 import {
   buildDarkPdf,
   imageTreatment,
@@ -209,6 +210,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           } catch (err) {
             console.warn("[pdf-dark] image-region scan failed", err);
           }
+          await yieldToMain();
 
           const canvas = document.createElement("canvas");
           canvas.width = viewport.width;
@@ -217,6 +219,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           if (!ctx) throw new Error("2D canvas not supported");
           await page.render({ canvas, canvasContext: ctx, viewport }).promise;
           throwIfCancelled(() => cancelledRef.current);
+          await yieldToMain();
 
           if (scratchCtx) {
             for (const r of imageRects) {
@@ -240,7 +243,8 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             }
           }
 
-          const originalDataUrl = canvas.toDataURL("image/jpeg", 0.88);
+          await yieldToMain();
+          const originalDataUrl = await canvasToJpegDataUrl(canvas, 0.88);
           // "Original" mode keeps scanned pages exactly as in the source.
           const displayDataUrl =
             imageMode === "original" && scannedPage
