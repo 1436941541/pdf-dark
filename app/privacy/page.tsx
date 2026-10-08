@@ -87,7 +87,7 @@ export default function PrivacyPage() {
         </h2>
         <p className="mb-4">
           To understand which pages people find useful and where the site is
-          slow or broken, we run two analytics tools — both on the site
+          slow or broken, we run three analytics tools — all on the site
           itself, never on your PDF file:
         </p>
         <ul className="space-y-2 list-disc pl-6 text-neutral-300 mb-4">
@@ -95,6 +95,12 @@ export default function PrivacyPage() {
             <strong className="text-neutral-100">Google Analytics 4</strong>{" "}
             — aggregate page views, referrers, country, device type. IP
             addresses are anonymized by GA4 by default and not stored.
+          </li>
+          <li>
+            <strong className="text-neutral-100">Umami</strong>{" "}
+            — a privacy-friendly counter we host ourselves: page views,
+            referrers and country, with no cookies and no cross-site
+            tracking.
           </li>
           <li>
             <strong className="text-neutral-100">Microsoft Clarity</strong>{" "}
@@ -105,9 +111,9 @@ export default function PrivacyPage() {
           </li>
         </ul>
         <p>
-          Neither tool sees your PDF file. If you&apos;d rather not be counted,
+          None of these tools sees your PDF file. If you&apos;d rather not be counted,
           a browser-level tracker blocker (uBlock Origin, Brave Shields, etc.)
-          will block both.
+          will block them.
         </p>
 
         {/* Ads */}

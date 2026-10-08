@@ -4,6 +4,9 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 export function Analytics() {
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID;
+  // 自建 Umami（https://yj-pulse.vercel.app，不写 Cookie），两个变量都配了才加载
+  const umamiSrc = process.env.NEXT_PUBLIC_UMAMI_SRC;
+  const umamiId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
 
   return (
     <>
@@ -17,6 +20,7 @@ export function Analytics() {
           })(window, document, "clarity", "script", "${clarityId}");`}
         </Script>
       ) : null}
+      {umamiSrc && umamiId ? <Script src={umamiSrc} data-website-id={umamiId} strategy="afterInteractive" /> : null}
     </>
   );
 }
