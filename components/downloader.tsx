@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import * as Sentry from "@sentry/nextjs";
+import { capturePdfProcessingException, loadPageBitmap } from "@/lib/pdf-image-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type { DarkifyRequest, DarkifyResponse } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
@@ -120,16 +120,17 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
       height: number,
       imageRects: ImageRect[],
       cancelled: () => boolean,
+      pageNumber: number,
     ): Promise<string> => {
       throwIfCancelled(cancelled);
       const w = workerRef.current;
       if (!w) throw new Error("worker not ready");
-      const res = await fetch(originalDataUrl);
-      throwIfCancelled(cancelled);
-      const srcBlob = await res.blob();
-      throwIfCancelled(cancelled);
-      const bitmap = await createImageBitmap(srcBlob);
-      throwIfCancelled(cancelled);
+      const bitmap = await loadPageBitmap(originalDataUrl, {
+        pageNumber,
+        width,
+        height,
+        imageRegionCount: imageRects.length,
+      }, () => throwIfCancelled(cancelled));
 
       const rects = imageRects.filter(
         (r) => imageTreatment(imageMode, r) !== "invert",
@@ -255,6 +256,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
                   canvas.height,
                   imageRects,
                   () => cancelledRef.current,
+                  i,
                 );
           if (cancelledRef.current) return;
 
@@ -314,7 +316,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
         if (kind === "other" && !cancelledRef.current) {
-          Sentry.captureException(e, { tags: { stage: "downloader" } });
+          capturePdfProcessingException(e, "downloader");
         }
         if (!cancelledRef.current) {
           setStatus({

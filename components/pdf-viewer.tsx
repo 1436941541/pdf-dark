@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import * as Sentry from "@sentry/nextjs";
+import { capturePdfProcessingException, loadPageBitmap } from "@/lib/pdf-image-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type {
   DarkifyRequest,
@@ -19,6 +19,7 @@ import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
 import { T, type Locale } from "@/lib/i18n";
 
 type PageImage = {
+  pageNumber: number;
   /** Full-color rendered PDF page (source of truth, never modified). */
   originalDataUrl: string;
   width: number;
@@ -274,12 +275,12 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
       const w = workerRef.current;
       if (!w) throw new Error("worker not ready");
-      const res = await fetch(p.originalDataUrl);
-      throwIfCancelled(cancelled);
-      const srcBlob = await res.blob();
-      throwIfCancelled(cancelled);
-      const bitmap = await createImageBitmap(srcBlob);
-      throwIfCancelled(cancelled);
+      const bitmap = await loadPageBitmap(p.originalDataUrl, {
+        pageNumber: p.pageNumber,
+        width: p.width,
+        height: p.height,
+        imageRegionCount: p.imageRects.length,
+      }, () => throwIfCancelled(cancelled));
 
       // Per-image treatment (keep / dim / invert) — images slated for
       // inversion simply aren't pasted back, the dark mapping handles them.
@@ -452,6 +453,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           await yieldToMain();
           const originalDataUrl = await canvasToJpegDataUrl(canvas, 0.88);
           const stub: PageImage = {
+            pageNumber: i,
             originalDataUrl,
             width: canvas.width,
             height: canvas.height,
@@ -490,7 +492,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
         if (kind === "other" && !cancelled && !isCancellationError(e)) {
-          Sentry.captureException(e, { tags: { stage: "render" } });
+          capturePdfProcessingException(e, "render");
         }
         if (!cancelled) {
           setErrorText(pdfLoadErrorText(kind, locale));
@@ -589,7 +591,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           } catch (err) {
             if (!aborted && !isCancellationError(err)) {
               console.error("[pdf-dark] darkify failed", err);
-              Sentry.captureException(err, { tags: { stage: "darkify" } });
+              capturePdfProcessingException(err, "darkify");
             }
           }
         }

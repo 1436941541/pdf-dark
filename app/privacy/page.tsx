@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
         <h1 className="text-3xl font-bold text-neutral-50 mb-2">Privacy</h1>
         <p className="text-sm text-neutral-500 mb-10">
-          Last updated: September 28, 2026
+          Last updated: October 12, 2026
         </p>
 
         <p className="text-lg mb-8">
@@ -170,6 +170,12 @@ export default function PrivacyPage() {
         <ul className="space-y-2 list-disc pl-6 text-neutral-300 mb-4">
           <li>The JavaScript stack trace of the error</li>
           <li>Browser and operating system version</li>
+          <li>
+            For image-processing failures: the processing step, page number,
+            image dimensions, data length, and whether the page was in the
+            background. These diagnostics do not contain file names, PDF text,
+            or image data.
+          </li>
           <li>A short, <strong>masked</strong> session replay of the failure
             — text, inputs, and the rendered PDF are all hidden so the replay
             shows structure but not content
