@@ -33,6 +33,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${base}/pdf-to-black-and-white`,
+      lastModified: "2026-10-13",
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
       url: `${base}/es`,
       lastModified: ES_HOME_UPDATED_AT,
       changeFrequency: "weekly",
