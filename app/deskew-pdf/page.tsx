@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DeskewGuide } from "@/components/deskew-guide";
 import { DeskewWorkspace } from "@/components/deskew-workspace";
 import { Footer } from "@/components/footer";
 import { ToolNavigation } from "@/components/tool-navigation";
 import { getSiteUrl } from "@/lib/site";
 
 const TITLE = "Deskew PDF — Straighten Scanned PDF Pages Online Free";
-const DESCRIPTION = "Deskew scanned PDF pages in your browser. Detect tilted text, fine-tune each page and preview the result before downloading. Free, no upload or signup.";
+const DESCRIPTION = "Deskew PDF pages online without uploading your file. Straighten tilted scans, fine-tune each page and preview the result before downloading. Free, no signup.";
 export const metadata: Metadata = {
   title: TITLE, description: DESCRIPTION, alternates: { canonical: "/deskew-pdf" },
   openGraph: { title: TITLE, description: DESCRIPTION, url: "/deskew-pdf", type: "website", images: [{ url: "/examples/deskew/social.png", width: 1200, height: 630, alt: "Tilted invoice scan before and after PDF deskew" }] },
@@ -34,6 +35,7 @@ export default function DeskewPage() {
       </section>
       <DeskewWorkspace />
       <section className="mx-auto max-w-4xl px-6 py-14"><h2 className="text-center text-2xl font-bold">Straighten a PDF in three steps</h2><ol className="mt-8 grid gap-6 sm:grid-cols-3">{[["Choose your scan", "Open a PDF from your device. Automatic detection checks each page for tilted text."], ["Check the angle", "Compare both previews. Fine-tune pages manually when automatic detection is uncertain."], ["Save a straight copy", "Download the corrected pages with white margins. Keep your original file for editing and archival use."]].map(([title, text], i) => <li key={title} className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6"><span className="text-sm text-amber-400">0{i + 1}</span><h3 className="mt-3 font-semibold">{title}</h3><p className="mt-3 text-sm leading-relaxed text-neutral-400">{text}</p></li>)}</ol></section>
+      <DeskewGuide />
       <section id="faq" className="mx-auto max-w-3xl px-6 pb-16"><h2 className="mb-8 text-center text-2xl font-bold">Frequently asked questions</h2><div className="space-y-3">{FAQ.map(([q, a]) => <details key={q} className="rounded-lg border border-neutral-800 bg-neutral-900/30"><summary className="cursor-pointer p-4 font-medium">{q}</summary><p className="px-4 pb-4 text-sm leading-relaxed text-neutral-400">{a}</p></details>)}</div><p className="mt-8 text-center text-sm text-neutral-500">Need cleaner printing after straightening? <Link href="/pdf-to-black-and-white" className="text-amber-400 hover:underline">Convert your PDF to black and white</Link>. For comfortable reading, <Link href="/" className="text-amber-400 hover:underline">try PDF dark mode</Link>.</p></section>
     </main><Footer />
   </div>;
