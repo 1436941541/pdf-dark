@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Converter } from "@/components/converter";
 import { Footer } from "@/components/footer";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { ToolNavigation } from "@/components/tool-navigation";
 import { IconLock, IconPalette, IconSmartphone } from "@/components/icons";
 import { getSiteUrl } from "@/lib/site";
 import { VARIANTS } from "@/lib/variants";
@@ -167,17 +167,12 @@ export default function Home() {
     <div className="flex flex-col flex-1 w-full">
       <StructuredData />
       <header className="w-full border-b border-neutral-800">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="text-2xl">🌙</span>
             <span className="text-lg font-semibold hidden sm:inline">PDF Dark</span>
           </div>
-          <nav className="text-sm text-neutral-400 flex gap-5">
-            <Link href="/invert-pdf-colors" className="hover:text-neutral-100">Invert &amp; Download</Link>
-            <Link href="/blog" className="hover:text-neutral-100">Blog</Link>
-            <a href="#faq" className="hover:text-neutral-100">FAQ</a>
-            <LanguageSwitcher page="home" current="en" />
-          </nav>
+          <ToolNavigation active="reader" />
         </div>
       </header>
 
@@ -218,6 +213,10 @@ export default function Home() {
               Invert the colors and download the file
             </Link>
             .
+          </p>
+          <p className="mt-3 text-sm text-neutral-500">
+            Need a grayscale or two-color copy instead?{" "}
+            <Link href="/pdf-to-black-and-white" className="text-amber-400 hover:underline">Convert your PDF to black and white</Link>.
           </p>
         </section>
 

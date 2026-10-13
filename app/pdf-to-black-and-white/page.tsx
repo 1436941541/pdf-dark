@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MonochromeWorkspace } from "@/components/monochrome-workspace";
 import { Footer } from "@/components/footer";
+import { ToolNavigation } from "@/components/tool-navigation";
 import { IconLock, IconDownload } from "@/components/icons";
 import { getSiteUrl } from "@/lib/site";
 
@@ -42,9 +43,9 @@ export default function BlackAndWhitePage() {
     <div className="flex min-h-screen flex-col items-center">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <header className="w-full border-b border-neutral-800">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-4">
           <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80"><span className="text-2xl">🌙</span><span className="hidden text-lg font-semibold sm:inline">PDF Dark</span></Link>
-          <nav className="flex gap-5 text-sm text-neutral-400"><Link href="/" className="hover:text-neutral-100">Reader</Link><Link href="/invert-pdf-colors" className="hover:text-neutral-100">Invert colors</Link><a href="#faq" className="hover:text-neutral-100">FAQ</a></nav>
+          <ToolNavigation active="monochrome" />
         </div>
       </header>
       <main className="w-full flex-1">

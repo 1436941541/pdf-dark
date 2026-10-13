@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Downloader } from "@/components/downloader";
 import { Footer } from "@/components/footer";
-import { LanguageSwitcher } from "@/components/language-switcher";
+import { ToolNavigation } from "@/components/tool-navigation";
 import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/components/icons";
 import { getSiteUrl } from "@/lib/site";
 
@@ -144,7 +144,7 @@ export default function InvertPdfColorsPage() {
       <StructuredData />
 
       <header className="w-full border-b border-neutral-800">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
           <Link
             href="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
@@ -154,18 +154,7 @@ export default function InvertPdfColorsPage() {
               PDF Dark
             </span>
           </Link>
-          <nav className="text-sm text-neutral-400 flex gap-5">
-            <Link href="/" className="hover:text-neutral-100">
-              Reader
-            </Link>
-            <Link href="/blog" className="hover:text-neutral-100">
-              Blog
-            </Link>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
-            <LanguageSwitcher page="invert" current="en" />
-          </nav>
+          <ToolNavigation active="invert" />
         </div>
       </header>
 
@@ -209,6 +198,10 @@ export default function InvertPdfColorsPage() {
               Open the dark mode PDF reader
             </Link>
             .
+          </p>
+          <p className="mt-3 text-sm text-neutral-500">
+            Want to remove color without inverting the page?{" "}
+            <Link href="/pdf-to-black-and-white" className="text-amber-400 hover:underline">Convert the PDF to grayscale or black and white</Link>.
           </p>
         </section>
 
