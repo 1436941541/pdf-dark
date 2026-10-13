@@ -13,11 +13,9 @@ const TOOLS: { id: Tool; href: string; label: string }[] = [
 
 export function ToolNavigation({ active }: { active: Tool }) {
   return (
-    <ResponsiveNavigation>
+    <ResponsiveNavigation language={(active === "reader" || active === "invert") ? <LanguageSwitcher page={active === "reader" ? "home" : "invert"} current="en" /> : undefined}>
       {TOOLS.map(({ id, href, label }) => <Link key={id} href={href} aria-current={active === id ? "page" : undefined} className={`whitespace-nowrap transition-colors ${active === id ? "text-amber-400" : "hover:text-neutral-100"}`}>{label}</Link>)}
       <Link href="/blog" className="hover:text-neutral-100">Blog</Link>
-      <a href="#faq" className="hover:text-neutral-100">FAQ</a>
-      {(active === "reader" || active === "invert") && <LanguageSwitcher page={active === "reader" ? "home" : "invert"} current="en" />}
     </ResponsiveNavigation>
   );
 }

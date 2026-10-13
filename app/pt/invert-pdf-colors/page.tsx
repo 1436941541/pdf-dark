@@ -145,18 +145,14 @@ export default function InvertPdfColorsPtPage() {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <span className="text-2xl">🌙</span>
-            <span className="text-lg font-semibold hidden sm:inline">
+            <span className="text-lg font-semibold whitespace-nowrap">
               PDF Dark
             </span>
           </Link>
-          <ResponsiveNavigation locale="pt" desktopGap="wide">
+          <ResponsiveNavigation locale="pt" desktopGap="wide" language={<LanguageSwitcher page="invert" current="pt" />}>
             <Link href="/pt" className="hover:text-neutral-100">
               Leitor
             </Link>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
-            <LanguageSwitcher page="invert" current="pt" />
           </ResponsiveNavigation>
         </div>
       </header>

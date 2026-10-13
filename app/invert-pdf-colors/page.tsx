@@ -150,7 +150,7 @@ export default function InvertPdfColorsPage() {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <span className="text-2xl">🌙</span>
-            <span className="text-lg font-semibold hidden sm:inline">
+            <span className="text-lg font-semibold whitespace-nowrap">
               PDF Dark
             </span>
           </Link>

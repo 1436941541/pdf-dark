@@ -45,7 +45,7 @@ export default function BlackAndWhitePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <header className="w-full border-b border-neutral-800">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-4">
-          <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80"><span className="text-2xl">🌙</span><span className="hidden text-lg font-semibold sm:inline">PDF Dark</span></Link>
+          <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80"><span className="text-2xl">🌙</span><span className="text-lg font-semibold whitespace-nowrap">PDF Dark</span></Link>
           <ToolNavigation active="monochrome" />
         </div>
       </header>

@@ -145,18 +145,14 @@ export default function InvertPdfColorsEsPage() {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <span className="text-2xl">🌙</span>
-            <span className="text-lg font-semibold hidden sm:inline">
+            <span className="text-lg font-semibold whitespace-nowrap">
               PDF Dark
             </span>
           </Link>
-          <ResponsiveNavigation locale="es" desktopGap="wide">
+          <ResponsiveNavigation locale="es" desktopGap="wide" language={<LanguageSwitcher page="invert" current="es" />}>
             <Link href="/es" className="hover:text-neutral-100">
               Lector
             </Link>
-            <a href="#faq" className="hover:text-neutral-100">
-              FAQ
-            </a>
-            <LanguageSwitcher page="invert" current="es" />
           </ResponsiveNavigation>
         </div>
       </header>

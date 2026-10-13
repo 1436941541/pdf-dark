@@ -25,7 +25,7 @@ export default function DeskewPage() {
   const schema = { "@context": "https://schema.org", "@type": "WebApplication", name: "Deskew PDF", url: `${getSiteUrl()}/deskew-pdf`, description: DESCRIPTION, applicationCategory: "UtilityApplication", operatingSystem: "Any modern browser", offers: { "@type": "Offer", price: "0", priceCurrency: "USD" } };
   return <div className="flex min-h-screen flex-col items-center">
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />
-    <header className="w-full border-b border-neutral-800"><div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-4"><Link href="/" className="flex items-center gap-2"><span className="text-2xl">🌙</span><span className="hidden text-lg font-semibold sm:inline">PDF Dark</span></Link><ToolNavigation active="deskew" /></div></header>
+    <header className="w-full border-b border-neutral-800"><div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-4"><Link href="/" className="flex items-center gap-2"><span className="text-2xl">🌙</span><span className="text-lg font-semibold whitespace-nowrap">PDF Dark</span></Link><ToolNavigation active="deskew" /></div></header>
     <main className="w-full flex-1">
       <section className="mx-auto max-w-5xl px-6 pb-8 pt-10 text-center">
         <p className="mb-3 text-xs font-medium uppercase tracking-widest text-amber-400">Straighten scans, one page at a time</p>

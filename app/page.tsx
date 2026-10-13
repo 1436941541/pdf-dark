@@ -170,7 +170,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="text-2xl">🌙</span>
-            <span className="text-lg font-semibold hidden sm:inline">PDF Dark</span>
+            <span className="text-lg font-semibold whitespace-nowrap">PDF Dark</span>
           </div>
           <ToolNavigation active="reader" />
         </div>

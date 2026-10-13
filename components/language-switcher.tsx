@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 
 // tr / id retired 2026-09-21 — their pages 404 now; see next.config.ts.
@@ -32,14 +35,32 @@ export function LanguageSwitcher({
   page: PageKind;
   current: Locale;
 }) {
+  const details = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    const onPointerDown = (event: PointerEvent) => {
+      if (details.current?.open && !details.current.contains(event.target as Node)) details.current.open = false;
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && details.current?.open) {
+        details.current.open = false;
+        details.current.querySelector("summary")?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
   return (
-    <details className="relative">
-      <summary className="inline-flex items-baseline gap-1 cursor-pointer list-none text-neutral-400 hover:text-neutral-100 [&::-webkit-details-marker]:hidden">
-        <span aria-hidden className="text-[0.85em]">🌐</span>
-        <span className="inline">{LABELS[current]}</span>
-        <span aria-hidden className="text-neutral-600 text-[0.7em]">⌄</span>
+    <details ref={details} className="relative" onClick={(event) => { if ((event.target as Element).closest("a") && details.current) details.current.open = false; }}>
+      <summary aria-label={`Select language: ${LABELS[current]}`} className="flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-lg border border-neutral-800 md:min-h-0 md:min-w-0 md:border-0 md:items-baseline cursor-pointer list-none text-neutral-400 hover:text-neutral-100 [&::-webkit-details-marker]:hidden">
+        <span aria-hidden className="text-lg md:text-[0.85em]">🌐</span>
+        <span className="hidden md:inline">{LABELS[current]}</span>
+        <span aria-hidden className="hidden text-neutral-600 text-[0.7em] md:inline">⌄</span>
       </summary>
-      <div className="absolute right-0 mt-2 min-w-40 rounded-lg border border-neutral-800 bg-neutral-900 shadow-lg overflow-hidden z-20">
+      <div className="absolute right-0 mt-2 min-w-40 rounded-lg border border-neutral-800 bg-neutral-900 shadow-lg overflow-hidden z-50">
         {LOCALES.map((loc) => (
           <Link
             key={loc}

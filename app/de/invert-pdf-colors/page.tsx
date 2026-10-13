@@ -142,12 +142,10 @@ export default function GermanInvertPage() {
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/de" className="flex items-center gap-2 hover:opacity-80">
             <span className="text-2xl">🌙</span>
-            <span className="text-lg font-semibold hidden sm:inline">PDF Dark</span>
+            <span className="text-lg font-semibold whitespace-nowrap">PDF Dark</span>
           </Link>
-          <ResponsiveNavigation locale="de" desktopGap="wide">
+          <ResponsiveNavigation locale="de" desktopGap="wide" language={<LanguageSwitcher page="invert" current="de" />}>
             <Link href="/de" className="hover:text-neutral-100">PDF-Reader</Link>
-            <a href="#faq" className="hover:text-neutral-100">FAQ</a>
-            <LanguageSwitcher page="invert" current="de" />
           </ResponsiveNavigation>
         </div>
       </header>
