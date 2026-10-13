@@ -9,13 +9,14 @@ import { getSiteUrl } from "@/lib/site";
 const TITLE = "PDF to Black and White — Free Online Grayscale Converter";
 const DESCRIPTION = "Convert a color PDF to black and white or grayscale. Preview the result, adjust the black-and-white threshold, and download a new PDF. Free, no upload.";
 const SLUG = "/pdf-to-black-and-white";
+const SOCIAL_IMAGE = { url: `${SLUG}/opengraph-image`, width: 1200, height: 630, alt: "PDF to Black and White — original, grayscale and pure black-and-white PDF comparison" };
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: SLUG },
-  openGraph: { title: TITLE, description: DESCRIPTION, url: SLUG, type: "website" },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
+  openGraph: { title: TITLE, description: DESCRIPTION, url: SLUG, type: "website", images: [SOCIAL_IMAGE] },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: [SOCIAL_IMAGE] },
 };
 
 const FAQ = [
