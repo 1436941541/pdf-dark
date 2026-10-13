@@ -36,7 +36,7 @@ export function LanguageSwitcher({
     <details className="relative">
       <summary className="inline-flex items-baseline gap-1 cursor-pointer list-none text-neutral-400 hover:text-neutral-100 [&::-webkit-details-marker]:hidden">
         <span aria-hidden className="text-[0.85em]">🌐</span>
-        <span className="hidden sm:inline">{LABELS[current]}</span>
+        <span className="inline">{LABELS[current]}</span>
         <span aria-hidden className="text-neutral-600 text-[0.7em]">⌄</span>
       </summary>
       <div className="absolute right-0 mt-2 min-w-40 rounded-lg border border-neutral-800 bg-neutral-900 shadow-lg overflow-hidden z-20">

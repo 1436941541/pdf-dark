@@ -1,3 +1,4 @@
+import { ResponsiveNavigation } from "@/components/responsive-navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -148,7 +149,7 @@ export default function InvertPdfColorsEsPage() {
               PDF Dark
             </span>
           </Link>
-          <nav className="text-sm text-neutral-400 flex gap-5">
+          <ResponsiveNavigation locale="es" desktopGap="wide">
             <Link href="/es" className="hover:text-neutral-100">
               Lector
             </Link>
@@ -156,7 +157,7 @@ export default function InvertPdfColorsEsPage() {
               FAQ
             </a>
             <LanguageSwitcher page="invert" current="es" />
-          </nav>
+          </ResponsiveNavigation>
         </div>
       </header>
 

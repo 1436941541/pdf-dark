@@ -1,3 +1,4 @@
+import { ResponsiveNavigation } from "@/components/responsive-navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/footer";
@@ -38,14 +39,14 @@ export default function BlogIndexPage() {
               PDF Dark
             </span>
           </Link>
-          <nav className="text-sm text-neutral-400 flex gap-5">
+          <ResponsiveNavigation locale="en" desktopGap="wide">
             <Link href="/" className="hover:text-neutral-100">
               Reader
             </Link>
             <Link href="/invert-pdf-colors" className="hover:text-neutral-100">
               Invert &amp; Download
             </Link>
-          </nav>
+          </ResponsiveNavigation>
         </div>
       </header>
 

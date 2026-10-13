@@ -1,3 +1,4 @@
+import { ResponsiveNavigation } from "@/components/responsive-navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -187,11 +188,11 @@ export default function HomeEs() {
             <span className="text-2xl">🌙</span>
             <span className="text-lg font-semibold hidden sm:inline">PDF Dark</span>
           </div>
-          <nav className="text-sm text-neutral-400 flex gap-5">
+          <ResponsiveNavigation locale="es" desktopGap="wide">
             <Link href="/es/invert-pdf-colors" className="hover:text-neutral-100">Invertir y descargar</Link>
             <a href="#faq" className="hover:text-neutral-100">FAQ</a>
             <LanguageSwitcher page="home" current="es" />
-          </nav>
+          </ResponsiveNavigation>
         </div>
       </header>
 

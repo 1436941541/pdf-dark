@@ -1,3 +1,4 @@
+import { ResponsiveNavigation } from "@/components/responsive-navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -130,11 +131,11 @@ export default function AdobeAcrobatVariantPage() {
               PDF Dark
             </span>
           </Link>
-          <nav className="text-sm text-neutral-400 flex gap-5">
+          <ResponsiveNavigation locale="en" desktopGap="wide">
             <Link href="/" className="hover:text-neutral-100">
               Home
             </Link>
-          </nav>
+          </ResponsiveNavigation>
         </div>
       </header>
 
