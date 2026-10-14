@@ -1,0 +1,7 @@
+# Black-and-white example image preloading
+
+The /pdf-to-black-and-white comparison previously fetched each case only when selected. After a visible case's three images finish loading, schedule low-priority background loading on browser idle (short timer fallback). Load/decode other case PNGs sequentially, including the scanned-page190 threshold image, retaining decoded images while the component is mounted. Ignore failed speculative loads and cancel queued work on unmount. Read actual loaded URLs to avoid counting stale events during rapid switching.
+
+No copy, URL/keyword positioning, conversion algorithm or sample PDF loading change. Background warming covers13 comparison assets total (under1MB encoded); already visible/loaded files are skipped. It reduces waits once background warming has completed; it cannot make an immediate switch to an uncached image instant on a slow connection.
+
+Validation: scoped ESLint and final production build/TypeScript passed. Production-mode Chromium check verified default3 loaded first, all13 assets warmed, four case switches and scan190 displayed complete images, and **zero additional image-transfer bytes** after warming. Two-frame readiness checks completed about22–31ms in the local run (test timings, not Core Web Vitals). Mobile390 layout has no horizontal overflow; no browser JS errors. Harness: /workspace/pdf-dark-browser-tests/examples-preload.cjs. Existing main deployment workflow publishes the change; live check follows deployment.
