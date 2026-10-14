@@ -2,12 +2,13 @@ import Link from "next/link";
 import { ResponsiveNavigation } from "./responsive-navigation";
 import { LanguageSwitcher } from "./language-switcher";
 
-type Tool = "reader" | "invert" | "monochrome" | "deskew";
+type Tool = "reader" | "invert" | "monochrome" | "deskew" | "background";
 
 const TOOLS: { id: Tool; href: string; label: string }[] = [
   { id: "reader", href: "/", label: "Reader" },
   { id: "invert", href: "/invert-pdf-colors", label: "Invert colors" },
   { id: "deskew", href: "/deskew-pdf", label: "Deskew PDF" },
+  { id: "background", href: "/pdf-background-remover", label: "Remove background" },
   { id: "monochrome", href: "/pdf-to-black-and-white", label: "Black & white" },
 ];
 
