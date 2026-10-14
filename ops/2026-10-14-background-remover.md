@@ -23,4 +23,8 @@ PDF.js renders local pages; background processing runs in a cancellable module w
 
 Research `/workspace/seo-research/background-remover/research.md`; cases/screenshots/exports `/workspace/pdf-dark-browser-tests/background/`; SEO evidence `/workspace/seo-tools/reports/pdf-background-remover/`. User-facing sample PDFs/images/social card retained under public/examples/background-remover.
 
-Existing ignored dev type/route cache was corrupt; retained it as `.next/dev-stale-background-*` and generated fresh dev cache. No tracked Next configuration changed. First version is ready for review, **not pushed or deployed**.
+Existing ignored dev type/route cache was corrupt; retained it as `.next/dev-stale-background-*` and generated fresh dev cache. No tracked Next configuration changed. First version was pushed as `be721b4` and deployed successfully. Live sample/reset/cancel, PDF download, mobile layout/menu, metadata, sitemap and incoming tool links passed.
+
+## Follow-up: upload expectations
+
+After a fresh live seo-page intent review, a readable 14px notice now precedes file selection and remains above the processing controls: scanned-paper cleanup toward white, no transparent/native-object removal, image-based PDF with no selectable text/links/forms. Existing full output details remain below. Added Adobe’s official guide for editor-added background removal, explicitly distinguished from flattened scan cleanup. Main keyword, URL, metadata and homepage/invert copy unchanged; no mapping sync needed for this content-only refinement. Browser checks cover notice ordering at320/390/768/1280, retained notice after sample selection and actual sample download.

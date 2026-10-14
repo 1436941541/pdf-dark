@@ -179,6 +179,10 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
           <div><h2 className="text-lg font-semibold text-neutral-100">Remove gray and yellow scan backgrounds</h2><p className="mt-1 text-sm text-neutral-400">Whiten paper shading while keeping readable text.</p></div>
           <span className="rounded-full border border-amber-400/20 bg-amber-400/5 px-3 py-1 text-xs text-amber-300">Files stay in your browser</span>
         </div>
+        <div className="mb-5 rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 text-sm leading-relaxed text-neutral-300">
+          <p><span className="font-medium text-amber-200">Scanned paper cleanup.</span> Lightens gray or yellow paper toward white; it does not create a transparent background or delete PDF background objects.</p>
+          <p className="mt-2">The download contains page images. Selectable text, links and forms are not retained. Keep your original PDF.</p>
+        </div>
         {!source && !busy && <DropZone onFile={selectFile} />}
         {source && <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-950/40 p-4"><div className="min-w-0"><p className="break-all text-sm font-medium text-neutral-200">{source.file.name}</p><p className="mt-1 text-xs text-neutral-400">{source.pdf.numPages} {source.pdf.numPages === 1 ? "page" : "pages"} · Check each preview before downloading</p></div><button type="button" onClick={reset} disabled={busy} className={buttonClass}>Choose another PDF</button></div>}
         {pendingSample && !activity && <div role="status" className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><p className="text-sm text-amber-200">Opening the sample PDF…</p><button type="button" onClick={cancel} className={buttonClass}>Cancel</button></div>}
