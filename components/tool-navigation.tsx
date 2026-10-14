@@ -8,7 +8,7 @@ const TOOLS: { id: Tool; href: string; label: string }[] = [
   { id: "reader", href: "/", label: "Reader" },
   { id: "invert", href: "/invert-pdf-colors", label: "Invert colors" },
   { id: "deskew", href: "/deskew-pdf", label: "Deskew PDF" },
-  { id: "background", href: "/pdf-background-remover", label: "Remove background" },
+  { id: "background", href: "/whiten-pdf", label: "Whiten PDF" },
   { id: "monochrome", href: "/pdf-to-black-and-white", label: "Black & white" },
 ];
 

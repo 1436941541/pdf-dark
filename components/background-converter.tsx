@@ -156,7 +156,7 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
       downloadUrls.current.add(url);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${source.file.name.replace(/\.pdf$/i, "")}-background-cleaned.pdf`;
+      link.download = `${source.file.name.replace(/\.pdf$/i, "")}-whitened.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -176,7 +176,7 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
     <div className="mx-auto max-w-4xl px-6 text-left">
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-8">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div><h2 className="text-lg font-semibold text-neutral-100">Remove gray and yellow scan backgrounds</h2><p className="mt-1 text-sm text-neutral-400">Whiten paper shading while keeping readable text.</p></div>
+          <div><h2 className="text-lg font-semibold text-neutral-100">Whiten gray and yellow PDF backgrounds</h2><p className="mt-1 text-sm text-neutral-400">Whiten paper shading while keeping readable text.</p></div>
           <span className="rounded-full border border-amber-400/20 bg-amber-400/5 px-3 py-1 text-xs text-amber-300">Files stay in your browser</span>
         </div>
         <div className="mb-5 rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 text-sm leading-relaxed text-neutral-300">
@@ -190,7 +190,7 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
         {error && <p role="alert" className="mb-5 rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-sm text-red-300">{error}</p>}
         {source && <>
           <fieldset disabled={busy} className="mb-5 rounded-xl border border-neutral-800 p-4">
-            <legend className="px-2 text-sm font-medium">Background cleaning</legend>
+            <legend className="px-2 text-sm font-medium">PDF whitening</legend>
             <div className="flex justify-between gap-3"><label htmlFor="background-strength" className="text-sm text-neutral-300">Cleaning strength · all enabled pages</label><output htmlFor="background-strength" className="font-mono text-amber-300">{settings.strength}%</output></div>
             <input id="background-strength" type="range" min="0" max="100" step="5" value={settings.strength} onChange={(e) => updateSettings({ ...settings, strength: Number(e.target.value) })} className="mt-3 w-full accent-amber-400" />
             <div className="flex justify-between text-xs text-neutral-500"><span>Gentle</span><span>Stronger cleaning</span></div>

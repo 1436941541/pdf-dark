@@ -45,7 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${base}/pdf-background-remover`,
+      url: `${base}/whiten-pdf`,
       lastModified: "2026-10-14",
       changeFrequency: "monthly",
       priority: 0.9,

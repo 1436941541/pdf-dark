@@ -23,6 +23,12 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Scan-paper whitening is more specific than background removal.
+      {
+        source: "/pdf-background-remover",
+        destination: "/whiten-pdf",
+        statusCode: 301,
+      },
       // August 2026: /converter and /invert-pdf-colors were the same tool —
       // drop a PDF, download the rewritten file — differing only in which
       // defaults they opened on. They are now one page at /invert-pdf-colors.

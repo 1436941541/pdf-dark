@@ -68,7 +68,7 @@ export function Footer({ locale = "en" }: { locale?: Locale }) {
           <Link href={INVERT_HREF[locale]} className="hover:text-neutral-300">{t.invert}</Link>
           {locale === "en" && <Link href="/pdf-to-black-and-white" className="hover:text-neutral-300">PDF to Black &amp; White</Link>}
           {locale === "en" && <Link href="/deskew-pdf" className="hover:text-neutral-300">Deskew PDF</Link>}
-          {locale === "en" && <Link href="/pdf-background-remover" className="hover:text-neutral-300">PDF Background Remover</Link>}
+          {locale === "en" && <Link href="/whiten-pdf" className="hover:text-neutral-300">PDF Whitener</Link>}
           <Link href="/about" className="hover:text-neutral-300">{t.about}</Link>
           <Link href="/changelog" className="hover:text-neutral-300">{t.changelog}</Link>
           <Link href="/about#contact" className="hover:text-neutral-300">{t.contact}</Link>

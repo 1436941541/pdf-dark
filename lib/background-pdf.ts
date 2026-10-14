@@ -80,7 +80,7 @@ async function pngBytes(canvas: HTMLCanvasElement) {
 }
 export async function exportBackgroundPdf(pdf: PDFDocumentProxy, settings: BackgroundSettings, skipped: Set<number>, quality: "standard" | "compact", signal: AbortSignal, onProgress: (done: number) => void) {
   const { PDFDocument } = await import("pdf-lib");
-  const output = await PDFDocument.create(); output.setCreator("PDF Dark — PDF Background Remover");
+  const output = await PDFDocument.create(); output.setCreator("PDF Dark — PDF Whitener");
   for (let number = 1; number <= pdf.numPages; number++) {
     const result = await renderPage(pdf, number, skipped.has(number) ? { ...settings, strength: 0 } : settings, signal, false, quality);
     try {

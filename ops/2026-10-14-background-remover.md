@@ -1,5 +1,7 @@
 # PDF Background Remover — first implementation
 
+**Historical record:** URL/keyword mapping below is superseded by `ops/2026-10-14-whiten-pdf.md`: `/whiten-pdf` ↔ **whiten pdf**; former URL redirects301. Use the new record for PAGES.md/project-console synchronization.
+
 URL `/pdf-background-remover`, English only. Primary keyword **pdf background remover**. Supporting intent: remove background from PDF, remove gray background from PDF, clean scanned PDF. Positioning: light scanned-paper gray/yellow tint and mild shading cleanup; not transparent output, watermark/subject removal or native PDF object deletion. Homepage/invert page copy unchanged; shared English navigation/footer gain one link and sitemap adds the route.
 
 User previously authorized recording URL/keyword changes inside this checkout because local SecondBrain PAGES.md and project-console are unavailable. **Pending user-side sync after pulling:** add https://pdfdark.org/pdf-background-remover ↔ pdf background remover, independent scanned-paper cleanup tool, English. Do not merge existing B&W or deskew pages.
