@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { loadPageBitmap } from "@/lib/pdf-image-diagnostics";
+import { loadPageBitmap, type PdfReaderStep } from "@/lib/pdf-image-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type {
   DarkifyRequest,
@@ -353,6 +353,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   // Initial render: load PDF, render each page, darkify with starting theme via worker
   useEffect(() => {
     let cancelled = false;
+    let readerStep: PdfReaderStep = "load_pdfjs";
+    let pageNumber = 0;
     const operation = beginPdfOperation("reader", "read", { bytes: file.size });
     setStatus("loading");
     setErrorText(null);
@@ -368,11 +370,15 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           import.meta.url,
         ).toString();
 
+        readerStep = "read_file";
         const arrayBuffer = await file.arrayBuffer();
+        readerStep = "parse_pdf";
         const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
         if (cancelled) return;
         setProgress({ done: 0, total: pdf.numPages });
         {
+          pageNumber = 1;
+          readerStep = "first_page";
           const first = (await pdf.getPage(1)).getViewport({
             scale: RENDER_SCALE,
           });
@@ -399,6 +405,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         const scratchCtx = scratch.getContext("2d", { willReadFrequently: true });
         for (let i = 1; i <= pdf.numPages; i++) {
           if (cancelled) return;
+          pageNumber = i;
+          readerStep = "get_page";
           const page = await pdf.getPage(i);
           const viewport = page.getViewport({ scale: RENDER_SCALE });
 
@@ -418,6 +426,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           }
           await yieldToMain();
 
+          readerStep = "render_page";
           const canvas = document.createElement("canvas");
           canvas.width = viewport.width;
           canvas.height = viewport.height;
@@ -453,6 +462,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           }
 
           await yieldToMain();
+          readerStep = "encode_page";
           const originalDataUrl = await canvasToJpegDataUrl(canvas, 0.88);
           const stub: PageImage = {
             pageNumber: i,
@@ -464,6 +474,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             imageRects,
             scannedPage,
           };
+          readerStep = "darkify_page";
           const display = await darkifyViaWorker(
             stub,
             theme,
@@ -474,6 +485,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           );
           if (cancelled) return;
 
+          readerStep = "commit_page";
           rendered.push({
             ...stub,
             displayDataUrl: display,
@@ -494,7 +506,9 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         const kind = classifyPdfLoadError(e);
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
-        if (!cancelled && !isCancellationError(e)) operation.failure(e);
+        if (!cancelled && !isCancellationError(e)) {
+          operation.failure(e, { readerStep, pageNumber });
+        }
         if (!cancelled) {
           setErrorText(pdfLoadErrorText(kind, locale));
           setStatus("error");

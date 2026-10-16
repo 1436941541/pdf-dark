@@ -26,6 +26,48 @@ type ImageFailureContext = {
   document_focused: boolean;
 };
 
+export type PdfReaderStep =
+  | "load_pdfjs"
+  | "read_file"
+  | "parse_pdf"
+  | "first_page"
+  | "get_page"
+  | "render_page"
+  | "encode_page"
+  | "darkify_page"
+  | "commit_page";
+
+export type PdfFailureDiagnostic = {
+  readerStep?: PdfReaderStep;
+  pageNumber?: number;
+};
+
+const SAFE_ERROR_NAMES = new Set([
+  "Error",
+  "TypeError",
+  "RangeError",
+  "ReferenceError",
+  "SyntaxError",
+  "NetworkError",
+  "NotFoundError",
+  "InvalidStateError",
+  "AbortError",
+  "EncodingError",
+  "DataCloneError",
+  "SecurityError",
+  "QuotaExceededError",
+  "UnknownErrorException",
+  "MissingPDFException",
+  "UnexpectedResponseException",
+  "FormatError",
+  "RenderingCancelledException",
+]);
+
+function safeErrorName(error: unknown): string {
+  const name = (error as { name?: unknown } | null)?.name;
+  return typeof name === "string" && SAFE_ERROR_NAMES.has(name) ? name : "Other";
+}
+
 // Associate safe metadata with the original exception without replacing its
 // stack, adding file contents to the error, or keeping document data alive.
 const failures = new WeakMap<object, ImageFailureContext>();
@@ -80,7 +122,12 @@ export async function loadPageBitmap(
   }
 }
 
-export function capturePdfProcessingException(error: unknown, stage: string, tags: Record<string, string> = {}) {
+export function capturePdfProcessingException(
+  error: unknown,
+  stage: string,
+  tags: Record<string, string> = {},
+  diagnostic: PdfFailureDiagnostic = {},
+) {
   const context = typeof error === "object" && error !== null ? failures.get(error) : undefined;
   // PDF parser messages can contain document strings. Keep code frames but
   // replace the message and discard non-script/inline/local-media frames.
@@ -91,9 +138,24 @@ export function capturePdfProcessingException(error: unknown, stage: string, tag
     if (frames.length) safe.stack = `${safe.name}: ${safe.message}\n${frames.join("\n")}`;
   }
   try {
+    const pageNumber = diagnostic.pageNumber;
+    const originalErrorType = safeErrorName(error);
+    const failureStep = diagnostic.readerStep ?? context?.step ?? "unknown";
     Sentry.captureException(safe, {
-      tags: { ...tags, stage, ...(context ? { image_step: context.step } : {}) },
-      contexts: context ? { pdf_image_processing: context } : undefined,
+      fingerprint: ["pdf-processing", tags.tool ?? "unknown", stage, failureStep, originalErrorType],
+      tags: {
+        ...tags,
+        stage,
+        original_error_type: originalErrorType,
+        ...(diagnostic.readerStep ? { reader_step: diagnostic.readerStep } : {}),
+        ...(context ? { image_step: context.step } : {}),
+      },
+      contexts: {
+        ...(context ? { pdf_image_processing: context } : {}),
+        ...(typeof pageNumber === "number" && Number.isInteger(pageNumber) && pageNumber > 0
+          ? { pdf_failure: { page_number: pageNumber } }
+          : {}),
+      },
     });
   } catch {
     // Monitoring failures must not replace the PDF error shown to the user.

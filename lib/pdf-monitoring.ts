@@ -1,12 +1,12 @@
 import { classifyPdfLoadError } from "./pdf-load-error";
-import { capturePdfProcessingException } from "./pdf-image-diagnostics";
+import { capturePdfProcessingException, type PdfFailureDiagnostic } from "./pdf-image-diagnostics";
 import { sizeBucket, trackPdfEvent, type PdfEventData, type PdfInput, type PdfStage, type PdfTool } from "./analytics-events";
 
-export function recordPdfFailure(tool: PdfTool, stage: PdfStage, error: unknown, data: Partial<PdfEventData> = {}) {
+export function recordPdfFailure(tool: PdfTool, stage: PdfStage, error: unknown, data: Partial<PdfEventData> = {}, diagnostic: PdfFailureDiagnostic = {}) {
   if ((error as { name?: string } | null)?.name === "AbortError") return;
   const kind = classifyPdfLoadError(error);
   trackPdfEvent("pdf_error", { ...data, tool, stage, reason: kind === "other" ? "processing" : kind });
-  if (kind === "other") capturePdfProcessingException(error, stage, { tool });
+  if (kind === "other") capturePdfProcessingException(error, stage, { tool }, diagnostic);
 }
 
 export function beginPdfOperation(tool: PdfTool, stage: PdfStage, options: { bytes?: number; pages?: number; input?: PdfInput; signal?: AbortSignal } = {}) {
@@ -28,12 +28,12 @@ export function beginPdfOperation(tool: PdfTool, stage: PdfStage, options: { byt
   if (options.signal?.aborted) cancel();
   return {
     success(pages?: number) { finish("pdf_success", pages); },
-    failure(error: unknown) {
+    failure(error: unknown, diagnostic: PdfFailureDiagnostic = {}) {
       if (finished) return;
       if ((error as { name?: string } | null)?.name === "AbortError") { cancel(); return; }
       finished = true;
       options.signal?.removeEventListener("abort", cancel);
-      recordPdfFailure(tool, stage, error, { ...data, duration_ms: performance.now() - started });
+      recordPdfFailure(tool, stage, error, { ...data, duration_ms: performance.now() - started }, diagnostic);
     },
     cancel,
   };

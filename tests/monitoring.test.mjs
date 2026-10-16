@@ -90,19 +90,36 @@ test('invalid/password PDFs and cancellation do not become Sentry bugs', () => {
 test('unexpected failures reach Sentry with redacted message and useful app code frame', () => {
   const events = [];
   setup((name, data) => events.push({ name, data }));
-  const error = new Error('TOP SECRET file private.pdf');
+  const error = new TypeError('TOP SECRET file private.pdf');
   error.stack = 'Error: TOP SECRET\n    at convert (https://pdfdark.org/_next/static/a.js:1:2)\n    at source (data:application/pdf;secret)';
-  const op = beginPdfOperation('whiten', 'export');
-  op.failure(error); op.cancel();
+  const op = beginPdfOperation('reader', 'read');
+  op.failure(error, { readerStep: 'render_page', pageNumber: 2 }); op.cancel();
   assert.equal(sentry.length, 1);
   const [safe, context] = sentry[0];
   assert.equal(safe.message, 'PDF processing failed');
   assert(safe.stack.includes('/_next/static/a.js:1:2'));
   assert(!safe.stack.includes('TOP SECRET'));
   assert(!safe.stack.includes('data:'));
-  assert.equal(context.tags.tool, 'whiten');
-  assert.equal(context.tags.stage, 'export');
+  assert.equal(context.tags.tool, 'reader');
+  assert.equal(context.tags.stage, 'read');
+  assert.equal(context.tags.original_error_type, 'TypeError');
+  assert.equal(context.tags.reader_step, 'render_page');
+  assert.deepEqual(context.fingerprint, ['pdf-processing', 'reader', 'read', 'render_page', 'TypeError']);
+  assert.deepEqual(context.contexts.pdf_failure, { page_number: 2 });
   assert(!JSON.stringify(events).includes('private.pdf'));
+});
+
+test('untrusted error names and messages never enter Sentry metadata', () => {
+  setup(() => {});
+  const error = Object.assign(new Error('PRIVATE PDF CONTENT'), { name: 'private-document.pdf' });
+  beginPdfOperation('reader', 'read').failure(error, { readerStep: 'parse_pdf', pageNumber: 0 });
+  const [safe, context] = sentry[0];
+  assert.equal(context.tags.original_error_type, 'Other');
+  assert.equal(context.tags.reader_step, 'parse_pdf');
+  assert.deepEqual(context.fingerprint, ['pdf-processing', 'reader', 'read', 'parse_pdf', 'Other']);
+  assert.equal(context.contexts.pdf_failure, undefined);
+  assert(!JSON.stringify({ safe: safe.message, context }).includes('private-document.pdf'));
+  assert(!JSON.stringify({ safe: safe.message, context }).includes('PRIVATE PDF CONTENT'));
 });
 
 
