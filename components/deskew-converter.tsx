@@ -8,8 +8,10 @@ import { DropZone } from "./drop-zone";
 import { analyzeDeskewPage, createDeskewProcessor, exportDeskewPdf, previewDeskewPdf, loadDeskewPdf, type DeskewAnalysis } from "@/lib/deskew-pdf";
 import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
 import { yieldToMain } from "@/lib/main-thread";
+import { beginPdfOperation, recordPdfFailure, trackPdfDownload } from "@/lib/pdf-monitoring";
+import type { PdfInput } from "@/lib/analytics-events";
 
-type Source = { file: File; pdf: PDFDocumentProxy };
+type Source = { file: File; pdf: PDFDocumentProxy; input: PdfInput };
 type Correction = { angle: number; analysis: DeskewAnalysis | null; manual: boolean };
 type Preview = { original: string; converted: string; key: string; loading: boolean; error: string | null };
 const emptyPreview: Preview = { original: "", converted: "", key: "", loading: false, error: null };
@@ -56,6 +58,7 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
         const result = await previewDeskewPdf(source!.pdf, page, angle, controller.signal);
         if (!controller.signal.aborted) setPreview({ ...result, key: previewKey, loading: false, error: null });
       } catch (failure) {
+        if (!controller.signal.aborted) recordPdfFailure("deskew", "preview", failure, { input: source!.input });
         if (!controller.signal.aborted) setPreview({ ...emptyPreview, key: previewKey, error: failure instanceof Error ? failure.message : "Could not preview this page." });
       }
     }
@@ -63,12 +66,13 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
     return () => controller.abort();
   }, [source, page, angle, previewKey]);
 
-  const selectFile = useCallback(async (file: File) => {
+  const selectFile = useCallback(async (file: File, input: PdfInput = "file") => {
     const id = ++loadId.current;
     active.current?.abort();
     detector.current?.dispose();
     const controller = new AbortController();
     active.current = controller;
+    const operation = beginPdfOperation("deskew", "prepare", { bytes: file.size, input, signal: controller.signal });
     setSource(null);
     setCorrections([]);
     setPreview(emptyPreview);
@@ -80,7 +84,7 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
     try {
       const pdf = await loadDeskewPdf(file, controller.signal);
       if (id !== loadId.current || !mounted.current || controller.signal.aborted) { await pdf.destroy(); return; }
-      setSource({ file, pdf });
+      setSource({ file, pdf, input });
       setCorrections(Array.from({ length: pdf.numPages }, () => ({ angle: 0, analysis: null, manual: false })));
       processor = createDeskewProcessor();
       detector.current = processor;
@@ -92,9 +96,12 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
         setActivity({ kind: "detecting", done: number });
         await yieldToMain();
       }
+      operation.success(pdf.numPages);
     } catch (failure) {
+      if (id === loadId.current && mounted.current && !controller.signal.aborted) operation.failure(failure);
       if (id === loadId.current && mounted.current && !controller.signal.aborted) setError(pdfLoadErrorText(classifyPdfLoadError(failure)) ?? (failure instanceof Error ? failure.message : "Could not open this PDF."));
     } finally {
+      operation.cancel();
       processor?.dispose();
       if (active.current === controller) {
         active.current = null;
@@ -113,8 +120,9 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
         const response = await fetch(sample!.url, { signal: controller.signal });
         if (!response.ok) throw new Error("Could not load the sample PDF.");
         const blob = await response.blob();
-        if (!controller.signal.aborted && currentLoad === loadId.current) await selectFile(new File([blob], sample!.name, { type: "application/pdf" }));
+        if (!controller.signal.aborted && currentLoad === loadId.current) await selectFile(new File([blob], sample!.name, { type: "application/pdf" }), "sample");
       } catch (failure) {
+        if (!controller.signal.aborted && currentLoad === loadId.current) recordPdfFailure("deskew", "sample", failure, { input: "sample" });
         if (!controller.signal.aborted && currentLoad === loadId.current) setError(failure instanceof Error ? failure.message : "Could not load the sample PDF.");
       }
     }
@@ -145,6 +153,7 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
   async function download() {
     if (!source || busy) return;
     const controller = new AbortController();
+    const operation = beginPdfOperation("deskew", "export", { pages: source.pdf.numPages, bytes: source.file.size, input: source.input, signal: controller.signal });
     active.current = controller;
     setActivity({ kind: "exporting", done: 0 });
     setError(null);
@@ -163,10 +172,14 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
       link.click();
       link.remove();
       setTimeout(() => { URL.revokeObjectURL(url); downloadUrls.current.delete(url); }, 60000);
+      operation.success();
+      trackPdfDownload("deskew", source.pdf.numPages, bytes.length, source.input);
       setDownloaded(true);
     } catch (failure) {
+      if (!controller.signal.aborted) operation.failure(failure);
       if (!controller.signal.aborted && mounted.current) setError(failure instanceof Error ? failure.message : "Could not export this PDF. Try a smaller file.");
     } finally {
+      operation.cancel();
       if (active.current === controller) {
         active.current = null;
         if (mounted.current) setActivity(null);

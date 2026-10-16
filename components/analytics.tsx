@@ -1,5 +1,6 @@
 import Script from "next/script";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { UmamiAnalytics } from "./umami-analytics";
 
 export function Analytics() {
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
@@ -20,7 +21,7 @@ export function Analytics() {
           })(window, document, "clarity", "script", "${clarityId}");`}
         </Script>
       ) : null}
-      {umamiSrc && umamiId ? <Script src={umamiSrc} data-website-id={umamiId} strategy="afterInteractive" /> : null}
+      {umamiSrc && umamiId ? <UmamiAnalytics src={umamiSrc} websiteId={umamiId} /> : null}
     </>
   );
 }

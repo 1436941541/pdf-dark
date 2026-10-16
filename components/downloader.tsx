@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { capturePdfProcessingException, loadPageBitmap } from "@/lib/pdf-image-diagnostics";
+import { loadPageBitmap } from "@/lib/pdf-image-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type { DarkifyRequest, DarkifyResponse } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
@@ -17,6 +17,7 @@ import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
 import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
 import { T, type Locale } from "@/lib/i18n";
 import { DropZone } from "./drop-zone";
+import { beginPdfOperation, trackPdfDownload } from "@/lib/pdf-monitoring";
 
 /** effectiveThemeBg result → CSS color. */
 const bgCss = (c: { r: number; g: number; b: number }) =>
@@ -81,6 +82,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   const cancelledRef = useRef(false);
+  const operationRef = useRef<ReturnType<typeof beginPdfOperation> | null>(null);
 
   // Worker setup — same darkify worker the reader uses.
   const workerRef = useRef<Worker | null>(null);
@@ -105,6 +107,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
     workerRef.current = w;
     return () => {
       cancelledRef.current = true;
+      operationRef.current?.cancel();
       for (const { reject } of pending.values()) reject(cancelledError());
       pending.clear();
       w.terminate();
@@ -170,6 +173,9 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
   const processFile = useCallback(
     async (file: File) => {
       cancelledRef.current = false;
+      operationRef.current?.cancel();
+      const operation = beginPdfOperation("invert", "export", { bytes: file.size });
+      operationRef.current = operation;
       setCopyStatus("idle");
       setStatus({ kind: "processing", phase: "render", done: 0, total: 0 });
       try {
@@ -309,21 +315,23 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         a.click();
         a.remove();
         window.setTimeout(() => URL.revokeObjectURL(url), 0);
+        operation.success(pdf.numPages);
+        trackPdfDownload("invert", pdf.numPages, outBytes.byteLength);
         setStatus({ kind: "done", filename });
       } catch (e) {
         if (!cancelledRef.current) console.error("[pdf-dark] convert failed", e);
         const kind = classifyPdfLoadError(e);
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
-        if (kind === "other" && !cancelledRef.current) {
-          capturePdfProcessingException(e, "downloader");
-        }
+        if (!cancelledRef.current) operation.failure(e);
         if (!cancelledRef.current) {
           setStatus({
             kind: "error",
             message: pdfLoadErrorText(kind, locale) ?? undefined,
           });
         }
+      } finally {
+        operation.cancel();
       }
     },
     [theme, imageMode, darkness, warmth, darkify, locale],

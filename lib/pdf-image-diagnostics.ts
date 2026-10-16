@@ -80,10 +80,22 @@ export async function loadPageBitmap(
   }
 }
 
-export function capturePdfProcessingException(error: unknown, stage: string) {
+export function capturePdfProcessingException(error: unknown, stage: string, tags: Record<string, string> = {}) {
   const context = typeof error === "object" && error !== null ? failures.get(error) : undefined;
-  Sentry.captureException(error, {
-    tags: { stage, ...(context ? { image_step: context.step } : {}) },
-    contexts: context ? { pdf_image_processing: context } : undefined,
-  });
+  // PDF parser messages can contain document strings. Keep code frames but
+  // replace the message and discard non-script/inline/local-media frames.
+  const safe = new Error("PDF processing failed");
+  safe.name = "PdfProcessingError";
+  if (error instanceof Error && error.stack) {
+    const frames = error.stack.split("\n").filter(line => /^\s*at /.test(line) && /https?:\/\/[^\s)]+\/_next\//.test(line) && !/data:|blob:/.test(line));
+    if (frames.length) safe.stack = `${safe.name}: ${safe.message}\n${frames.join("\n")}`;
+  }
+  try {
+    Sentry.captureException(safe, {
+      tags: { ...tags, stage, ...(context ? { image_step: context.step } : {}) },
+      contexts: context ? { pdf_image_processing: context } : undefined,
+    });
+  } catch {
+    // Monitoring failures must not replace the PDF error shown to the user.
+  }
 }

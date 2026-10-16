@@ -9,8 +9,10 @@ import { exportBackgroundPdf, previewBackgroundPdf, loadBackgroundPdf } from "@/
 import type { BackgroundSettings } from "@/lib/background";
 import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
 import { yieldToMain } from "@/lib/main-thread";
+import { beginPdfOperation, recordPdfFailure, trackPdfDownload } from "@/lib/pdf-monitoring";
+import type { PdfInput } from "@/lib/analytics-events";
 
-type Source = { file: File; pdf: PDFDocumentProxy };
+type Source = { file: File; pdf: PDFDocumentProxy; input: PdfInput };
 type Preview = { original: string; converted: string; key: string; loading: boolean; error: string | null };
 const emptyPreview: Preview = { original: "", converted: "", key: "", loading: false, error: null };
 const buttonClass = "rounded-lg border border-neutral-700 px-3 py-2 text-sm text-neutral-200 hover:border-neutral-500 disabled:cursor-not-allowed disabled:opacity-40";
@@ -58,6 +60,7 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
         const result = await previewBackgroundPdf(source!.pdf, page, skipped.has(page) ? { ...settings, strength: 0 } : settings, controller.signal);
         if (!controller.signal.aborted) setPreview({ ...result, key: previewKey, loading: false, error: null });
       } catch (failure) {
+        if (!controller.signal.aborted) recordPdfFailure("whiten", "preview", failure, { input: source!.input });
         if (!controller.signal.aborted) setPreview({ ...emptyPreview, key: previewKey, error: failure instanceof Error ? failure.message : "Could not preview this page." });
       }
     }
@@ -65,11 +68,12 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
     return () => controller.abort();
   }, [source, page, settings, skipped, previewKey]);
 
-  const selectFile = useCallback(async (file: File) => {
+  const selectFile = useCallback(async (file: File, input: PdfInput = "file") => {
     const id = ++loadId.current;
     active.current?.abort();
     const controller = new AbortController();
     active.current = controller;
+    const operation = beginPdfOperation("whiten", "prepare", { bytes: file.size, input, signal: controller.signal });
     setSource(null);
     setSkipped(new Set());
     setPreview(emptyPreview);
@@ -80,11 +84,14 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
     try {
       const pdf = await loadBackgroundPdf(file, controller.signal);
       if (id !== loadId.current || !mounted.current || controller.signal.aborted) { await pdf.destroy(); return; }
-      setSource({ file, pdf });
+      setSource({ file, pdf, input });
+      operation.success(pdf.numPages);
 
     } catch (failure) {
+      if (id === loadId.current && mounted.current && !controller.signal.aborted) operation.failure(failure);
       if (id === loadId.current && mounted.current && !controller.signal.aborted) setError(pdfLoadErrorText(classifyPdfLoadError(failure)) ?? (failure instanceof Error ? failure.message : "Could not open this PDF."));
     } finally {
+      operation.cancel();
       if (active.current === controller) {
         active.current = null;
         if (mounted.current) setActivity(null);
@@ -106,9 +113,10 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
         if (!controller.signal.aborted && currentLoad === loadId.current) {
           setSettings({ strength: 65, preserveColors: true });
           setQuality("standard");
-          await selectFile(new File([blob], sample!.name, { type: "application/pdf" }));
+          await selectFile(new File([blob], sample!.name, { type: "application/pdf" }), "sample");
         }
       } catch (failure) {
+        if (!controller.signal.aborted && currentLoad === loadId.current) recordPdfFailure("whiten", "sample", failure, { input: "sample" });
         if (!controller.signal.aborted && currentLoad === loadId.current) setError(failure instanceof Error ? failure.message : "Could not load the sample PDF.");
       } finally {
         if (!controller.signal.aborted && mounted.current) setHandledSampleId(sample!.id);
@@ -143,6 +151,7 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
   async function download() {
     if (!source || busy) return;
     const controller = new AbortController();
+    const operation = beginPdfOperation("whiten", "export", { pages: source.pdf.numPages, bytes: source.file.size, input: source.input, signal: controller.signal });
     active.current = controller;
     setActivity({ kind: "exporting", done: 0 });
     setError(null);
@@ -161,10 +170,14 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
       link.click();
       link.remove();
       setTimeout(() => { URL.revokeObjectURL(url); downloadUrls.current.delete(url); }, 60000);
+      operation.success();
+      trackPdfDownload("whiten", source.pdf.numPages, bytes.length, source.input);
       setDownloaded(true);
     } catch (failure) {
+      if (!controller.signal.aborted) operation.failure(failure);
       if (!controller.signal.aborted && mounted.current) setError(failure instanceof Error ? failure.message : "Could not export this PDF. Try a smaller file.");
     } finally {
+      operation.cancel();
       if (active.current === controller) {
         active.current = null;
         if (mounted.current) setActivity(null);

@@ -9,6 +9,17 @@ if (dsn) {
     // Privacy defaults — we don't want PII or user profiling
     sendDefaultPii: false,
 
+    beforeBreadcrumb(breadcrumb) {
+      // Parser/console messages and local media URLs may contain PDF data.
+      if (breadcrumb.category === "console") return null;
+      const url = breadcrumb.data?.url;
+      if (typeof url === "string") {
+        if (url.startsWith("data:") || url.startsWith("blob:")) return null;
+        breadcrumb.data = { ...breadcrumb.data, url: url.split(/[?#]/, 1)[0] };
+      }
+      return breadcrumb;
+    },
+
     // Only record a replay when something actually breaks.
     // Normal sessions = 0%, sessions that hit an error = 100%.
     replaysSessionSampleRate: 0,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { capturePdfProcessingException, loadPageBitmap } from "@/lib/pdf-image-diagnostics";
+import { loadPageBitmap } from "@/lib/pdf-image-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type {
   DarkifyRequest,
@@ -17,6 +17,7 @@ import {
 import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
 import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
 import { T, type Locale } from "@/lib/i18n";
+import { beginPdfOperation, recordPdfFailure } from "@/lib/pdf-monitoring";
 
 type PageImage = {
   pageNumber: number;
@@ -352,6 +353,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   // Initial render: load PDF, render each page, darkify with starting theme via worker
   useEffect(() => {
     let cancelled = false;
+    const operation = beginPdfOperation("reader", "read", { bytes: file.size });
     setStatus("loading");
     setErrorText(null);
     setPages([]);
@@ -484,6 +486,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           setProgress({ done: i, total: pdf.numPages });
           if (i === 1) setStatus("ready");
         }
+        operation.success(pdf.numPages);
       } catch (e) {
         if (!cancelled && !isCancellationError(e)) {
           console.error("[pdf-dark] render failed", e);
@@ -491,18 +494,19 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         const kind = classifyPdfLoadError(e);
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
-        if (kind === "other" && !cancelled && !isCancellationError(e)) {
-          capturePdfProcessingException(e, "render");
-        }
+        if (!cancelled && !isCancellationError(e)) operation.failure(e);
         if (!cancelled) {
           setErrorText(pdfLoadErrorText(kind, locale));
           setStatus("error");
         }
+      } finally {
+        operation.cancel();
       }
     })();
 
     return () => {
       cancelled = true;
+      operation.cancel();
     };
     // theme intentionally omitted — initial pass uses whatever theme is live.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -591,7 +595,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           } catch (err) {
             if (!aborted && !isCancellationError(err)) {
               console.error("[pdf-dark] darkify failed", err);
-              capturePdfProcessingException(err, "darkify");
+              recordPdfFailure("reader", "preview", err);
             }
           }
         }
