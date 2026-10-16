@@ -37,8 +37,20 @@ export type PdfReaderStep =
   | "darkify_page"
   | "commit_page";
 
+export type PdfInvertStep =
+  | "load_pdfjs"
+  | "read_file"
+  | "parse_pdf"
+  | "get_page"
+  | "render_page"
+  | "encode_page"
+  | "darkify_page"
+  | "build_pdf"
+  | "download";
+
 export type PdfFailureDiagnostic = {
   readerStep?: PdfReaderStep;
+  invertStep?: PdfInvertStep;
   pageNumber?: number;
 };
 
@@ -140,7 +152,7 @@ export function capturePdfProcessingException(
   try {
     const pageNumber = diagnostic.pageNumber;
     const originalErrorType = safeErrorName(error);
-    const failureStep = diagnostic.readerStep ?? context?.step ?? "unknown";
+    const failureStep = diagnostic.readerStep ?? diagnostic.invertStep ?? context?.step ?? "unknown";
     Sentry.captureException(safe, {
       fingerprint: ["pdf-processing", tags.tool ?? "unknown", stage, failureStep, originalErrorType],
       tags: {
@@ -148,6 +160,7 @@ export function capturePdfProcessingException(
         stage,
         original_error_type: originalErrorType,
         ...(diagnostic.readerStep ? { reader_step: diagnostic.readerStep } : {}),
+        ...(diagnostic.invertStep ? { invert_step: diagnostic.invertStep } : {}),
         ...(context ? { image_step: context.step } : {}),
       },
       contexts: {

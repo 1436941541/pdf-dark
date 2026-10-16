@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { loadPageBitmap } from "@/lib/pdf-image-diagnostics";
+import { loadPageBitmap, type PdfInvertStep } from "@/lib/pdf-image-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type { DarkifyRequest, DarkifyResponse } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
@@ -173,6 +173,8 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
   const processFile = useCallback(
     async (file: File) => {
       cancelledRef.current = false;
+      let invertStep: PdfInvertStep = "load_pdfjs";
+      let pageNumber = 0;
       operationRef.current?.cancel();
       const operation = beginPdfOperation("invert", "export", { bytes: file.size });
       operationRef.current = operation;
@@ -185,7 +187,9 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           import.meta.url,
         ).toString();
 
+        invertStep = "read_file";
         const srcBytes = await file.arrayBuffer();
+        invertStep = "parse_pdf";
         const pdf = await pdfjs.getDocument({ data: srcBytes.slice(0) }).promise;
         if (cancelledRef.current) return;
         setStatus({
@@ -204,6 +208,8 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         const pages: PageRender[] = [];
         for (let i = 1; i <= pdf.numPages; i++) {
           if (cancelledRef.current) return;
+          pageNumber = i;
+          invertStep = "get_page";
           const page = await pdf.getPage(i);
           const viewport = page.getViewport({ scale: RENDER_SCALE });
 
@@ -219,6 +225,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           }
           await yieldToMain();
 
+          invertStep = "render_page";
           const canvas = document.createElement("canvas");
           canvas.width = viewport.width;
           canvas.height = viewport.height;
@@ -251,8 +258,10 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           }
 
           await yieldToMain();
+          invertStep = "encode_page";
           const originalDataUrl = await canvasToJpegDataUrl(canvas, 0.88);
           // "Original" mode keeps scanned pages exactly as in the source.
+          invertStep = "darkify_page";
           const displayDataUrl =
             imageMode === "original" && scannedPage
               ? originalDataUrl
@@ -287,6 +296,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           done: pdf.numPages,
           total: pdf.numPages,
         });
+        invertStep = "build_pdf";
         const { bytes: outBytes, objectPages, rasterPages } = await buildDarkPdf(
           srcBytes,
           pages,
@@ -297,6 +307,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           warmth / 100,
         );
         if (cancelledRef.current) return;
+        invertStep = "download";
         console.info(
           `[pdf-dark] download built: ${objectPages} vector page(s), ${rasterPages} raster page(s)`,
         );
@@ -323,7 +334,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         const kind = classifyPdfLoadError(e);
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
-        if (!cancelledRef.current) operation.failure(e);
+        if (!cancelledRef.current) operation.failure(e, { invertStep, pageNumber });
         if (!cancelledRef.current) {
           setStatus({
             kind: "error",

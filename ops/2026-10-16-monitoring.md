@@ -20,7 +20,7 @@ Reader `read` measures the initial complete render pass. Invert `export` measure
 
 **Sentry**: existing global/server error setup retained. Unexpected handled PDF errors from all five tools now report sanitized `PdfProcessingError`, tags tool/stage, original safe application code frames and existing numeric bitmap diagnostics when available. Known password/invalid inputs and cancellation remain outside Sentry bug reports. Drop console breadcrumbs and local data/blob URLs to prevent parser strings/media leaking through breadcrumbs. Replay masking/blocking remains enabled as previously configured; no new replay or tracing sampling added. `tracesSampleRate` stays0; performance lives in Umami and PDF duration events rather than Sentry tracing. No invented test error sent to the production Sentry project.
 
-After `PDF-DARK-19`, the reader also supplies a fixed `reader_step` for each load/render phase and a numeric page number. All unexpected PDF errors include an allowlisted `original_error_type`; Sentry groups them by tool, stage, safe step and type. Raw exception messages, PDF text, file names and media still do not leave the browser. The original cause of `PDF-DARK-19` cannot be recovered retroactively from its sanitized event.
+After `PDF-DARK-19`, the reader supplies a fixed `reader_step` for each load/render phase and a numeric page number. The invert/export flow also supplies an `invert_step` and page number after the 2026-10-16 Umami-only export failure. All unexpected PDF errors include an allowlisted `original_error_type`; Sentry groups them by tool, stage, safe step and type. Raw exception messages, PDF text, file names and media still do not leave the browser. The original causes of past sanitized or Umami-only events cannot be recovered retroactively.
 
 ## Reliability and reading the data
 
@@ -30,7 +30,7 @@ In Umami, filter events by tool, stage and input=file to separate user work from
 
 ## Validation
 
-- Eight meaningful monitoring tests (late/bounded queue, metadata allowlist, tracker failures, single settlement/abort, expected inputs, error redaction/frame preservation, safe error-type and step metadata, SDK failure isolation) plus24 existing pixel/deskew tests.
+- Nine meaningful monitoring tests (late/bounded queue, metadata allowlist, tracker failures, single settlement/abort, expected inputs, error redaction/frame preservation, safe error-type and reader/invert step metadata, SDK failure isolation) plus24 existing pixel/deskew tests.
 - Production browser test uses the **actual deployed Umami tracker** with intercepted test collectors and fake DSN, not a fabricated performance payload. Five tools' real success/download events verified, plus invalid input in all five, cancellation, unexpected worker error with sanitized Sentry event, and successful export with the complete analytics script blocked. Native `performance` request observed with actual FCP/LCP.
 - Test fixtures are generated documents. Local artifacts `/workspace/pdf-dark-browser-tests/monitoring/`; no real user file uploaded and no fake test Sentry issue sent externally.
 - Final production build/TypeScript passed (46 routes). Scoped lint passed; reader checked with its pre-existing set-state-in-effect rule findings excluded, leaving existing reader effect behavior unchanged. Final built app source hashes match checkout. No dependency added and no page copy/SEO changes.

@@ -122,6 +122,19 @@ test('untrusted error names and messages never enter Sentry metadata', () => {
   assert(!JSON.stringify({ safe: safe.message, context }).includes('PRIVATE PDF CONTENT'));
 });
 
+test('invert export failures retain a safe processing step and page number', () => {
+  setup(() => {});
+  const error = new DOMException('private PDF content', 'InvalidStateError');
+  beginPdfOperation('invert', 'export').failure(error, { invertStep: 'build_pdf', pageNumber: 24 });
+  const [safe, context] = sentry[0];
+  assert.equal(safe.message, 'PDF processing failed');
+  assert.equal(context.tags.original_error_type, 'InvalidStateError');
+  assert.equal(context.tags.invert_step, 'build_pdf');
+  assert.deepEqual(context.contexts.pdf_failure, { page_number: 24 });
+  assert.deepEqual(context.fingerprint, ['pdf-processing', 'invert', 'export', 'build_pdf', 'InvalidStateError']);
+  assert(!JSON.stringify(context).includes('private PDF content'));
+});
+
 
 test('a failing error-monitor SDK never replaces the PDF error handling', () => {
   const events = [];
