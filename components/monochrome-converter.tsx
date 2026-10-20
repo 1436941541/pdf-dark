@@ -28,6 +28,7 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
   const mounted = useRef(true);
   const exportController = useRef<AbortController | null>(null);
   const downloadUrls = useRef(new Set<string>());
+  const processorRef = useRef<ReturnType<typeof createMonochromeProcessor> | null>(null);
   const busy = loading || progress !== null;
   const previewKey = `${page}:${mode}:${threshold}`;
   const previewReady = preview.key === previewKey && !preview.loading && !!preview.converted && !preview.error;
@@ -43,27 +44,38 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
     };
   }, []);
 
-  useEffect(() => () => { void source?.pdf.destroy(); }, [source]);
+  useEffect(() => {
+    if (!source) return;
+    // One processor for this PDF, shared by previews and export. Settings
+    // changes cancel tasks, never the worker's in-flight script loading.
+    const processor = createMonochromeProcessor();
+    processorRef.current = processor;
+    return () => {
+      if (processorRef.current === processor) processorRef.current = null;
+      processor.dispose();
+      void source.pdf.destroy();
+    };
+  }, [source]);
 
   useEffect(() => {
     if (!source) return;
     const controller = new AbortController();
-    let processor: ReturnType<typeof createMonochromeProcessor> | null = null;
     async function update() {
       await yieldToMain();
       if (controller.signal.aborted) return;
       setPreview((current) => ({ ...current, loading: true, error: null }));
       try {
-        processor = createMonochromeProcessor();
+        const processor = processorRef.current;
+        if (!processor) return;
         const result = await previewMonochromePdf(source!.pdf, page, { mode, threshold }, processor, controller.signal);
         if (!controller.signal.aborted) setPreview({ ...result, loading: false, error: null, key: previewKey });
       } catch (failure) {
         if (!controller.signal.aborted) recordPdfFailure("monochrome", "preview", failure, { input: source!.input });
         if (!controller.signal.aborted) setPreview({ original: "", converted: "", loading: false, error: failure instanceof Error ? failure.message : "Could not preview this page.", key: previewKey });
-      } finally { processor?.dispose(); }
+      }
     }
-    void update();
-    return () => { controller.abort(); processor?.dispose(); };
+    const timer = setTimeout(() => { void update(); }, 120);
+    return () => { clearTimeout(timer); controller.abort(); };
   }, [source, page, mode, threshold, previewKey]);
 
   const selectFile = useCallback(async (file: File, input: PdfInput = "file") => {
@@ -134,12 +146,12 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
     const controller = new AbortController();
     const operation = beginPdfOperation("monochrome", "export", { pages: source.pdf.numPages, bytes: source.file.size, input: source.input, signal: controller.signal });
     exportController.current = controller;
-    let processor: ReturnType<typeof createMonochromeProcessor> | null = null;
     setProgress(0);
     setDownloaded(false);
     setError(null);
     try {
-      processor = createMonochromeProcessor();
+      const processor = processorRef.current;
+      if (!processor) throw new Error("The PDF is no longer open. Please choose it again.");
       const bytes = await exportMonochromePdf(source.pdf, { mode, threshold }, processor, controller.signal, setProgress);
       if (controller.signal.aborted) return;
       const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: "application/pdf" }));
@@ -159,7 +171,6 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
       if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : "Conversion failed. Please try a smaller PDF.");
     } finally {
       operation.cancel();
-      processor?.dispose();
       if (exportController.current === controller) {
         exportController.current = null;
         if (mounted.current) setProgress(null);

@@ -9,46 +9,85 @@ export function checkCancelled(signal: AbortSignal) {
 
 export function createMonochromeProcessor() {
   let worker: Worker | null = null;
+  let disposed = false;
+  let workerUnavailable = false;
   let id = 0;
   const pending = new Map<number, { resolve: (data: Uint8ClampedArray<ArrayBuffer>) => void; reject: (error: Error) => void }>();
   const dispose = () => {
+    disposed = true;
     worker?.terminate();
     worker = null;
     for (const task of pending.values()) task.reject(new DOMException("Conversion cancelled", "AbortError"));
     pending.clear();
   };
-  try {
-    worker = new Worker(new URL("./monochrome-worker.ts", import.meta.url), { type: "module" });
-    worker.onmessage = ({ data }: MessageEvent<MonochromeResponse>) => {
-      pending.get(data.id)?.resolve(new Uint8ClampedArray(data.buffer));
-      pending.delete(data.id);
-    };
-    worker.onerror = () => {
-      for (const task of pending.values()) task.reject(new Error("The color conversion worker could not start. Please reload and try again."));
-      pending.clear();
-      worker?.terminate();
-      worker = null;
-    };
-  } catch {
-    // Browsers without module workers still support conversion on the main thread.
+  function startWorker() {
+    if (worker || workerUnavailable) return;
+    try {
+      // Start only when pixels are ready. A cancelled render never starts a
+      // bootstrap request which would immediately be terminated again.
+      const current = new Worker(new URL("./monochrome-worker.ts", import.meta.url), { type: "module" });
+      worker = current;
+      current.onmessage = ({ data }: MessageEvent<MonochromeResponse>) => {
+        pending.get(data.id)?.resolve(new Uint8ClampedArray(data.buffer));
+        pending.delete(data.id);
+      };
+      current.onerror = (event) => {
+        if (disposed || worker !== current) {
+          // Only intentional disposal is cancellation; genuine startup errors
+          // below still reach the normal error UI and global monitoring.
+          event.preventDefault();
+          return;
+        }
+        for (const task of pending.values()) task.reject(new Error("The color conversion worker could not start. Please reload and try again."));
+        pending.clear();
+        worker = null;
+        workerUnavailable = true;
+        current.terminate();
+      };
+    } catch {
+      // Browsers without module workers still support conversion on the main thread.
+      workerUnavailable = true;
+    }
   }
   return {
-    async process(data: Uint8ClampedArray<ArrayBuffer>, settings: MonochromeSettings) {
+    async process(data: Uint8ClampedArray<ArrayBuffer>, settings: MonochromeSettings, signal?: AbortSignal) {
+      const checkActive = () => {
+        if (disposed) throw new DOMException("Conversion cancelled", "AbortError");
+        if (signal) checkCancelled(signal);
+      };
+      checkActive();
+      startWorker();
       if (!worker) {
         // Chunk the fallback so cancellation and other input can be handled.
         for (let offset = 0; offset < data.length; offset += 262144) {
+          checkActive();
           monochromePixels(data.subarray(offset, offset + 262144), settings);
           await yieldToMain();
         }
+        checkActive();
         return data;
       }
       const taskId = ++id;
       return new Promise<Uint8ClampedArray<ArrayBuffer>>((resolve, reject) => {
-        pending.set(taskId, { resolve, reject });
+        const cleanup = () => signal?.removeEventListener("abort", cancel);
+        const cancel = () => {
+          pending.delete(taskId);
+          cleanup();
+          reject(new DOMException("Conversion cancelled", "AbortError"));
+        };
+        pending.set(taskId, {
+          resolve: (pixels) => { cleanup(); resolve(pixels); },
+          reject: (error) => { cleanup(); reject(error); },
+        });
+        // Cancelling one preview discards its response, preserving the worker
+        // and any other tasks (including the current export).
+        signal?.addEventListener("abort", cancel, { once: true });
+        if (signal?.aborted) { cancel(); return; }
         try {
           worker!.postMessage({ id: taskId, buffer: data.buffer, settings }, [data.buffer]);
         } catch (error) {
           pending.delete(taskId);
+          cleanup();
           reject(error);
         }
       });
@@ -99,7 +138,7 @@ async function renderPage(
     checkCancelled(signal);
     const original = preview ? canvas.toDataURL("image/png") : "";
     const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = await processor.process(image.data, settings);
+    const pixels = await processor.process(image.data, settings, signal);
     checkCancelled(signal);
     ctx.putImageData(new ImageData(pixels, canvas.width, canvas.height), 0, 0);
     return { canvas, original, size, page };
