@@ -142,3 +142,48 @@ test('a failing error-monitor SDK never replaces the PDF error handling', () => 
   const broken = compile('../lib/pdf-image-diagnostics.ts', { '@sentry/nextjs': { captureException: () => { throw Error('SDK offline'); } } });
   assert.doesNotThrow(() => broken.capturePdfProcessingException(new Error('private text'), 'export'));
 });
+
+test('navigation cancellation wins over a blob read TypeError, but active failures still report', async () => {
+  const events = [];
+  setup((name, data) => events.push({ name, data }));
+  const originalFetch = globalThis.fetch;
+  const originalDocument = globalThis.document;
+  const originalConsoleError = console.error;
+  const logged = [];
+  console.error = (...args) => logged.push(args);
+  globalThis.document = { visibilityState: 'visible', hasFocus: () => true };
+  try {
+    for (const navigate of [true, false]) {
+      let rejectBlob;
+      globalThis.fetch = async () => ({ blob: () => new Promise((resolve, reject) => { rejectBlob = reject; }) });
+      const controller = new AbortController();
+      const operation = beginPdfOperation('reader', 'read', { signal: controller.signal });
+      const bitmap = diagnostics.loadPageBitmap('data:image/jpeg;base64,PRIVATE', {
+        pageNumber: 2, width: 918, height: 1188, imageRegionCount: 0,
+      }, () => controller.signal.throwIfAborted());
+      // Let fetch finish and blob reading begin, then reproduce a browser
+      // rejecting the read during navigation before component cleanup runs.
+      await Promise.resolve();
+      if (navigate) controller.abort();
+      rejectBlob(new TypeError('PRIVATE image interrupted'));
+      await bitmap.catch(error => {
+        assert.equal(error.name, navigate ? 'AbortError' : 'TypeError');
+        operation.failure(error);
+      });
+      if (navigate) {
+        assert.equal(sentry.length, 0);
+        assert.equal(logged.length, 0);
+        assert.deepEqual(events.map(event => event.name), ['pdf_start', 'pdf_cancel']);
+      }
+    }
+    assert.equal(sentry.length, 1);
+    assert.equal(logged.length, 1);
+    assert.equal(events.at(-1).name, 'pdf_error');
+    assert.equal(sentry[0][1].tags.image_step, 'read_image_blob');
+    assert(!JSON.stringify(sentry).includes('PRIVATE'));
+  } finally {
+    globalThis.fetch = originalFetch;
+    globalThis.document = originalDocument;
+    console.error = originalConsoleError;
+  }
+});

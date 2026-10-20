@@ -109,6 +109,9 @@ export async function loadPageBitmap(
     checkCancelled();
     return bitmap;
   } catch (error) {
+    // Navigation may interrupt fetch/blob decoding with a TypeError rather
+    // than AbortError. Prefer the caller's explicit cancellation state.
+    checkCancelled();
     if (error instanceof DOMException && error.name === "AbortError") throw error;
 
     const context: ImageFailureContext = {

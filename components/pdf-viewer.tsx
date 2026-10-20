@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { loadPageBitmap, type PdfReaderStep } from "@/lib/pdf-image-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type {
@@ -123,6 +124,13 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   const lastAppliedThemeRef = useRef<string | null>(null);
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
+  const cancelOperationsRef = useRef(new Set<() => void>());
+
+  const cancelForNavigation = useCallback(() => {
+    // A document navigation can reject blob reads before React unmounts.
+    // Settle both render loops before starting the navigation instead.
+    for (const cancel of cancelOperationsRef.current) cancel();
+  }, []);
 
   // Worker setup
   const workerRef = useRef<Worker | null>(null);
@@ -356,6 +364,12 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     let readerStep: PdfReaderStep = "load_pdfjs";
     let pageNumber = 0;
     const operation = beginPdfOperation("reader", "read", { bytes: file.size });
+    const cancel = () => {
+      cancelled = true;
+      operation.cancel();
+    };
+    const cancellations = cancelOperationsRef.current;
+    cancellations.add(cancel);
     setStatus("loading");
     setErrorText(null);
     setPages([]);
@@ -519,8 +533,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     })();
 
     return () => {
-      cancelled = true;
-      operation.cancel();
+      cancel();
+      cancellations.delete(cancel);
     };
     // theme intentionally omitted — initial pass uses whatever theme is live.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -566,6 +580,9 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     }
 
     let aborted = false;
+    const cancel = () => { aborted = true; };
+    const cancellations = cancelOperationsRef.current;
+    cancellations.add(cancel);
     setThemeApplying(true);
 
     (async () => {
@@ -613,6 +630,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             }
           }
         }
+        if (aborted || themeVersionRef.current !== version) return;
         // Commit frequently near the user's view; batch later pages.
         if (k < VISIBLE_COMMIT || k % 4 === 0) {
           setPages([...next]);
@@ -633,7 +651,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     })();
 
     return () => {
-      aborted = true;
+      cancel();
+      cancellations.delete(cancel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme, imageMode, appliedDarkness, appliedWarmth, status]);
@@ -946,13 +965,14 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
         <div className="border-t border-neutral-800 my-6" />
 
-        <a
+        <Link
           href={t.viewer.invertHref}
+          onNavigate={cancelForNavigation}
           className="block text-center px-4 py-2 rounded-full text-sm text-neutral-300 hover:text-neutral-100 border border-neutral-800 hover:border-neutral-600 transition-colors"
           title={t.viewer.invertAndDownloadTitle}
         >
           {t.viewer.invertAndDownload}
-        </a>
+        </Link>
         <button
           onClick={onReset}
           className="mt-3 w-full px-4 py-2 rounded-full text-sm text-neutral-400 hover:text-neutral-100 border border-neutral-800 hover:border-neutral-600 transition-colors"
