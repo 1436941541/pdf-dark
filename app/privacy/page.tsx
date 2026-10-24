@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
         <h1 className="text-3xl font-bold text-neutral-50 mb-2">Privacy</h1>
         <p className="text-sm text-neutral-500 mb-10">
-          Last updated: October 12, 2026
+          Last updated: October 24, 2026
         </p>
 
         <p className="text-lg mb-8">
@@ -24,7 +24,7 @@ export default function PrivacyPage() {
           </strong>{" "}
           The file you drop in — its name, content, text, and images — stays
           on your device. The site itself (this page, page-view analytics,
-          and the ads we may show to keep the tool free) works like any
+          and the Google ads that keep the tool free) works like any
           normal free utility — details below.
         </p>
 
@@ -121,20 +121,33 @@ export default function PrivacyPage() {
           Ads
         </h2>
         <p className="mb-4">
-          PDF Dark is free and runs on a paid hosting bill, so we plan to
-          show display ads on the site to cover costs. We&apos;ll likely use
-          Google AdSense (the standard publisher network), which means:
+          PDF Dark is free and runs on a paid hosting bill, so the site shows
+          display ads through{" "}
+          <strong className="text-neutral-100">Google AdSense</strong>. This
+          means:
         </p>
         <ul className="space-y-2 list-disc pl-6 text-neutral-300 mb-4">
           <li>
-            Ads appear <em>on the site</em>, in clearly marked slots — never
-            inside the PDF you download, and never on top of the converter
-            in a way that gets in the way of the tool.
+            Ads appear <em>on the site</em> — never inside the PDF you
+            download.
           </li>
           <li>
-            Like all AdSense placements, ads may use cookies for frequency
-            capping, fraud prevention, and basic targeting. You can opt out
-            of personalized ads at{" "}
+            Third-party vendors, including Google, use cookies to serve ads
+            based on your prior visits to this site and other websites.
+            Google&apos;s use of advertising cookies enables it and its
+            partners to serve ads to you based on those visits. See{" "}
+            <a
+              href="https://policies.google.com/technologies/partner-sites"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              how Google uses information from sites that use its services
+            </a>
+            .
+          </li>
+          <li>
+            You can opt out of personalized advertising at{" "}
             <a
               href="https://adssettings.google.com/"
               target="_blank"
@@ -143,7 +156,22 @@ export default function PrivacyPage() {
             >
               Google&apos;s Ad Settings
             </a>
-            , or block them entirely with a tracker blocker.
+            , opt out of other vendors&apos; cookies at{" "}
+            <a
+              href="https://www.aboutads.info/choices/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:underline"
+            >
+              aboutads.info
+            </a>
+            , or block ads entirely with a tracker blocker.
+          </li>
+          <li>
+            Visitors in the European Economic Area, the UK, and Switzerland see
+            a consent message (Google&apos;s certified consent tool) before any
+            personalized ads are shown, and can change their choice at any time
+            from the privacy and cookie settings link it adds to the page.
           </li>
           <li>
             Ad networks do not receive your PDF file or anything extracted
@@ -151,11 +179,6 @@ export default function PrivacyPage() {
             nothing to send.
           </li>
         </ul>
-        <p>
-          When ads go live, we&apos;ll bump the &ldquo;Last updated&rdquo;
-          date and list the exact networks here so you know what cookies to
-          expect.
-        </p>
 
         {/* Error monitoring */}
         <h2 className="text-xl font-semibold text-neutral-50 mt-12 mb-4">
@@ -247,8 +270,8 @@ export default function PrivacyPage() {
         <p>
           Since we don&apos;t have accounts or profiles, there&apos;s almost
           nothing tied to you personally — the traces we have are aggregate
-          Google Analytics and Clarity events, ad-network cookies (once ads
-          are live), short-term Vercel access logs, and (if something
+          Google Analytics and Clarity events, Google AdSense advertising
+          cookies, short-term Vercel access logs, and (if something
           crashes) a masked Sentry error report, plus any support email you
           choose to send. If you want to check,
           correct, or delete anything under GDPR / UK / CCPA, or just have a
