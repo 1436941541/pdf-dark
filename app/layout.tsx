@@ -15,6 +15,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Google AdSense 发布商 ID（2026-10-24 账号审核通过，和 public/ads.txt 里的一致）。
+// 广告位置由 AdSense 后台的「自动广告」决定，这里只加载脚本。
+const ADSENSE_CLIENT = "ca-pub-6429027443057424";
+
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: "PDF Dark Mode — Free Online Dark Mode PDF Reader | PDF Dark",
@@ -40,6 +44,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     // title + description inherit from root metadata above.
   },
+  // AdSense 认领网站用的 meta（google-adsense-account）
+  other: { "google-adsense-account": ADSENSE_CLIENT },
 };
 
 export default async function RootLayout({
@@ -56,6 +62,15 @@ export default async function RootLayout({
       lang={htmlLang}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      {/* AdSense 要求脚本放在每个页面的 <head> 里：用原生 script 由服务端直接输出，
+          不用 next/script（它会加 data-nscript 属性，AdSense 会报不支持） */}
+      <head>
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-neutral-950 text-neutral-100">
         {children}
         <Analytics />
