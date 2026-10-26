@@ -85,7 +85,7 @@ function safeErrorName(error: unknown): string {
 const failures = new WeakMap<object, ImageFailureContext>();
 
 export async function loadPageBitmap(
-  source: string,
+  source: string | Blob,
   page: PageImageInfo,
   checkCancelled: () => void,
 ): Promise<ImageBitmap> {
@@ -93,22 +93,30 @@ export async function loadPageBitmap(
   let stepStarted = started;
   let step: ImageStep = "fetch_image_data";
   let blobBytes: number | undefined;
+  let bitmap: ImageBitmap | undefined;
 
   try {
     checkCancelled();
-    const response = await fetch(source);
-    checkCancelled();
-    step = "read_image_blob";
-    stepStarted = performance.now();
-    const blob = await response.blob();
+    let blob: Blob;
+    if (typeof source === "string") {
+      const response = await fetch(source);
+      checkCancelled();
+      step = "read_image_blob";
+      stepStarted = performance.now();
+      blob = await response.blob();
+    } else {
+      blob = source;
+    }
     blobBytes = blob.size;
     checkCancelled();
     step = "decode_image_bitmap";
     stepStarted = performance.now();
-    const bitmap = await createImageBitmap(blob);
+    bitmap = await createImageBitmap(blob);
     checkCancelled();
     return bitmap;
   } catch (error) {
+    // A navigation can cancel after decoding has already allocated a bitmap.
+    bitmap?.close();
     // Navigation may interrupt fetch/blob decoding with a TypeError rather
     // than AbortError. Prefer the caller's explicit cancellation state.
     checkCancelled();
@@ -120,10 +128,12 @@ export async function loadPageBitmap(
       width: page.width,
       height: page.height,
       image_region_count: page.imageRegionCount,
-      source_kind: source.startsWith("data:") ? "data" : source.startsWith("blob:") ? "blob" : "other",
-      source_length: source.length,
-      source_empty: source.length === 0 || source === "data:,",
-      image_format: source.startsWith("data:image/jpeg;") ? "jpeg" : source.startsWith("data:image/png;") ? "png" : "other",
+      source_kind: typeof source !== "string" ? "blob" : source.startsWith("data:") ? "data" : source.startsWith("blob:") ? "blob" : "other",
+      source_length: typeof source === "string" ? source.length : source.size,
+      source_empty: typeof source === "string" ? source.length === 0 || source === "data:," : source.size === 0,
+      image_format: typeof source === "string"
+        ? source.startsWith("data:image/jpeg;") ? "jpeg" : source.startsWith("data:image/png;") ? "png" : "other"
+        : source.type === "image/jpeg" ? "jpeg" : source.type === "image/png" ? "png" : "other",
       blob_bytes: blobBytes,
       elapsed_ms: Math.round(performance.now() - started),
       step_elapsed_ms: Math.round(performance.now() - stepStarted),

@@ -126,6 +126,8 @@ export type DarkifyRequest = {
    *  fully original. Computed on the main thread so downloads reuse the
    *  exact same numbers. Missing → mild fixed veil. */
   imageDims?: number[];
+  /** Export releases scratch backing stores after each page. */
+  releaseResources?: boolean;
 };
 
 export type DarkifyResponse =
@@ -146,8 +148,9 @@ ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
     imageRects,
     imageDims,
   } = e.data;
+  let canvas: OffscreenCanvas | undefined;
   try {
-    const canvas = new OffscreenCanvas(width, height);
+    canvas = new OffscreenCanvas(width, height);
     const c2d = canvas.getContext("2d");
     if (!c2d) throw new Error("OffscreenCanvas 2d context unavailable");
 
@@ -213,5 +216,13 @@ ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
       error: err instanceof Error ? err.message : String(err),
     };
     ctx.postMessage(res);
+  } finally {
+    if (e.data.releaseResources) {
+      bitmap.close();
+      if (canvas) {
+        canvas.width = 0;
+        canvas.height = 0;
+      }
+    }
   }
 };

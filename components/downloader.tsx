@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { PDFDocumentLoadingTask, PDFDocumentProxy } from "pdfjs-dist";
 import { loadPageBitmap, type PdfInvertStep } from "@/lib/pdf-image-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type { DarkifyRequest, DarkifyResponse } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
-import { canvasToJpegDataUrl, yieldToMain } from "@/lib/main-thread";
+import { canvasToJpegBlob, yieldToMain } from "@/lib/main-thread";
 import {
   buildDarkPdf,
   imageTreatment,
@@ -118,17 +119,17 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
   /** Darken one rendered page bitmap through the worker. */
   const darkify = useCallback(
     async (
-      originalDataUrl: string,
+      originalBlob: Blob,
       width: number,
       height: number,
       imageRects: ImageRect[],
       cancelled: () => boolean,
       pageNumber: number,
-    ): Promise<string> => {
+    ): Promise<Blob> => {
       throwIfCancelled(cancelled);
       const w = workerRef.current;
       if (!w) throw new Error("worker not ready");
-      const bitmap = await loadPageBitmap(originalDataUrl, {
+      const bitmap = await loadPageBitmap(originalBlob, {
         pageNumber,
         width,
         height,
@@ -139,32 +140,38 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         (r) => imageTreatment(imageMode, r) !== "invert",
       );
       const id = ++msgIdRef.current;
-      const outBlob = await new Promise<Blob>((resolve, reject) => {
-        pendingRef.current.set(id, { resolve, reject });
-        const req: DarkifyRequest = {
-          id,
-          bitmap,
-          width,
-          height,
-          theme,
-          darkness: darkness / 100,
-          warmth: warmth / 100,
-          imageRects: rects,
-          imageDims: rects.map((r) =>
-            imageTreatment(imageMode, r) === "dim"
-              ? imageDimAlpha(r.brightness)
-              : 0,
-          ),
-        };
-        w.postMessage(req, [bitmap]);
-      });
-
-      return await new Promise<string>((resolve, reject) => {
-        const fr = new FileReader();
-        fr.onload = () => resolve(fr.result as string);
-        fr.onerror = () => reject(new Error("FileReader failed"));
-        fr.readAsDataURL(outBlob);
-      });
+      try {
+        const outBlob = await new Promise<Blob>((resolve, reject) => {
+          pendingRef.current.set(id, { resolve, reject });
+          const req: DarkifyRequest = {
+            id,
+            bitmap,
+            width,
+            height,
+            theme,
+            darkness: darkness / 100,
+            warmth: warmth / 100,
+            imageRects: rects,
+            imageDims: rects.map((r) =>
+              imageTreatment(imageMode, r) === "dim"
+                ? imageDimAlpha(r.brightness)
+                : 0,
+            ),
+            releaseResources: true,
+          };
+          try {
+            w.postMessage(req, [bitmap]);
+          } catch (error) {
+            pendingRef.current.delete(id);
+            reject(error);
+          }
+        });
+        throwIfCancelled(cancelled);
+        return outBlob;
+      } finally {
+        // Transferred bitmaps are detached here; close also covers a failed send.
+        bitmap.close();
+      }
     },
     [theme, imageMode, darkness, warmth],
   );
@@ -177,6 +184,10 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
       let pageNumber = 0;
       operationRef.current?.cancel();
       const operation = beginPdfOperation("invert", "export", { bytes: file.size });
+      let pdf: PDFDocumentProxy | undefined;
+      let loadingTask: PDFDocumentLoadingTask | undefined;
+      let scratch: HTMLCanvasElement | undefined;
+      const pages: PageRender[] = [];
       operationRef.current = operation;
       setCopyStatus("idle");
       setStatus({ kind: "processing", phase: "render", done: 0, total: 0 });
@@ -190,7 +201,8 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         invertStep = "read_file";
         const srcBytes = await file.arrayBuffer();
         invertStep = "parse_pdf";
-        const pdf = await pdfjs.getDocument({ data: srcBytes.slice(0) }).promise;
+        loadingTask = pdfjs.getDocument({ data: srcBytes.slice(0) });
+        pdf = await loadingTask.promise;
         if (cancelledRef.current) return;
         setStatus({
           kind: "processing",
@@ -200,12 +212,11 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         });
 
         // Small scratch canvas for per-image brightness sampling.
-        const scratch = document.createElement("canvas");
+        scratch = document.createElement("canvas");
         scratch.width = 32;
         scratch.height = 32;
         const scratchCtx = scratch.getContext("2d", { willReadFrequently: true });
 
-        const pages: PageRender[] = [];
         for (let i = 1; i <= pdf.numPages; i++) {
           if (cancelledRef.current) return;
           pageNumber = i;
@@ -229,65 +240,70 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           const canvas = document.createElement("canvas");
           canvas.width = viewport.width;
           canvas.height = viewport.height;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) throw new Error("2D canvas not supported");
-          await page.render({ canvas, canvasContext: ctx, viewport }).promise;
-          throwIfCancelled(() => cancelledRef.current);
-          await yieldToMain();
+          try {
+            const ctx = canvas.getContext("2d");
+            if (!ctx) throw new Error("2D canvas not supported");
+            await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+            throwIfCancelled(() => cancelledRef.current);
+            await yieldToMain();
 
-          if (scratchCtx) {
-            for (const r of imageRects) {
-              try {
-                scratchCtx.drawImage(canvas, r.x, r.y, r.w, r.h, 0, 0, 32, 32);
-                const d = scratchCtx.getImageData(0, 0, 32, 32).data;
-                let lumSum = 0;
-                let satSum = 0;
-                for (let j = 0; j < d.length; j += 4) {
-                  lumSum += 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
-                  const mx = Math.max(d[j], d[j + 1], d[j + 2]);
-                  const mn = Math.min(d[j], d[j + 1], d[j + 2]);
-                  satSum += (mx - mn) / 255;
+            if (scratchCtx) {
+              for (const r of imageRects) {
+                try {
+                  scratchCtx.drawImage(canvas, r.x, r.y, r.w, r.h, 0, 0, 32, 32);
+                  const d = scratchCtx.getImageData(0, 0, 32, 32).data;
+                  let lumSum = 0;
+                  let satSum = 0;
+                  for (let j = 0; j < d.length; j += 4) {
+                    lumSum += 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
+                    const mx = Math.max(d[j], d[j + 1], d[j + 2]);
+                    const mn = Math.min(d[j], d[j + 1], d[j + 2]);
+                    satSum += (mx - mn) / 255;
+                  }
+                  const n = d.length / 4;
+                  r.brightness = lumSum / n;
+                  r.saturation = satSum / n;
+                } catch {
+                  // leave features undefined → classifier falls back to a mild veil
                 }
-                const n = d.length / 4;
-                r.brightness = lumSum / n;
-                r.saturation = satSum / n;
-              } catch {
-                // leave features undefined → classifier falls back to a mild veil
               }
             }
+
+            await yieldToMain();
+            invertStep = "encode_page";
+            const originalBlob = await canvasToJpegBlob(canvas, 0.88);
+            // "Original" mode keeps scanned pages exactly as in the source.
+            invertStep = "darkify_page";
+            const displayBlob =
+              imageMode === "original" && scannedPage
+                ? originalBlob
+                : await darkify(
+                    originalBlob,
+                    canvas.width,
+                    canvas.height,
+                    imageRects,
+                    () => cancelledRef.current,
+                    i,
+                  );
+            if (cancelledRef.current) return;
+
+            pages.push({
+              displayBlob,
+              width: canvas.width,
+              height: canvas.height,
+              imageRects,
+              scannedPage,
+            });
+            setStatus({
+              kind: "processing",
+              phase: "render",
+              done: i,
+              total: pdf.numPages,
+            });
+          } finally {
+            canvas.width = 0;
+            canvas.height = 0;
           }
-
-          await yieldToMain();
-          invertStep = "encode_page";
-          const originalDataUrl = await canvasToJpegDataUrl(canvas, 0.88);
-          // "Original" mode keeps scanned pages exactly as in the source.
-          invertStep = "darkify_page";
-          const displayDataUrl =
-            imageMode === "original" && scannedPage
-              ? originalDataUrl
-              : await darkify(
-                  originalDataUrl,
-                  canvas.width,
-                  canvas.height,
-                  imageRects,
-                  () => cancelledRef.current,
-                  i,
-                );
-          if (cancelledRef.current) return;
-
-          pages.push({
-            displayDataUrl,
-            width: canvas.width,
-            height: canvas.height,
-            imageRects,
-            scannedPage,
-          });
-          setStatus({
-            kind: "processing",
-            phase: "render",
-            done: i,
-            total: pdf.numPages,
-          });
         }
 
         setStatus({
@@ -343,6 +359,17 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         }
       } finally {
         operation.cancel();
+        pages.length = 0;
+        if (scratch) {
+          scratch.width = 0;
+          scratch.height = 0;
+        }
+        // Keep PDF.js resources through assembly: overlays and text still use them.
+        try {
+          await loadingTask?.destroy();
+        } catch {
+          console.warn("[pdf-dark] PDF cleanup failed");
+        }
       }
     },
     [theme, imageMode, darkness, warmth, darkify, locale],

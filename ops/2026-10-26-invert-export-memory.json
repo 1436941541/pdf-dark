@@ -1,0 +1,700 @@
+{
+  "date": "2026-10-26",
+  "status": "verified_for_release",
+  "scope": [
+    "components/downloader.tsx",
+    "lib/build-dark-pdf.ts",
+    "lib/main-thread.ts",
+    "lib/dark-worker.ts",
+    "lib/pdf-image-diagnostics.ts",
+    "tests/export-memory.test.mjs"
+  ],
+  "method": {
+    "build": "production builds from same working tree before and after optimization; pre-existing diagnostics left intact",
+    "browser": "Chrome 155.0.8059.86",
+    "host_ram_gib": 16,
+    "viewport": "393 x 851, mobile adaptation; not a real Android device",
+    "external_scripts": "ads and analytics disabled identically in local benchmark",
+    "constraints": "no memory limits, no forced GC, no simulated application errors",
+    "metric": "maximum renderer process RSS, sampled via OS ps every second, fresh isolated browser per case",
+    "runs_per_fixture_per_version": 1
+  },
+  "memory": {
+    "before-text": {
+      "peak_renderer_rss_mib": 1015.29,
+      "sampling_interval_seconds": 1,
+      "samples": 142
+    },
+    "after-text": {
+      "peak_renderer_rss_mib": 511.04,
+      "sampling_interval_seconds": 1,
+      "samples": 124
+    },
+    "before-image": {
+      "peak_renderer_rss_mib": 504.49,
+      "sampling_interval_seconds": 1,
+      "samples": 140
+    },
+    "after-image": {
+      "peak_renderer_rss_mib": 460.98,
+      "sampling_interval_seconds": 1,
+      "samples": 126
+    },
+    "text_peak_reduction_percent": 49.7,
+    "image_peak_reduction_percent": 8.6
+  },
+  "outputs": [
+    {
+      "label": "before-text",
+      "pages": 520,
+      "bytes": 2411900
+    },
+    {
+      "label": "after-text",
+      "pages": 520,
+      "bytes": 2411900
+    },
+    {
+      "label": "before-image",
+      "pages": 520,
+      "bytes": 45905164
+    },
+    {
+      "label": "after-image",
+      "pages": 520,
+      "bytes": 45905163
+    }
+  ],
+  "regression": {
+    "unit_tests": 53,
+    "unit_tests_passed": 53,
+    "scoped_eslint": "passed",
+    "production_build": "passed",
+    "chrome_theme_image_mode_exports": {
+      "browser": "155.0.8059.86",
+      "errors": [],
+      "results": [
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Original",
+          "name": "before-Midnight-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Auto",
+          "name": "before-Midnight-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Invert",
+          "name": "before-Midnight-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Original",
+          "name": "before-Sepia-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Auto",
+          "name": "before-Sepia-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Invert",
+          "name": "before-Sepia-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Original",
+          "name": "before-Solarized-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Auto",
+          "name": "before-Solarized-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Invert",
+          "name": "before-Solarized-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Original",
+          "name": "before-OLED-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Auto",
+          "name": "before-OLED-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Invert",
+          "name": "before-OLED-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Original",
+          "name": "after-Midnight-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Auto",
+          "name": "after-Midnight-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Invert",
+          "name": "after-Midnight-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Original",
+          "name": "after-Sepia-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Auto",
+          "name": "after-Sepia-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Invert",
+          "name": "after-Sepia-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Original",
+          "name": "after-Solarized-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Auto",
+          "name": "after-Solarized-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Invert",
+          "name": "after-Solarized-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Original",
+          "name": "after-OLED-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Auto",
+          "name": "after-OLED-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Invert",
+          "name": "after-OLED-Invert.pdf",
+          "error": null
+        }
+      ]
+    },
+    "chrome_visual_text_rotation_comparison": [
+      {
+        "theme": "Midnight",
+        "mode": "Original",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Midnight",
+        "mode": "Auto",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Midnight",
+        "mode": "Invert",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Sepia",
+        "mode": "Original",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Sepia",
+        "mode": "Auto",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Sepia",
+        "mode": "Invert",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Solarized",
+        "mode": "Original",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Solarized",
+        "mode": "Auto",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Solarized",
+        "mode": "Invert",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "OLED",
+        "mode": "Original",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "OLED",
+        "mode": "Auto",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "OLED",
+        "mode": "Invert",
+        "identical": true,
+        "pages": 5
+      }
+    ],
+    "webkit_theme_image_mode_exports": {
+      "browser": "26.6",
+      "errors": [],
+      "results": [
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Original",
+          "name": "before-Midnight-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Auto",
+          "name": "before-Midnight-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Invert",
+          "name": "before-Midnight-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Original",
+          "name": "before-Sepia-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Auto",
+          "name": "before-Sepia-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Invert",
+          "name": "before-Sepia-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Original",
+          "name": "before-Solarized-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Auto",
+          "name": "before-Solarized-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Invert",
+          "name": "before-Solarized-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Original",
+          "name": "before-OLED-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Auto",
+          "name": "before-OLED-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Invert",
+          "name": "before-OLED-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Original",
+          "name": "after-Midnight-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Auto",
+          "name": "after-Midnight-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Invert",
+          "name": "after-Midnight-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Original",
+          "name": "after-Sepia-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Auto",
+          "name": "after-Sepia-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Invert",
+          "name": "after-Sepia-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Original",
+          "name": "after-Solarized-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Auto",
+          "name": "after-Solarized-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Invert",
+          "name": "after-Solarized-Invert.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Original",
+          "name": "after-OLED-Original.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Auto",
+          "name": "after-OLED-Auto.pdf",
+          "error": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Invert",
+          "name": "after-OLED-Invert.pdf",
+          "error": null
+        }
+      ]
+    },
+    "webkit_output_visual_text_rotation_comparison": [
+      {
+        "theme": "Midnight",
+        "mode": "Original",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Midnight",
+        "mode": "Auto",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Midnight",
+        "mode": "Invert",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Sepia",
+        "mode": "Original",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Sepia",
+        "mode": "Auto",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Sepia",
+        "mode": "Invert",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Solarized",
+        "mode": "Original",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Solarized",
+        "mode": "Auto",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "Solarized",
+        "mode": "Invert",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "OLED",
+        "mode": "Original",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "OLED",
+        "mode": "Auto",
+        "identical": true,
+        "pages": 5
+      },
+      {
+        "theme": "OLED",
+        "mode": "Invert",
+        "identical": true,
+        "pages": 5
+      }
+    ],
+    "password_invalid_cancel_retry": {
+      "results": [
+        {
+          "version": "before",
+          "kind": "owner",
+          "download": null
+        },
+        {
+          "version": "before",
+          "kind": "password",
+          "message": "PY DOWNLOADS AUTOMATICALLY\nThis PDF is password-protected. Remove the password (e.g. print it to a new PDF) and try again.\nBack\n\nJust here to read, not to save a file? Open the dark mode PDF reader.\n\nWant to remove color without inverting the page? Convert the PDF to grayscale or black and white.\n\nHow to invert PDF colors\n\nText and background are always flipped. What happens to the pictures is your call — that's what the Images control is for: leave them untouched, flip them with the page, or let each one be judged separately. Curious how that detection decides? Here's how the conversion works.\n\n1\nPick your settings\nChoose how colors are mapped: Images can stay Original, use Auto, or fully Invert. You can also set the background, darkness, and warmth.\n2\nDrop your PDF\nDrag & drop or click to browse. Never leaves your browser.\n3\nDownload your PDF\nConversion starts immediately and the new f"
+        },
+        {
+          "version": "before",
+          "kind": "invalid",
+          "message": "PY DOWNLOADS AUTOMATICALLY\nThat file isn't a readable PDF — it may be empty or corrupted. Try re-selecting or re-downloading it.\nBack\n\nJust here to read, not to save a file? Open the dark mode PDF reader.\n\nWant to remove color without inverting the page? Convert the PDF to grayscale or black and white.\n\nHow to invert PDF colors\n\nText and background are always flipped. What happens to the pictures is your call — that's what the Images control is for: leave them untouched, flip them with the page, or let each one be judged separately. Curious how that detection decides? Here's how the conversion works.\n\n1\nPick your settings\nChoose how colors are mapped: Images can stay Original, use Auto, or fully Invert. You can also set the background, darkness, and warmth.\n2\nDrop your PDF\nDrag & drop or click to browse. Never leaves your browser.\n3\nDownload your PDF\nConversion starts immediately and the"
+        },
+        {
+          "version": "before",
+          "kind": "navigate-cancel",
+          "url": "http://localhost:3100/"
+        },
+        {
+          "version": "before",
+          "kind": "cancel-retry",
+          "workers": [
+            "http://localhost:3100/_next/static/chunks/turbopack-worker-0sjn--fhq~1cg.js",
+            "http://localhost:3100/_next/static/media/pdf.worker.min.0pd.0f~fv76np.mjs"
+          ]
+        },
+        {
+          "version": "after",
+          "kind": "owner",
+          "download": null
+        },
+        {
+          "version": "after",
+          "kind": "password",
+          "message": "PY DOWNLOADS AUTOMATICALLY\nThis PDF is password-protected. Remove the password (e.g. print it to a new PDF) and try again.\nBack\n\nJust here to read, not to save a file? Open the dark mode PDF reader.\n\nWant to remove color without inverting the page? Convert the PDF to grayscale or black and white.\n\nHow to invert PDF colors\n\nText and background are always flipped. What happens to the pictures is your call — that's what the Images control is for: leave them untouched, flip them with the page, or let each one be judged separately. Curious how that detection decides? Here's how the conversion works.\n\n1\nPick your settings\nChoose how colors are mapped: Images can stay Original, use Auto, or fully Invert. You can also set the background, darkness, and warmth.\n2\nDrop your PDF\nDrag & drop or click to browse. Never leaves your browser.\n3\nDownload your PDF\nConversion starts immediately and the new f"
+        },
+        {
+          "version": "after",
+          "kind": "invalid",
+          "message": "PY DOWNLOADS AUTOMATICALLY\nThat file isn't a readable PDF — it may be empty or corrupted. Try re-selecting or re-downloading it.\nBack\n\nJust here to read, not to save a file? Open the dark mode PDF reader.\n\nWant to remove color without inverting the page? Convert the PDF to grayscale or black and white.\n\nHow to invert PDF colors\n\nText and background are always flipped. What happens to the pictures is your call — that's what the Images control is for: leave them untouched, flip them with the page, or let each one be judged separately. Curious how that detection decides? Here's how the conversion works.\n\n1\nPick your settings\nChoose how colors are mapped: Images can stay Original, use Auto, or fully Invert. You can also set the background, darkness, and warmth.\n2\nDrop your PDF\nDrag & drop or click to browse. Never leaves your browser.\n3\nDownload your PDF\nConversion starts immediately and the"
+        },
+        {
+          "version": "after",
+          "kind": "navigate-cancel",
+          "url": "http://localhost:3101/"
+        },
+        {
+          "version": "after",
+          "kind": "cancel-retry",
+          "workers": [
+            "http://localhost:3101/_next/static/chunks/turbopack-worker-0sjn--fhq~1cg.js"
+          ]
+        }
+      ],
+      "allErrors": []
+    },
+    "reader_chrome": {
+      "jump": "5",
+      "images": 5,
+      "errors": []
+    },
+    "reader_webkit": {
+      "errors": [],
+      "images": 5,
+      "jump": "5",
+      "url": "http://localhost:3101/"
+    },
+    "long_document_payload_comparison": [
+      {
+        "kind": "text",
+        "identical": true,
+        "different": []
+      },
+      {
+        "kind": "image",
+        "identical": true,
+        "different": []
+      }
+    ],
+    "chrome_reader_final": {
+      "errors": [],
+      "images": 5,
+      "jump": "5"
+    }
+  },
+  "limitations": [
+    "The original Sentry TypeError was not reproduced; this optimization does not establish its cause.",
+    "All encoded output pages and final PDF serialization still require memory; this is not streaming output.",
+    "Illustrated-document peak improvement is smaller because assembly and serialization dominate.",
+    "Continuous reuse of a PDF.js QA canvas initially produced a transient render hash mismatch; decoded PDF contents matched, and isolated-page rerenders passed all combinations."
+  ],
+  "base_commit": "efd7ba13e9ddb3637066173d0637ea3cb2524a9a",
+  "source_sha256": {
+    "components/downloader.tsx": "9edd202032eb5958b8f805e64a3b7f9b7da69152768cd6d73cf247608fa2a62d",
+    "lib/build-dark-pdf.ts": "ca091e5bc376dd492459fb0e6c542c532503611dad7726cefb7a5e9dcf0078ce",
+    "lib/main-thread.ts": "26d539b7f236dc1b07b8a541b7239f888bdbf81c301e8887e8f9a8450e587566",
+    "lib/dark-worker.ts": "75d4f00947c467cf13a1f9f01f2664a152675219223980eb9f17d157b3175353",
+    "lib/pdf-image-diagnostics.ts": "189c1eb2e61aef72cf742a47b5bfba2ee1e0709cacbb9a05f9a402b7cb53abe1",
+    "tests/export-memory.test.mjs": "a80a5a1e0a37aaf264fb708cea84970a29b35a943f7a5da62eb4f91a94801cb6"
+  },
+  "artifacts": {
+    "baseline_build_log": "/tmp/pdf-memory-baseline-build.log",
+    "modified_build_log": "/tmp/pdf-memory-after-build.log",
+    "unit_log": "/tmp/pdf-memory-unit-final.log",
+    "scoped_lint_log": "/tmp/pdf-memory-lint-final.log",
+    "screenshot": "output/playwright/memory-bench-after-image.png",
+    "rss_csvs": [
+      "/tmp/pdf-memory-before-text-rss.csv",
+      "/tmp/pdf-memory-after-text-rss.csv",
+      "/tmp/pdf-memory-before-image-rss.csv",
+      "/tmp/pdf-memory-after-image-rss.csv"
+    ]
+  },
+  "release_scope": "Only the invert export memory optimization; pre-existing uncommitted client diagnostics are excluded.",
+  "release_checks": {
+    "scope": "staged release snapshot excluding pre-existing client diagnostics",
+    "unit_tests_passed": 45,
+    "scoped_eslint": "passed",
+    "production_build_and_types": "passed",
+    "local_production_start": "ready on localhost:3102",
+    "local_browser_download": {
+      "errors": [],
+      "download": null,
+      "url": "http://localhost:3102/invert-pdf-colors"
+    },
+    "downloaded_pages": 5
+  }
+}

@@ -10,6 +10,33 @@ export function yieldToMain(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
+/** Export keeps encoded pages as Blobs instead of Base64 strings. */
+export function canvasToJpegBlob(
+  canvas: HTMLCanvasElement,
+  quality: number,
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+        return;
+      }
+      // Preserve the existing encoder fallback without a data-URL fetch.
+      try {
+        const url = canvas.toDataURL("image/jpeg", quality);
+        if (!url.startsWith("data:image/jpeg;base64,")) {
+          throw new Error("JPEG encoding failed");
+        }
+        const binary = atob(url.slice(url.indexOf(",") + 1));
+        const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+        resolve(new Blob([bytes], { type: "image/jpeg" }));
+      } catch (error) {
+        reject(error);
+      }
+    }, "image/jpeg", quality);
+  });
+}
+
 /**
  * Same result as `canvas.toDataURL("image/jpeg", quality)`, but the JPEG
  * encode runs off the main thread (`toBlob`) and the base64 step is async

@@ -30,8 +30,8 @@ import { recolorPageInPlace } from "./content-recolor";
 export const RENDER_SCALE = 1.5;
 
 export type PageRender = {
-  /** Darkened page bitmap (JPEG dataUrl) at RENDER_SCALE. */
-  displayDataUrl: string;
+  /** Darkened page JPEG at RENDER_SCALE, without a Base64 copy. */
+  displayBlob: Blob;
   width: number;
   height: number;
   imageRects: ImageRect[];
@@ -197,8 +197,7 @@ async function drawRasterPage(
 ): Promise<void> {
   const { rgb } = await import("pdf-lib");
 
-  const res = await fetch(p.displayDataUrl);
-  const jpgBytes = new Uint8Array(await res.arrayBuffer());
+  const jpgBytes = new Uint8Array(await p.displayBlob.arrayBuffer());
   const base = await doc.embedJpg(jpgBytes);
   page.drawImage(base, box);
 
