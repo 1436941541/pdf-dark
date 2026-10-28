@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { loadPageBitmap, type PdfReaderStep } from "@/lib/pdf-image-diagnostics";
+import { restoreDarkWorkerError } from "@/lib/dark-worker-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type {
   DarkifyRequest,
@@ -149,7 +150,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       const cb = pending.get(id);
       if (!cb) return;
       pending.delete(id);
-      if ("error" in e.data) cb.reject(new Error(e.data.error));
+      if ("error" in e.data) cb.reject(restoreDarkWorkerError(e.data));
       else cb.resolve(e.data.blob);
     };
     workerRef.current = w;
@@ -305,6 +306,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           width: p.width,
           height: p.height,
           theme: nextTheme,
+          pageNumber: p.pageNumber,
+          imageMode: nextMode,
           darkness: nextDarkness / 100,
           warmth: nextWarmth / 100,
           imageRects: rects,

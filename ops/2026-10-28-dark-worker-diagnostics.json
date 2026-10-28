@@ -1,0 +1,583 @@
+{
+  "date": "2026-10-28",
+  "status": "verified_for_release",
+  "base_commit": "292323aa00d82507bb9b05b9cbf4ee1edabc138b",
+  "source_sha256": {
+    "lib/dark-worker-diagnostics.ts": "394c5e711c77d01e1886c9b28bb124d4b92a0e0e24d7be7261ea039f8a9bffe6",
+    "lib/dark-worker.ts": "2bac66f08dcc4d328c2e08dcb486075c1a8d2896330ce8c57a07c432607192d7",
+    "lib/pdf-image-diagnostics.ts": "61b3ac60d2275e1fb315ca279b6de81e7e7a49a91f9749fd9fbc90bc5c857804",
+    "components/downloader.tsx": "e443f65227fe5285e5f45f2d08ee6153d8036eb21b5021e778bf00c010f07e31",
+    "components/pdf-viewer.tsx": "8787b3a704973069ab252c9c255b8d05b1ab6889e2dee3c53bbb4f570f885097",
+    "tests/dark-worker-diagnostics.test.mjs": "f02d6c66a421620be0291a52da438ea1592bad04e4b9f0088892e578250e95cb",
+    "tests/export-memory.test.mjs": "25cee5de3fe540ef3fe4362e2b275dabf436aa530b98d799b16243fd6b4dde23",
+    "tests/monitoring.test.mjs": "00de8e48ebc3a275689d7672e8b9da0d9f612f4353d0ca194888eedf23712c8a"
+  },
+  "changes": [
+    "Ten worker processing steps, original allowlisted exception type and bounded message hint.",
+    "Page number, canvas/bitmap dimensions, pixel count, source JPEG bytes, image-region count, theme/mode, timing and optional context-loss signal.",
+    "Main-thread visibility, focus and online flags, best effort only.",
+    "Versioned, re-allowlisted error metadata forwarded to existing Sentry failure event with stage-specific grouping.",
+    "No success logs or extra Sentry capture calls; original Error/cancellation semantics retained.",
+    "Raw exception messages, stacks, image data and document names are excluded."
+  ],
+  "tests": {
+    "local_unit_tests": 70,
+    "production_build_and_types": "passed",
+    "strict_eslint": "3 existing react-hooks/set-state-in-effect errors in pdf-viewer.tsx; same errors verified against pre-change commit",
+    "other_touched_file_eslint": "passed with only the existing effect rule excluded",
+    "unit_failure_tests": "Local canvas/worker/Sentry test doubles only; no errors injected into production.",
+    "chrome_matrix": {
+      "engine": "chromium",
+      "browser": "155.0.8059.84",
+      "errors": [],
+      "diagnosticLogs": [],
+      "sentry": [],
+      "results": [
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Invert",
+          "failure": null
+        }
+      ]
+    },
+    "webkit_matrix": {
+      "engine": "webkit",
+      "browser": "26.6",
+      "errors": [],
+      "diagnosticLogs": [],
+      "sentry": [],
+      "results": [
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Midnight",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Sepia",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "Solarized",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "before",
+          "theme": "OLED",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Midnight",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Sepia",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "Solarized",
+          "mode": "Invert",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Original",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Auto",
+          "failure": null
+        },
+        {
+          "version": "after",
+          "theme": "OLED",
+          "mode": "Invert",
+          "failure": null
+        }
+      ]
+    },
+    "output_comparison": [
+      {
+        "engine": "chromium",
+        "theme": "Midnight",
+        "mode": "Original",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "Midnight",
+        "mode": "Auto",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "Midnight",
+        "mode": "Invert",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "Sepia",
+        "mode": "Original",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "Sepia",
+        "mode": "Auto",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "Sepia",
+        "mode": "Invert",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "Solarized",
+        "mode": "Original",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "Solarized",
+        "mode": "Auto",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "Solarized",
+        "mode": "Invert",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "OLED",
+        "mode": "Original",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "OLED",
+        "mode": "Auto",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "chromium",
+        "theme": "OLED",
+        "mode": "Invert",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "Midnight",
+        "mode": "Original",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "Midnight",
+        "mode": "Auto",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "Midnight",
+        "mode": "Invert",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "Sepia",
+        "mode": "Original",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "Sepia",
+        "mode": "Auto",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "Sepia",
+        "mode": "Invert",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "Solarized",
+        "mode": "Original",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "Solarized",
+        "mode": "Auto",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "Solarized",
+        "mode": "Invert",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "OLED",
+        "mode": "Original",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "OLED",
+        "mode": "Auto",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "theme": "OLED",
+        "mode": "Invert",
+        "pages": 8,
+        "identical": true
+      }
+    ],
+    "chrome_reader": {
+      "results": [
+        {
+          "port": 4121,
+          "images": 8,
+          "jump": "4"
+        },
+        {
+          "port": 4122,
+          "images": 8,
+          "jump": "4"
+        }
+      ],
+      "errors": [],
+      "diagnosticLogs": [],
+      "sentry": []
+    },
+    "webkit_reader": {
+      "results": [
+        {
+          "port": 4121,
+          "images": 8,
+          "jump": "4"
+        },
+        {
+          "port": 4122,
+          "images": 8,
+          "jump": "4"
+        }
+      ],
+      "errors": [],
+      "diagnosticLogs": [],
+      "sentry": []
+    },
+    "chrome_cancel_retry": {
+      "errors": [],
+      "diagnosticLogs": [],
+      "sentry": [],
+      "retry": "downloaded"
+    },
+    "webkit_cancel_retry": {
+      "errors": [],
+      "diagnosticLogs": [],
+      "sentry": [],
+      "retry": "downloaded"
+    },
+    "long_document": {
+      "saved": true,
+      "progress": [
+        "Saved pdf-g-text-midnight.pdf"
+      ],
+      "errors": [],
+      "diagnosticLogs": [],
+      "sentry": []
+    },
+    "long_output_comparison": {
+      "pages": 1000,
+      "identical": true
+    }
+  },
+  "limitations": [
+    "New fields require deployment and a newly loaded worker; historical 1G events cannot be enriched retrospectively.",
+    "error_hint is inferred from a bounded message and is not a confirmed root cause.",
+    "Browser context-loss/focus/network signals may be unavailable. A killed browser process cannot send worker diagnostics.",
+    "Pre-existing unrelated local client diagnostics changes were preserved."
+  ],
+  "release_scope": "Worker diagnostics only; unrelated client diagnostics excluded. Monitoring test stages only the required worker dependency changes.",
+  "staged_monitoring_test_sha256": "0af139e8f114a6e15886dba07d0d680482d36a3c78ae74c134622d7ba2620576",
+  "release_checks": {
+    "snapshot_unit_tests_passed": 62,
+    "production_build_and_types": "passed",
+    "lint": "passed excluding the 3 pre-existing effect-rule errors confirmed on baseline",
+    "local_production_start": "ready on localhost:4123",
+    "local_browser": {
+      "downloaded_pages": 8,
+      "errors": []
+    }
+  }
+}

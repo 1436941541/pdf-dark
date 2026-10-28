@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PDFDocumentLoadingTask, PDFDocumentProxy } from "pdfjs-dist";
 import { loadPageBitmap, type PdfInvertStep } from "@/lib/pdf-image-diagnostics";
+import { restoreDarkWorkerError } from "@/lib/dark-worker-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type { DarkifyRequest, DarkifyResponse } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
@@ -102,7 +103,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
       const cb = pending.get(id);
       if (!cb) return;
       pending.delete(id);
-      if ("error" in e.data) cb.reject(new Error(e.data.error));
+      if ("error" in e.data) cb.reject(restoreDarkWorkerError(e.data));
       else cb.resolve(e.data.blob);
     };
     workerRef.current = w;
@@ -149,6 +150,9 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             width,
             height,
             theme,
+            pageNumber,
+            sourceBytes: originalBlob.size,
+            imageMode,
             darkness: darkness / 100,
             warmth: warmth / 100,
             imageRects: rects,

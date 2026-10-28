@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { darkWorkerFailure } from "./dark-worker-diagnostics";
 
 type PageImageInfo = {
   pageNumber: number;
@@ -154,6 +155,17 @@ export function capturePdfProcessingException(
   diagnostic: PdfFailureDiagnostic = {},
 ) {
   const context = typeof error === "object" && error !== null ? failures.get(error) : undefined;
+  const workerContext = darkWorkerFailure(error);
+  const workerEnvironment: Record<string, boolean | string> = {};
+  if (workerContext) {
+    try {
+      const visibility = document.visibilityState;
+      if (visibility === "visible" || visibility === "hidden") workerEnvironment.visibility = visibility;
+      const focused = document.hasFocus();
+      if (typeof focused === "boolean") workerEnvironment.document_focused = focused;
+      if (typeof navigator.onLine === "boolean") workerEnvironment.online = navigator.onLine;
+    } catch { /* missing browser signals must not prevent error reporting */ }
+  }
   // PDF parser messages can contain document strings. Keep code frames but
   // replace the message and discard non-script/inline/local-media frames.
   const safe = new Error("PDF processing failed");
@@ -164,10 +176,12 @@ export function capturePdfProcessingException(
   }
   try {
     const pageNumber = diagnostic.pageNumber;
-    const originalErrorType = safeErrorName(error);
+    const originalErrorType = workerContext?.error_type ?? safeErrorName(error);
     const failureStep = diagnostic.readerStep ?? diagnostic.invertStep ?? context?.step ?? "unknown";
     Sentry.captureException(safe, {
-      fingerprint: ["pdf-processing", tags.tool ?? "unknown", stage, failureStep, originalErrorType],
+      fingerprint: ["pdf-processing", tags.tool ?? "unknown", stage, failureStep, originalErrorType,
+        ...(workerContext ? ["dark-worker", workerContext.step, workerContext.error_hint] : []),
+      ],
       tags: {
         ...tags,
         stage,
@@ -175,9 +189,15 @@ export function capturePdfProcessingException(
         ...(diagnostic.readerStep ? { reader_step: diagnostic.readerStep } : {}),
         ...(diagnostic.invertStep ? { invert_step: diagnostic.invertStep } : {}),
         ...(context ? { image_step: context.step } : {}),
+        ...(workerContext ? {
+          worker_step: workerContext.step,
+          worker_error_type: workerContext.error_type,
+          worker_error_hint: workerContext.error_hint,
+        } : {}),
       },
       contexts: {
         ...(context ? { pdf_image_processing: context } : {}),
+        ...(workerContext ? { pdf_dark_worker: { ...workerContext, ...workerEnvironment } } : {}),
         ...(typeof pageNumber === "number" && Number.isInteger(pageNumber) && pageNumber > 0
           ? { pdf_failure: { page_number: pageNumber } }
           : {}),

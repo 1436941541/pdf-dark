@@ -13,6 +13,11 @@
 // the original bitmap with a mild dim, so photos stay photos, not negatives.
 
 import type { ImageRect } from "./image-regions";
+import {
+  describeDarkWorkerFailure,
+  type DarkWorkerFailure,
+  type DarkWorkerStep,
+} from "./dark-worker-diagnostics";
 
 export type ThemeId = "midnight" | "sepia" | "solarized" | "oled";
 
@@ -126,15 +131,27 @@ export type DarkifyRequest = {
    *  fully original. Computed on the main thread so downloads reuse the
    *  exact same numbers. Missing → mild fixed veil. */
   imageDims?: number[];
+  pageNumber?: number;
+  sourceBytes?: number;
+  imageMode?: "original" | "smart" | "invert";
   /** Export releases scratch backing stores after each page. */
   releaseResources?: boolean;
 };
 
 export type DarkifyResponse =
   | { id: number; blob: Blob }
-  | { id: number; error: string };
+  | { id: number; error: string; diagnostic?: DarkWorkerFailure };
 
 const ctx = self as unknown as DedicatedWorkerGlobalScope;
+
+function diagnosticClock(): number | undefined {
+  try { return performance.now(); } catch { return undefined; }
+}
+
+function elapsed(start: number | undefined): number | undefined {
+  const now = diagnosticClock();
+  return start === undefined || now === undefined ? undefined : now - start;
+}
 
 ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
   const {
@@ -148,16 +165,32 @@ ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
     imageRects,
     imageDims,
   } = e.data;
+  const started = diagnosticClock();
+  let stepStarted = started;
+  let step: DarkWorkerStep = "create_canvas";
+  const enter = (next: DarkWorkerStep) => {
+    step = next;
+    stepStarted = diagnosticClock();
+  };
+  let bitmapWidth: number | undefined;
+  let bitmapHeight: number | undefined;
+  try { bitmapWidth = bitmap.width; bitmapHeight = bitmap.height; } catch { /* diagnostic only */ }
   let canvas: OffscreenCanvas | undefined;
+  let c2d: OffscreenCanvasRenderingContext2D | null = null;
   try {
     canvas = new OffscreenCanvas(width, height);
-    const c2d = canvas.getContext("2d");
+    enter("create_context");
+    c2d = canvas.getContext("2d");
     if (!c2d) throw new Error("OffscreenCanvas 2d context unavailable");
 
+    enter("draw_bitmap");
     c2d.drawImage(bitmap, 0, 0, width, height);
 
+    enter("read_pixels");
     const img = c2d.getImageData(0, 0, width, height);
+    enter("apply_dark");
     applyDark(img.data, theme, darkness ?? 1, warmth ?? 0);
+    enter("write_pixels");
     c2d.putImageData(img, 0, 0);
 
     // Paste the original image regions back, then veil them. Circular /
@@ -165,6 +198,7 @@ ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
     // clipped-away corners don't resurrect the light page background.
     // Rect pastes sharing an opacity are veiled through one combined path so
     // overlaps are only dimmed once.
+    enter("restore_images");
     if (imageRects && imageRects.length > 0) {
       for (const r of imageRects) {
         if (r.rounded) {
@@ -200,20 +234,38 @@ ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
         c2d.fill();
       }
     }
+    enter("close_bitmap");
     bitmap.close?.();
 
+    enter("encode_jpeg");
     const blob = await canvas.convertToBlob({
       type: "image/jpeg",
       quality: 0.88,
     });
 
     const res: DarkifyResponse = { id, blob };
+    enter("post_result");
     ctx.postMessage(res);
   } catch (err) {
-    console.error("[dark-worker] failed", err);
+    let contextLost: boolean | undefined;
+    try { contextLost = c2d?.isContextLost?.(); } catch { /* diagnostic only */ }
+    let diagnostic: DarkWorkerFailure | undefined;
+    try {
+      diagnostic = describeDarkWorkerFailure(err, {
+        step, page_number: e.data.pageNumber, width, height, pixel_count: width * height,
+        bitmap_width: bitmapWidth, bitmap_height: bitmapHeight,
+        canvas_width: canvas?.width, canvas_height: canvas?.height,
+        image_region_count: imageRects?.length ?? 0,
+        source_bytes: e.data.sourceBytes,
+        theme, image_mode: e.data.imageMode, context_lost: contextLost,
+        elapsed_ms: elapsed(started), step_elapsed_ms: elapsed(stepStarted),
+      });
+    } catch { /* diagnostic failure must not prevent the error response */ }
+    try { console.error("[dark-worker] failed", diagnostic ?? { step }); } catch { /* diagnostic only */ }
     const res: DarkifyResponse = {
       id,
-      error: err instanceof Error ? err.message : String(err),
+      error: "PDF image worker failed",
+      ...(diagnostic ? { diagnostic } : {}),
     };
     ctx.postMessage(res);
   } finally {

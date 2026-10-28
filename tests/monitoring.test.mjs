@@ -15,8 +15,9 @@ function compile(file, imports) {
   }, exports);
   return exports;
 }
+const workerDiagnostics = compile('../lib/dark-worker-diagnostics.ts', {});
 const sentry = [];
-const diagnostics = compile('../lib/pdf-image-diagnostics.ts', { '@sentry/nextjs': { captureException: (...args) => sentry.push(args) } });
+const diagnostics = compile('../lib/pdf-image-diagnostics.ts', { './dark-worker-diagnostics': workerDiagnostics, '@sentry/nextjs': { captureException: (...args) => sentry.push(args) } });
 const classifier = compile('../lib/pdf-load-error.ts', { './i18n': { T: {} } });
 const { beginPdfOperation, recordPdfFailure } = compile('../lib/pdf-monitoring.ts', {
   './analytics-events': analytics, './pdf-load-error': classifier, './pdf-image-diagnostics': diagnostics,
@@ -139,7 +140,7 @@ test('invert export failures retain a safe processing step and page number', () 
 test('a failing error-monitor SDK never replaces the PDF error handling', () => {
   const events = [];
   setup((name, data) => events.push({ name, data }));
-  const broken = compile('../lib/pdf-image-diagnostics.ts', { '@sentry/nextjs': { captureException: () => { throw Error('SDK offline'); } } });
+  const broken = compile('../lib/pdf-image-diagnostics.ts', { './dark-worker-diagnostics': workerDiagnostics, '@sentry/nextjs': { captureException: () => { throw Error('SDK offline'); } } });
   assert.doesNotThrow(() => broken.capturePdfProcessingException(new Error('private text'), 'export'));
 });
 
