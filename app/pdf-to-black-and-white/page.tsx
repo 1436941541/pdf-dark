@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MonochromeWorkspace } from "@/components/monochrome-workspace";
+import { MonochromeGuide } from "@/components/monochrome-guide";
 import { Footer } from "@/components/footer";
 import { ToolNavigation } from "@/components/tool-navigation";
 import { IconLock, IconDownload } from "@/components/icons";
@@ -20,13 +21,18 @@ export const metadata: Metadata = {
 };
 
 const FAQ = [
-  { q: "How do I convert a PDF to black and white?", a: "Choose Grayscale or Pure black & white, then select your PDF. Compare the original and converted previews, adjust the threshold if needed, and click Convert & download PDF. The result is a separate file." },
-  { q: "What is the difference between grayscale and pure black and white?", a: "Grayscale replaces colors with shades of gray, preserving the tones in photos and charts. Pure black and white uses only two colors. It works well for text and line drawings, but can remove detail from photographs." },
-  { q: "Can I convert a scanned PDF?", a: "Yes. Scanned pages are converted along with text-based pages. For faint text, try Pure black & white and increase the threshold while checking the preview. This does not add OCR or recover missing detail." },
-  { q: "Will my PDF be uploaded?", a: "No. Your file is opened, previewed and converted in your browser. There is no document upload, account or server-side conversion." },
-  { q: "Will text, links and forms be preserved?", a: "This version renders the page appearance into images and adds a searchable text layer where supported. Some text, including rotated text and characters outside the supported font, may not carry over. Original vector detail, interactive links, forms, bookmarks and digital signatures are not preserved. Keep your original file." },
-  { q: "Does this make the PDF smaller or save ink?", a: "Not necessarily. Output size depends on the document, and rendered pages can make a file larger. Grayscale removes color but keeps gray backgrounds. For a dark background that needs to become white before printing, use the PDF color inverter instead." },
-  { q: "Is there a file size limit?", a: "There is no fixed upload limit because your file stays on your device. Large files can take longer or exceed browser memory. Try a smaller document if conversion fails." },
+  { q: "How can I convert a PDF to black and white online for free?", a: "Use PDF Dark's free PDF to black and white converter: choose Grayscale or Pure black & white, open your file, compare the previews, and select Convert & download PDF. No account is required, and the converter does not add a visible watermark. The result is a separate PDF; your original is not overwritten." },
+  { q: "Can I convert a confidential PDF without uploading it?", a: "PDF Dark processes your selected PDF in your browser rather than uploading it for server-side conversion. The website still loads ordinary resources, advertising and analytics, so it is not an offline application. Review the privacy policy for details about website data handling." },
+  { q: "Should I choose grayscale or pure black and white?", a: "Choose Grayscale for photos, illustrations and reports that need intermediate tones. Choose Pure black & white for text or line drawings that suit two colors. Compare representative pages first: similar-brightness chart colors can merge in grayscale, while two-color conversion can remove faint details." },
+  { q: "Should I convert the PDF or use my printer's black-and-white setting?", a: "Your printer's monochrome setting may be enough for a single paper copy. Use PDF Dark when you want to preview, save or share a monochrome PDF first. Conversion does not guarantee ink savings: grayscale can retain gray backgrounds, and pure black and white can create solid black areas." },
+  { q: "Can I use this converter on a phone, Mac or Windows PC?", a: "You can use PDF Dark in a modern browser on a phone, Mac or Windows PC without installing a desktop converter. Document capacity depends on the browser and available device resources. Check your preview, and try a smaller PDF or another device if processing fails." },
+  { q: "How do I convert a scanned PDF with faint text?", a: "Select Pure black & white and adjust the threshold from its default of 128 within the slider's 1–254 range. Higher values make more tones black, including faint strokes and some paper shadows. Compare both together, or try Grayscale. This does not add OCR or recover missing detail." },
+  { q: "Will the converted PDF still support text search and copying?", a: "PDF Dark adds a limited invisible text layer from text already present in the source, where supported. Some characters, rotated text and vertical text may not carry over. It does not recognize words inside scanned images because OCR is not provided. Check search and copying in your download." },
+  { q: "Will links, forms, bookmarks and digital signatures be preserved?", a: "No. This converter rebuilds page appearances as images with a limited text layer; it does not preserve interactive links, fillable forms, bookmarks or digital signatures. Original vector objects and fonts are not retained as their original objects. Keep the source when those features are required." },
+  { q: "Will converting to black and white make my PDF smaller?", a: "Not necessarily. Rendering compact text pages into images can increase the output size, and results vary for scanned documents. PDF Dark is not a dedicated PDF compressor. Pure black and white describes the visible result, not a guarantee of a specially compressed one-bit file." },
+  { q: "Can I choose an export page range or batch-convert several PDFs?", a: "PDF Dark currently processes one PDF at a time and exports all its pages. The preview page only selects what you inspect. Your chosen mode and threshold apply to the whole export; this page has no page-range, batch-conversion or individual per-page settings." },
+  { q: "Can I convert a PDF that requires a password?", a: "PDF Dark has no password-entry or unlocking workflow. Use PDF software you are authorized to use to open the original and prepare a copy that opens without a password, then try conversion. Keep your source file and check the saved copy before relying on it." },
+  { q: "Why does a large PDF stop converting or make my phone slow?", a: "Large or complex PDFs can exceed browser resources even when their file size looks small. This page has no fixed file-size rejection, but device memory is finite. Try a document with fewer pages, close other demanding tabs, or use another device with more available memory." },
 ];
 
 export default function BlackAndWhitePage() {
@@ -74,6 +80,7 @@ export default function BlackAndWhitePage() {
             {[['Choose a mode', 'Use grayscale for tonal detail, or pure black and white for a two-color result.'], ['Preview your PDF', 'Pick a file and compare both versions. Browse pages and tune the threshold.'], ['Download your copy', 'Convert all pages locally and save the new PDF. Your original stays unchanged.']].map(([title, description], index) => <li key={title}><span className="mx-auto flex h-9 w-9 items-center justify-center rounded-full border border-amber-400/30 bg-amber-400/5 text-sm text-amber-400">{index + 1}</span><h3 className="mt-4 font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-neutral-400">{description}</p></li>)}
           </ol>
         </section>
+        <MonochromeGuide />
         <section id="faq" className="mx-auto max-w-3xl px-6 pb-16">
           <h2 className="mb-8 text-center text-2xl font-bold">Frequently asked questions</h2>
           <div className="space-y-3">{FAQ.map(({ q, a }) => <details key={q} className="rounded-lg border border-neutral-800 bg-neutral-900/30 open:bg-neutral-900/60"><summary className="cursor-pointer p-4 font-medium text-neutral-100">{q}</summary><p className="px-4 pb-4 text-sm leading-relaxed text-neutral-400">{a}</p></details>)}</div>

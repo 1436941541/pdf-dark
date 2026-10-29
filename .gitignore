@@ -22,6 +22,9 @@
 # playwright / test artifacts
 /.playwright-mcp/
 
+# Local SEO analysis cache
+/.seo-cache/
+
 # stray screenshots / dev captures (commit by adding to public/)
 *.png
 !public/**/*.png

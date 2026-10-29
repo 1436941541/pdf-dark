@@ -34,7 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${base}/pdf-to-black-and-white`,
-      lastModified: "2026-10-13",
+      lastModified: "2026-10-29",
       changeFrequency: "monthly",
       priority: 0.9,
     },
