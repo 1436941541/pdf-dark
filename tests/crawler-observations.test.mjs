@@ -87,7 +87,7 @@ test('each actual request has an independent UUID and no verified claim', () => 
 });
 
 test('named AI user-triggered fetchers are observed even when their names do not contain bot', () => {
-  for (const userAgent of ['ChatGPT-User/1.0', 'Claude-User/1.0', 'Perplexity-User/1.0', 'GPTBot/1.0', 'OAI-SearchBot/1.0']) {
+  for (const userAgent of ['ChatGPT-User/1.0', 'Claude-User/1.0', 'Perplexity-User/1.0', 'GPTBot/1.0', 'OAI-SearchBot/1.0', 'NicheFetcher/1.0']) {
     const observation = createCrawlerObservation(req('/about', { 'user-agent': userAgent }), env);
     assert.equal(observation?.userAgent, userAgent);
     assert.equal(observation?.path, '/about');
