@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import type { NextFetchEvent, NextRequest } from "next/server";
+import { observeCrawlerRequest } from "./lib/crawler-observations";
 
 // Locale segments that get their own `<html lang>` value. Everything else
 // (including the unprefixed English routes) falls back to "en" — see
 // app/layout.tsx, which reads this header to set the root `<html>` tag.
 const LOCALE_SEGMENTS = new Set(["es", "pt", "tr", "id", "de"]);
 
-export function proxy(request: NextRequest) {
+export function proxy(request: NextRequest, event: NextFetchEvent) {
+  observeCrawlerRequest(request, event);
   const firstSegment = request.nextUrl.pathname.split("/")[1];
   const locale = LOCALE_SEGMENTS.has(firstSegment) ? firstSegment : "en";
 
@@ -16,5 +18,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)", "/robots.txt", "/sitemap.xml"],
 };

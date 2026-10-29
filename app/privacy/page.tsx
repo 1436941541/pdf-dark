@@ -14,7 +14,7 @@ export default function PrivacyPage() {
       <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
         <h1 className="text-3xl font-bold text-neutral-50 mb-2">Privacy</h1>
         <p className="text-sm text-neutral-500 mb-10">
-          Last updated: October 24, 2026
+          Last updated: October 29, 2026
         </p>
 
         <p className="text-lg mb-8">
@@ -114,6 +114,26 @@ export default function PrivacyPage() {
           None of these tools sees your PDF file. If you&apos;d rather not be counted,
           a browser-level tracker blocker (uBlock Origin, Brave Shields, etc.)
           will block them.
+        </p>
+
+        <h3 className="text-lg font-semibold text-neutral-100 mt-6 mb-3">
+          Search and AI crawler requests
+        </h3>
+        <p className="mb-4">
+          When crawler monitoring is enabled, requests identifying themselves
+          as known crawlers are also recorded by our own analytics service.
+          We use the request&apos;s user agent and hosting-provided source IP
+          to check whether a claimed crawler matches its official IP ranges.
+          The source IP and raw user agent are not saved in these records.
+        </p>
+        <p>
+          Records contain a public page path without query parameters, request
+          time and method, crawler name, purpose, and verification result.
+          Individual request records are shown for seven days and daily
+          aggregates for 90 days; expired records are removed in batches.
+          This server-side monitoring uses no browser cookies and receives no
+          uploaded PDF, filename, or document content. Browser script blockers
+          do not block these server-side records.
         </p>
 
         {/* Ads */}
@@ -271,7 +291,8 @@ export default function PrivacyPage() {
           Since we don&apos;t have accounts or profiles, there&apos;s almost
           nothing tied to you personally — the traces we have are aggregate
           Google Analytics and Clarity events, Google AdSense advertising
-          cookies, short-term Vercel access logs, and (if something
+          cookies, short-term Vercel access logs, the crawler records described
+          above, and (if something
           crashes) a masked Sentry error report, plus any support email you
           choose to send. If you want to check,
           correct, or delete anything under GDPR / UK / CCPA, or just have a

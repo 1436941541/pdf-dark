@@ -1,0 +1,68 @@
+{
+  "state": "locally_verified_not_pushed_or_deployed",
+  "date": "2026-10-29",
+  "tests": {
+    "pdfDarkExactFeatureSnapshot": 93,
+    "pulseCrawlerAndUi": 106
+  },
+  "builds": {
+    "pdfDark": "passed",
+    "pulse": "passed",
+    "pulseOpenApi": "192/192 explicit"
+  },
+  "staticChecks": {
+    "pdfTargetedEslint": "passed",
+    "pulseTargetedBiome": "passed",
+    "pdfTypeScript": "passed in production build",
+    "pulseTypeScript": "four existing errors; no new crawler errors"
+  },
+  "database": {
+    "database": "isolated Neon branch",
+    "tripleRetry": [
+      "recorded",
+      "duplicate",
+      "duplicate"
+    ],
+    "crossSiteRejected": true,
+    "invalidSignatureRejected": true,
+    "staleEventRejected": true,
+    "concurrentCapAccepted": 1,
+    "concurrentCapRejected": 2,
+    "midnightAccepted": "recorded",
+    "rawCleaned": 1,
+    "ipUaNotStored": true,
+    "oldKeyRevoked": true,
+    "websiteId": "43e0375c-2472-47b1-9364-34042a742f02"
+  },
+  "migration": {
+    "finalMigrationStatements": 7,
+    "foreignKeys": 3,
+    "rolledBackCleanly": true,
+    "independentCounts": {
+      "sessions": 0,
+      "events": 0,
+      "crawlers": 4
+    }
+  },
+  "localPipeline": {
+    "observations": 4,
+    "sourceIp": "unavailable on localhost",
+    "verification": "unverified",
+    "originalSessions": 0,
+    "originalWebsiteEvents": 0
+  },
+  "browser": {
+    "desktop1440": "passed",
+    "mobile390": "passed, no document overflow",
+    "monochromeModes": "grayscale and pure black-and-white: preview, navigation and eight-page exports passed",
+    "collectorOffline": "same successful exports with no page exceptions",
+    "exportPayloads": "identical to baseline in both modes"
+  },
+  "production": {
+    "databaseModified": false,
+    "environmentModified": false,
+    "deploymentCreated": false,
+    "syntheticErrorsOrCrawlerEvents": false
+  },
+  "rollback": "Disable producer flag and redeploy, or immediately revoke the website ingest key."
+}
