@@ -9,7 +9,7 @@ const PUBLIC_PATHS = new Set([
   ...["es", "pt", "de"].flatMap(locale => [`/${locale}`, `/${locale}/invert-pdf-colors`]),
   ...VARIANTS.map(variant => `/blog/${variant.slug}`),
 ]);
-const BOT_CANDIDATE = /bot\b|crawler|spider|slurp|Google-InspectionTool|ChatGPT-User|facebookexternalhit|WhatsApp|HeadlessChrome/i;
+const BOT_CANDIDATE = /bot\b|crawler|spider|slurp|Google-InspectionTool|ChatGPT-User|Claude-User|Perplexity-User|facebookexternalhit|WhatsApp|HeadlessChrome/i;
 const TIMEOUT_MS = 1500;
 const MAX_IN_FLIGHT = 8;
 let inFlight = 0;
