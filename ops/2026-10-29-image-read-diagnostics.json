@@ -1,0 +1,298 @@
+{
+  "created_at": "2026-10-29T02:41:03.556Z",
+  "timezone": "Asia/Shanghai",
+  "status": "verified_for_release",
+  "base_commit": "8ce7853cbc3093f271f4476442f932b32469b825",
+  "scope": "Add privacy-safe diagnostics to main-thread image fetch/body-read/bitmap-decode failures. No conversion/render/cache policy changes.",
+  "changes": {
+    "memory": [
+      "memory_api",
+      "js_heap_used_bytes",
+      "js_heap_total_bytes",
+      "js_heap_limit_bytes",
+      "device_memory_gb"
+    ],
+    "cache": [
+      "total_pages",
+      "cached_pages",
+      "cached_original_chars",
+      "cached_display_chars",
+      "cached_variant_chars",
+      "cached_variant_count",
+      "cached_data_url_chars",
+      "cached_blob_bytes",
+      "cache_incomplete",
+      "cache_snapshot_status"
+    ],
+    "classification": [
+      "out_of_memory",
+      "security_error",
+      "quota_exceeded",
+      "invalid_state",
+      "fetch_failed",
+      "body_read_failed",
+      "bitmap_decode_failed",
+      "other"
+    ],
+    "reporting": "Existing pdf_image_processing context gains safe scalar metrics. image_error_hint tag and image-read/step/hint fingerprint distinguish new failures. Existing historical events cannot be enriched retroactively.",
+    "sampling": "Cache and memory probes execute only after a non-cancelled image read failure. Reader uses the live initial-render/variant arrays; exporter uses accumulated output Blobs. All probe failures preserve original error identity."
+  },
+  "privacy": [
+    "No file names, raw source data URLs, PDF text, image bytes or raw exception messages are added to diagnostics.",
+    "Only fixed-enum classifications and bounded scalar counters are emitted.",
+    "No document buffers are copied, decoded or retained for logging."
+  ],
+  "limitations": [
+    "performance.memory is optional and legacy. JS heap counters are not total tab/device/canvas/GPU/Worker resident memory. Unavailable metrics are omitted, never invented as zero.",
+    "device_memory_gb is browser-reported coarse capacity, not free RAM. Cache characters are logical payload characters, not physical memory bytes; aliases are de-duplicated only within a page.",
+    "out_of_memory is a bounded error-message hint, not proof of OS OOM. A process killed before JavaScript handles the failure cannot guarantee a report.",
+    "Chrome/WebKit desktop testing is not a real Android/iPhone device test. Local browser QA isolates third-party HTTPS ads/analytics for both builds; production settings were unchanged.",
+    "Failure branch tests use local unit doubles and mocked Sentry only. No simulated error was injected into production or production reporting.",
+    "The earlier working-tree checks include separate client-diagnostics work. Exact release checks exclude that work, which remains untouched locally."
+  ],
+  "documentation": [
+    "https://developer.mozilla.org/en-US/docs/Web/API/Performance/memory",
+    "https://developer.mozilla.org/en-US/docs/Web/API/Navigator/deviceMemory"
+  ],
+  "source_sha256": {
+    "lib/pdf-image-diagnostics.ts": "761ce93aa7529aa15790fe64726f443e3443b1ecd00a62cb8b4ff8ea37a3e9b0",
+    "lib/pdf-image-resource-diagnostics.ts": "7dfe3fb301ac9a1cb9d4a7bab516e75eb4c74862beb106f7003a86ee8fc64ad1",
+    "components/pdf-viewer.tsx": "fa10101971196e84ef8fb36c6e1286492099f2b76c44ebba627154e458886c9b",
+    "components/downloader.tsx": "bca7a0f1b71ad00d5bbacf1dffe573212019ca8fa8ed2761cc22f0f86b76115d",
+    "tests/image-read-diagnostics.test.mjs": "1df80749e73c47e9b03f493546026bb1d25872ffaa1ac027709a181b2106f34c",
+    "tests/pdf-image-resource-diagnostics.test.mjs": "d1ebf25af8c74a4acaf9e229fd2badfbe4ad362cf4a99f1107b5a9c30ae91036",
+    "tests/monitoring.test.mjs": "80f50ec17a8ac10518235ac7fa33df04b8948b8f740761af4a77734e330744ef",
+    "tests/export-memory.test.mjs": "719dd41c870cb5e3fd2216b4c5142c9fe40cbbfe8b389ea59eb8927b8284ada0",
+    "tests/dark-worker-diagnostics.test.mjs": "b4c64dd7e0958c6fe57739d50d4c2835bef5a0e60f8f2901fd2c316c39292505"
+  },
+  "working_tree_checks": {
+    "unit": {
+      "passed": 90,
+      "failed": 0,
+      "log": "/tmp/pdf-image-read-final-tests.log",
+      "includes_existing_unrelated_client_diagnostic_tests": true
+    },
+    "typescript": {
+      "passed": true,
+      "log": "/tmp/pdf-image-read-tsc.log"
+    },
+    "production_build": {
+      "passed": true,
+      "sentry_dsn_disabled_for_local_build": true,
+      "log": "/tmp/pdf-image-read-build.log"
+    },
+    "local_start": {
+      "passed": true,
+      "modified_port": 4130,
+      "baseline_port": 4131,
+      "logs": [
+        "/tmp/pdf-image-read-server.log",
+        "/tmp/pdf-image-read-baseline-server.log"
+      ]
+    },
+    "lint": {
+      "strict_passed": false,
+      "existing_reader_set_state_in_effect_errors": 3,
+      "before_log": "/tmp/pdf-image-read-lint-before.log",
+      "after_log": "/tmp/pdf-image-read-lint.log",
+      "all_changed_code_passed_with_only_existing_rule_disabled_by_cli": true,
+      "filtered_log": "/tmp/pdf-image-read-final-lint.log",
+      "source_suppressions_added": false
+    },
+    "browser_comparisons": [
+      {
+        "engine": "chrome",
+        "browser": "156.0.8078.73",
+        "export_pairs": [
+          {
+            "theme": "Midnight",
+            "mode": "Original",
+            "pages": 8,
+            "identical_normalized_pdf_payload": true
+          },
+          {
+            "theme": "Sepia",
+            "mode": "Auto",
+            "pages": 8,
+            "identical_normalized_pdf_payload": true
+          },
+          {
+            "theme": "Solarized",
+            "mode": "Invert",
+            "pages": 8,
+            "identical_normalized_pdf_payload": true
+          },
+          {
+            "theme": "OLED",
+            "mode": "Auto",
+            "pages": 8,
+            "identical_normalized_pdf_payload": true
+          }
+        ],
+        "reader_variant_pairs": 4,
+        "all_page_image_hashes_identical": true,
+        "jump_page": "4",
+        "errors": [],
+        "diagnostic_errors": []
+      },
+      {
+        "engine": "webkit",
+        "browser": "26.6",
+        "export_pairs": [
+          {
+            "theme": "Midnight",
+            "mode": "Original",
+            "pages": 8,
+            "identical_normalized_pdf_payload": true
+          },
+          {
+            "theme": "Sepia",
+            "mode": "Auto",
+            "pages": 8,
+            "identical_normalized_pdf_payload": true
+          },
+          {
+            "theme": "Solarized",
+            "mode": "Invert",
+            "pages": 8,
+            "identical_normalized_pdf_payload": true
+          },
+          {
+            "theme": "OLED",
+            "mode": "Auto",
+            "pages": 8,
+            "identical_normalized_pdf_payload": true
+          }
+        ],
+        "reader_variant_pairs": 4,
+        "all_page_image_hashes_identical": true,
+        "jump_page": "4",
+        "errors": [],
+        "diagnostic_errors": []
+      }
+    ],
+    "cancellation_and_retry": [
+      {
+        "engine": "chromium",
+        "readerNavigationCancelled": true,
+        "exportNavigationCancelled": true,
+        "retrySucceeded": true,
+        "output": "/tmp/pdf-image-read-browser/chromium-cancel-retry.pdf",
+        "downloadFailure": null,
+        "errors": [],
+        "diagnosticErrors": []
+      },
+      {
+        "engine": "webkit",
+        "readerNavigationCancelled": true,
+        "exportNavigationCancelled": true,
+        "retrySucceeded": true,
+        "output": "/tmp/pdf-image-read-browser/webkit-cancel-retry.pdf",
+        "downloadFailure": null,
+        "errors": [],
+        "diagnosticErrors": []
+      }
+    ],
+    "cancellation_output_comparison": [
+      {
+        "engine": "chromium",
+        "pages": 8,
+        "identical": true
+      },
+      {
+        "engine": "webkit",
+        "pages": 8,
+        "identical": true
+      }
+    ],
+    "long_document": {
+      "pages": 1000,
+      "loaded_pages": 1000,
+      "progress": null,
+      "browser": "156.0.8078.73",
+      "theme_controls_enabled": {
+        "midnightEnabled": true,
+        "autoEnabled": true
+      },
+      "jump_page": "1000",
+      "errors": [],
+      "diagnostics": [],
+      "test_page_sentry_exceptions": [],
+      "screenshot": "output/playwright/image-read-local-1000-reader.png",
+      "evidence": "/tmp/pdf-image-read-long-finish.txt"
+    },
+    "independent_review": {
+      "blocking_findings": 0,
+      "focus": "Cancellation/success behavior, lazily captured live caches, privacy/metric bounds, new grouping and probe failure isolation",
+      "suggested_pending_read_cache_mutation_test_added_and_passed": true
+    }
+  },
+  "release_checks": {
+    "verified_at": "2026-10-29T02:48:19.732Z",
+    "snapshot": "/tmp/pdf-image-read-release",
+    "excludes_unrelated_client_diagnostics": true,
+    "unit": {
+      "passed": 82,
+      "failed": 0,
+      "log": "/tmp/image-read-release-exact-tests.log"
+    },
+    "production_build": {
+      "passed": true,
+      "includes_typescript": true,
+      "log": "/tmp/image-read-release-build.log"
+    },
+    "lint": {
+      "passed_except_preexisting_reader_hook_rule": true,
+      "existing_reader_hook_errors": 3,
+      "filtered_log": "/tmp/image-read-release-exact-lint.log",
+      "initial_attempt": "Lint started before dependency clone completed and encountered a missing module; rerun after clone completed passed."
+    },
+    "local_start": {
+      "passed": true,
+      "port": 4140,
+      "log": "/tmp/image-read-release-server.log"
+    },
+    "browser_smoke": {
+      "browser": "156.0.8078.73",
+      "readerPages": 8,
+      "jump": "4",
+      "theme": "Sepia",
+      "mode": "Original",
+      "downloadFailure": null,
+      "errors": [],
+      "diagnosticErrors": []
+    },
+    "pdf_output": {
+      "pages": 8,
+      "identical": true,
+      "before": {
+        "file": "/tmp/pdf-image-read-browser/chromium-baseline-Midnight-Original.pdf",
+        "bytes": 473703,
+        "pages": 8,
+        "sha": "6f3963526a93b6fec6fe70bac91bb04d7e40f7dd4779fc862fbc95c4e9df8350"
+      },
+      "after": {
+        "file": "/tmp/image-read-release-local.pdf",
+        "bytes": 473703,
+        "pages": 8,
+        "sha": "6f3963526a93b6fec6fe70bac91bb04d7e40f7dd4779fc862fbc95c4e9df8350"
+      }
+    },
+    "independent_review": {
+      "blocking_findings": 0,
+      "new_tests_independently_rerun": 20
+    },
+    "staged_files": [
+      "components/downloader.tsx",
+      "components/pdf-viewer.tsx",
+      "lib/pdf-image-diagnostics.ts",
+      "lib/pdf-image-resource-diagnostics.ts",
+      "ops/2026-10-29-image-read-diagnostics.json",
+      "tests/dark-worker-diagnostics.test.mjs",
+      "tests/export-memory.test.mjs",
+      "tests/image-read-diagnostics.test.mjs",
+      "tests/monitoring.test.mjs",
+      "tests/pdf-image-resource-diagnostics.test.mjs"
+    ]
+  }
+}

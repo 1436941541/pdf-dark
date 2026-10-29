@@ -13,6 +13,7 @@ function compile(file, imports = {}, globals = {}) {
   return exports;
 }
 const diagnostics = compile('../lib/dark-worker-diagnostics.ts');
+const resourceDiagnostics = compile('../lib/pdf-image-resource-diagnostics.ts');
 const { sanitizeDarkWorkerFailure, describeDarkWorkerFailure, restoreDarkWorkerError, darkWorkerFailure } = diagnostics;
 function harness(step, options = {}) {
   const messages = [], logged = [];
@@ -99,6 +100,7 @@ test('actual worker error packet reaches redacted Sentry context with stage-spec
   const h = harness('read_pixels'); await h.self.onmessage({ data: h.request });
   const calls = [];
   const monitoring = compile('../lib/pdf-image-diagnostics.ts', {
+    './pdf-image-resource-diagnostics': resourceDiagnostics,
     './dark-worker-diagnostics': diagnostics, '@sentry/nextjs': { captureException: (...args) => calls.push(args) },
   }, { document: { visibilityState: 'hidden', hasFocus: () => false }, navigator: { onLine: false } });
   const error = restoreDarkWorkerError(h.messages[0]);
@@ -122,6 +124,7 @@ test('missing browser signals or a failing SDK cannot replace a worker error', (
   const error = restoreDarkWorkerError({ diagnostic: { version: 1, step: 'read_pixels', error_type: 'RangeError' } });
   let calls = 0;
   const monitoring = compile('../lib/pdf-image-diagnostics.ts', {
+    './pdf-image-resource-diagnostics': resourceDiagnostics,
     './dark-worker-diagnostics': diagnostics,
     '@sentry/nextjs': { captureException() { calls++; throw Error('SDK offline'); } },
   }, { document: { get visibilityState() { throw Error('unavailable'); } } });

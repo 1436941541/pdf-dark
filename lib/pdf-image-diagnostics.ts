@@ -1,5 +1,13 @@
 import * as Sentry from "@sentry/nextjs";
 import { darkWorkerFailure } from "./dark-worker-diagnostics";
+import {
+  imageReadErrorHint,
+  readImageMemorySnapshot,
+  type ImageReadStep,
+  type ImageReadErrorHint,
+  type ImageMemorySnapshot,
+  type ImageCacheSummary,
+} from "./pdf-image-resource-diagnostics";
 
 type PageImageInfo = {
   pageNumber: number;
@@ -8,10 +16,13 @@ type PageImageInfo = {
   imageRegionCount: number;
 };
 
-type ImageStep = "fetch_image_data" | "read_image_blob" | "decode_image_bitmap";
+// Providers are evaluated only after an active read failure. They must return
+// scalar summaries, never PDF contents; re-allowlist even these internal inputs.
+export type ImageCacheSnapshotProvider = () => unknown;
 
-type ImageFailureContext = {
-  step: ImageStep;
+type ImageFailureContext = Partial<ImageCacheSummary> & ImageMemorySnapshot & {
+  step: ImageReadStep;
+  error_hint: ImageReadErrorHint;
   page_number: number;
   width: number;
   height: number;
@@ -21,11 +32,47 @@ type ImageFailureContext = {
   source_empty: boolean;
   image_format: "jpeg" | "png" | "other";
   blob_bytes?: number;
-  elapsed_ms: number;
-  step_elapsed_ms: number;
-  visibility: DocumentVisibilityState;
-  document_focused: boolean;
+  elapsed_ms?: number;
+  step_elapsed_ms?: number;
+  visibility?: DocumentVisibilityState;
+  document_focused?: boolean;
+  online?: boolean;
+  cache_snapshot_status: "captured" | "unavailable";
 };
+
+const CACHE_NUMBERS = [
+  "total_pages", "cached_pages", "cached_original_chars", "cached_display_chars",
+  "cached_variant_chars", "cached_variant_count", "cached_blob_bytes", "cached_data_url_chars",
+] as const;
+
+function clockNow(): number | undefined {
+  try {
+    const value = performance.now();
+    if (Number.isFinite(value) && value >= 0) return value;
+  } catch { /* Optional diagnostics must not affect image decoding. */ }
+}
+
+function cacheSnapshot(provider?: ImageCacheSnapshotProvider): Partial<ImageCacheSummary> & {
+  cache_snapshot_status: "captured" | "unavailable";
+} {
+  const result: Partial<ImageCacheSummary> & { cache_snapshot_status: "captured" | "unavailable" } = {
+    cache_snapshot_status: "unavailable",
+  };
+  try {
+    const value = provider?.();
+    if (!value || typeof value !== "object" || Array.isArray(value)) return result;
+    const source = value as Record<string, unknown>;
+    for (const key of CACHE_NUMBERS) {
+      const n = source[key];
+      if (typeof n === "number" && Number.isSafeInteger(n) && n >= 0) {
+        result[key] = n;
+        result.cache_snapshot_status = "captured";
+      }
+    }
+    if (source.cache_incomplete === true) result.cache_incomplete = true;
+  } catch { result.cache_incomplete = true; /* Keep partial counters explicitly marked. */ }
+  return result;
+}
 
 export type PdfReaderStep =
   | "load_pdfjs"
@@ -77,8 +124,10 @@ const SAFE_ERROR_NAMES = new Set([
 ]);
 
 function safeErrorName(error: unknown): string {
-  const name = (error as { name?: unknown } | null)?.name;
-  return typeof name === "string" && SAFE_ERROR_NAMES.has(name) ? name : "Other";
+  try {
+    const name = (error as { name?: unknown } | null)?.name;
+    return typeof name === "string" && SAFE_ERROR_NAMES.has(name) ? name : "Other";
+  } catch { return "Other"; }
 }
 
 // Associate safe metadata with the original exception without replacing its
@@ -89,10 +138,11 @@ export async function loadPageBitmap(
   source: string | Blob,
   page: PageImageInfo,
   checkCancelled: () => void,
+  getCacheSnapshot?: ImageCacheSnapshotProvider,
 ): Promise<ImageBitmap> {
-  const started = performance.now();
+  const started = clockNow();
   let stepStarted = started;
-  let step: ImageStep = "fetch_image_data";
+  let step: ImageReadStep = "fetch_image_data";
   let blobBytes: number | undefined;
   let bitmap: ImageBitmap | undefined;
 
@@ -103,7 +153,7 @@ export async function loadPageBitmap(
       const response = await fetch(source);
       checkCancelled();
       step = "read_image_blob";
-      stepStarted = performance.now();
+      stepStarted = clockNow();
       blob = await response.blob();
     } else {
       blob = source;
@@ -111,39 +161,55 @@ export async function loadPageBitmap(
     blobBytes = blob.size;
     checkCancelled();
     step = "decode_image_bitmap";
-    stepStarted = performance.now();
+    stepStarted = clockNow();
     bitmap = await createImageBitmap(blob);
     checkCancelled();
     return bitmap;
   } catch (error) {
     // A navigation can cancel after decoding has already allocated a bitmap.
-    bitmap?.close();
+    try { bitmap?.close(); } catch { /* Best-effort cleanup preserves cancellation/error semantics. */ }
     // Navigation may interrupt fetch/blob decoding with a TypeError rather
     // than AbortError. Prefer the caller's explicit cancellation state.
     checkCancelled();
     if (error instanceof DOMException && error.name === "AbortError") throw error;
 
-    const context: ImageFailureContext = {
-      step,
-      page_number: page.pageNumber,
-      width: page.width,
-      height: page.height,
-      image_region_count: page.imageRegionCount,
-      source_kind: typeof source !== "string" ? "blob" : source.startsWith("data:") ? "data" : source.startsWith("blob:") ? "blob" : "other",
-      source_length: typeof source === "string" ? source.length : source.size,
-      source_empty: typeof source === "string" ? source.length === 0 || source === "data:," : source.size === 0,
-      image_format: typeof source === "string"
-        ? source.startsWith("data:image/jpeg;") ? "jpeg" : source.startsWith("data:image/png;") ? "png" : "other"
-        : source.type === "image/jpeg" ? "jpeg" : source.type === "image/png" ? "png" : "other",
-      blob_bytes: blobBytes,
-      elapsed_ms: Math.round(performance.now() - started),
-      step_elapsed_ms: Math.round(performance.now() - stepStarted),
-      visibility: document.visibilityState,
-      document_focused: document.hasFocus(),
-    };
-    if (typeof error === "object" && error !== null) failures.set(error, context);
-    // Never log the source URL, file name, PDF text, or image bytes.
-    console.error("[pdf-dark] image processing diagnostic", context);
+    try {
+      const ended = clockNow();
+      const context: ImageFailureContext = {
+        ...readImageMemorySnapshot(),
+        ...cacheSnapshot(getCacheSnapshot),
+        step,
+        error_hint: imageReadErrorHint(error, step),
+        page_number: page.pageNumber,
+        width: page.width,
+        height: page.height,
+        image_region_count: page.imageRegionCount,
+        source_kind: typeof source !== "string" ? "blob" : source.startsWith("data:") ? "data" : source.startsWith("blob:") ? "blob" : "other",
+        source_length: typeof source === "string" ? source.length : source.size,
+        source_empty: typeof source === "string" ? source.length === 0 || source === "data:," : source.size === 0,
+        image_format: typeof source === "string"
+          ? source.startsWith("data:image/jpeg;") ? "jpeg" : source.startsWith("data:image/png;") ? "png" : "other"
+          : source.type === "image/jpeg" ? "jpeg" : source.type === "image/png" ? "png" : "other",
+        blob_bytes: blobBytes,
+        ...(ended !== undefined && started !== undefined && ended >= started ? { elapsed_ms: Math.round(ended - started) } : {}),
+        ...(ended !== undefined && stepStarted !== undefined && ended >= stepStarted ? { step_elapsed_ms: Math.round(ended - stepStarted) } : {}),
+      };
+      try {
+        const visibility = document.visibilityState;
+        if (visibility === "visible" || visibility === "hidden") context.visibility = visibility;
+      } catch { /* unavailable DOM signal */ }
+      try {
+        const focused = document.hasFocus();
+        if (typeof focused === "boolean") context.document_focused = focused;
+      } catch { /* unavailable DOM signal */ }
+      try {
+        const online = navigator.onLine;
+        if (typeof online === "boolean") context.online = online;
+      } catch { /* unavailable network signal */ }
+      if (typeof error === "object" && error !== null) failures.set(error, context);
+      // Never log the source URL, file name, PDF text, or image bytes.
+      try { console.error("[pdf-dark] image processing diagnostic", context); } catch { /* unavailable console */ }
+    } catch { /* Diagnostics must never replace a PDF failure with a probe failure. */ }
     throw error;
   }
 }
@@ -170,16 +236,19 @@ export function capturePdfProcessingException(
   // replace the message and discard non-script/inline/local-media frames.
   const safe = new Error("PDF processing failed");
   safe.name = "PdfProcessingError";
-  if (error instanceof Error && error.stack) {
-    const frames = error.stack.split("\n").filter(line => /^\s*at /.test(line) && /https?:\/\/[^\s)]+\/_next\//.test(line) && !/data:|blob:/.test(line));
-    if (frames.length) safe.stack = `${safe.name}: ${safe.message}\n${frames.join("\n")}`;
-  }
+  try {
+    if (error instanceof Error && typeof error.stack === "string") {
+      const frames = error.stack.split("\n").filter(line => /^\s*at /.test(line) && /https?:\/\/[^\s)]+\/_next\//.test(line) && !/data:|blob:/.test(line));
+      if (frames.length) safe.stack = `${safe.name}: ${safe.message}\n${frames.join("\n")}`;
+    }
+  } catch { /* A non-standard stack getter must not prevent error handling. */ }
   try {
     const pageNumber = diagnostic.pageNumber;
     const originalErrorType = workerContext?.error_type ?? safeErrorName(error);
     const failureStep = diagnostic.readerStep ?? diagnostic.invertStep ?? context?.step ?? "unknown";
     Sentry.captureException(safe, {
       fingerprint: ["pdf-processing", tags.tool ?? "unknown", stage, failureStep, originalErrorType,
+        ...(context ? ["image-read", context.step, context.error_hint] : []),
         ...(workerContext ? ["dark-worker", workerContext.step, workerContext.error_hint] : []),
       ],
       tags: {
@@ -188,7 +257,7 @@ export function capturePdfProcessingException(
         original_error_type: originalErrorType,
         ...(diagnostic.readerStep ? { reader_step: diagnostic.readerStep } : {}),
         ...(diagnostic.invertStep ? { invert_step: diagnostic.invertStep } : {}),
-        ...(context ? { image_step: context.step } : {}),
+        ...(context ? { image_step: context.step, image_error_hint: context.error_hint } : {}),
         ...(workerContext ? {
           worker_step: workerContext.step,
           worker_error_type: workerContext.error_type,

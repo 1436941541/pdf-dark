@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { loadPageBitmap, type PdfReaderStep } from "@/lib/pdf-image-diagnostics";
+import { loadPageBitmap, type PdfReaderStep, type ImageCacheSnapshotProvider } from "@/lib/pdf-image-diagnostics";
+import { summarizeImageCache } from "@/lib/pdf-image-resource-diagnostics";
 import { restoreDarkWorkerError } from "@/lib/dark-worker-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type {
@@ -277,6 +278,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       nextDarkness: number,
       nextWarmth: number,
       cancelled: () => boolean,
+      getCacheSnapshot?: ImageCacheSnapshotProvider,
     ): Promise<string> => {
       throwIfCancelled(cancelled);
       // "Original" mode treats a scanned page (page == one big image) as an
@@ -290,7 +292,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         width: p.width,
         height: p.height,
         imageRegionCount: p.imageRects.length,
-      }, () => throwIfCancelled(cancelled));
+      }, () => throwIfCancelled(cancelled), getCacheSnapshot);
 
       // Per-image treatment (keep / dim / invert) — images slated for
       // inversion simply aren't pasted back, the dark mapping handles them.
@@ -499,6 +501,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             appliedDarkness,
             appliedWarmth,
             () => cancelled,
+            () => summarizeImageCache(rendered, pdf.numPages),
           );
           if (cancelled) return;
 
@@ -617,6 +620,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
               appliedDarkness,
               appliedWarmth,
               () => aborted,
+              () => summarizeImageCache(next, progress.total || undefined),
             );
             if (aborted || themeVersionRef.current !== version) return;
             next[idx] = {

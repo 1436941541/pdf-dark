@@ -15,6 +15,7 @@ function compile(file, imports = {}, globals = {}) {
   return exports;
 }
 const workerDiagnostics = compile('../lib/dark-worker-diagnostics.ts');
+const resourceDiagnostics = compile('../lib/pdf-image-resource-diagnostics.ts', {});
 const { canvasToJpegBlob } = compile('../lib/main-thread.ts');
 
 test('JPEG export retains encoded bytes and quality without a Base64 or fetch round trip', async () => {
@@ -40,7 +41,7 @@ test('Blob decoding bypasses fetch and closes a bitmap if cancelled immediately 
   const bitmap = { close() { closes++; } };
   let checks = 0;
   const blob = new Blob(['jpeg'], { type: 'image/jpeg' });
-  const { loadPageBitmap } = compile('../lib/pdf-image-diagnostics.ts', { './dark-worker-diagnostics': workerDiagnostics, '@sentry/nextjs': {} }, {
+  const { loadPageBitmap } = compile('../lib/pdf-image-diagnostics.ts', { './pdf-image-resource-diagnostics': resourceDiagnostics, './dark-worker-diagnostics': workerDiagnostics, '@sentry/nextjs': {} }, {
     fetch() { assert.fail('Blob input must not use fetch'); },
     createImageBitmap: async (input) => { assert.equal(input, blob); return bitmap; },
   });
@@ -54,7 +55,7 @@ test('Blob decoding bypasses fetch and closes a bitmap if cancelled immediately 
 test('Blob decode failures keep safe diagnostics and the original rejection', async () => {
   const captured = [];
   const error = new TypeError('PRIVATE document data');
-  const diagnostics = compile('../lib/pdf-image-diagnostics.ts', { './dark-worker-diagnostics': workerDiagnostics, '@sentry/nextjs': { captureException: (...args) => captured.push(args) } }, {
+  const diagnostics = compile('../lib/pdf-image-diagnostics.ts', { './pdf-image-resource-diagnostics': resourceDiagnostics, './dark-worker-diagnostics': workerDiagnostics, '@sentry/nextjs': { captureException: (...args) => captured.push(args) } }, {
     createImageBitmap: async () => { throw error; },
     console: { error() {} }, document: { visibilityState: 'visible', hasFocus: () => true },
   });

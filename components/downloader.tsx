@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PDFDocumentLoadingTask, PDFDocumentProxy } from "pdfjs-dist";
-import { loadPageBitmap, type PdfInvertStep } from "@/lib/pdf-image-diagnostics";
+import { loadPageBitmap, type PdfInvertStep, type ImageCacheSnapshotProvider } from "@/lib/pdf-image-diagnostics";
+import { summarizeImageCache } from "@/lib/pdf-image-resource-diagnostics";
 import { restoreDarkWorkerError } from "@/lib/dark-worker-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type { DarkifyRequest, DarkifyResponse } from "@/lib/dark-worker";
@@ -126,6 +127,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
       imageRects: ImageRect[],
       cancelled: () => boolean,
       pageNumber: number,
+      getCacheSnapshot?: ImageCacheSnapshotProvider,
     ): Promise<Blob> => {
       throwIfCancelled(cancelled);
       const w = workerRef.current;
@@ -135,7 +137,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         width,
         height,
         imageRegionCount: imageRects.length,
-      }, () => throwIfCancelled(cancelled));
+      }, () => throwIfCancelled(cancelled), getCacheSnapshot);
 
       const rects = imageRects.filter(
         (r) => imageTreatment(imageMode, r) !== "invert",
@@ -288,6 +290,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
                     imageRects,
                     () => cancelledRef.current,
                     i,
+                    () => summarizeImageCache(pages, pdf?.numPages),
                   );
             if (cancelledRef.current) return;
 
