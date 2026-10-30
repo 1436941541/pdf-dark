@@ -9,6 +9,7 @@ import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
 import { yieldToMain } from "@/lib/main-thread";
 import { beginPdfOperation, recordPdfFailure, trackPdfDownload } from "@/lib/pdf-monitoring";
 import type { PdfInput } from "@/lib/analytics-events";
+import type { MonochromeDiagnostic } from "@/lib/monochrome-pdf";
 
 type Source = { file: File; pdf: PDFDocumentProxy; input: PdfInput };
 type Preview = { original: string; converted: string; loading: boolean; error: string | null; key: string };
@@ -60,6 +61,7 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
   useEffect(() => {
     if (!source) return;
     const controller = new AbortController();
+    const diagnostic: MonochromeDiagnostic = {};
     async function update() {
       await yieldToMain();
       if (controller.signal.aborted) return;
@@ -67,10 +69,10 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
       try {
         const processor = processorRef.current;
         if (!processor) return;
-        const result = await previewMonochromePdf(source!.pdf, page, { mode, threshold }, processor, controller.signal);
+        const result = await previewMonochromePdf(source!.pdf, page, { mode, threshold }, processor, controller.signal, diagnostic);
         if (!controller.signal.aborted) setPreview({ ...result, loading: false, error: null, key: previewKey });
       } catch (failure) {
-        if (!controller.signal.aborted) recordPdfFailure("monochrome", "preview", failure, { input: source!.input });
+        if (!controller.signal.aborted) recordPdfFailure("monochrome", "preview", failure, { input: source!.input }, diagnostic);
         if (!controller.signal.aborted) setPreview({ original: "", converted: "", loading: false, error: failure instanceof Error ? failure.message : "Could not preview this page.", key: previewKey });
       }
     }
@@ -145,6 +147,7 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
     if (!source || progress !== null) return;
     const controller = new AbortController();
     const operation = beginPdfOperation("monochrome", "export", { pages: source.pdf.numPages, bytes: source.file.size, input: source.input, signal: controller.signal });
+    const diagnostic: MonochromeDiagnostic = {};
     exportController.current = controller;
     setProgress(0);
     setDownloaded(false);
@@ -152,8 +155,9 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
     try {
       const processor = processorRef.current;
       if (!processor) throw new Error("The PDF is no longer open. Please choose it again.");
-      const bytes = await exportMonochromePdf(source.pdf, { mode, threshold }, processor, controller.signal, setProgress);
+      const bytes = await exportMonochromePdf(source.pdf, { mode, threshold }, processor, controller.signal, setProgress, diagnostic);
       if (controller.signal.aborted) return;
+      diagnostic.monochromeStep = "download";
       const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: "application/pdf" }));
       downloadUrls.current.add(url);
       const link = document.createElement("a");
@@ -167,7 +171,7 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
       trackPdfDownload("monochrome", source.pdf.numPages, bytes.length, source.input);
       setDownloaded(true);
     } catch (failure) {
-      if (!controller.signal.aborted) operation.failure(failure);
+      if (!controller.signal.aborted) operation.failure(failure, diagnostic);
       if (!controller.signal.aborted) setError(failure instanceof Error ? failure.message : "Conversion failed. Please try a smaller PDF.");
     } finally {
       operation.cancel();

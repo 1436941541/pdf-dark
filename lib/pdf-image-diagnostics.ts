@@ -99,8 +99,21 @@ export type PdfInvertStep =
 export type PdfFailureDiagnostic = {
   readerStep?: PdfReaderStep;
   invertStep?: PdfInvertStep;
+  monochromeStep?: PdfMonochromeStep;
+  monochromeMode?: "grayscale" | "black-and-white";
+  threshold?: number;
   pageNumber?: number;
+  pageWidth?: number;
+  pageHeight?: number;
+  totalPages?: number;
 };
+
+const MONOCHROME_STEPS = [
+  "load_pdf_lib", "create_pdf", "embed_font", "get_page", "get_viewport", "create_canvas",
+  "render_page", "encode_preview", "read_pixels", "process_pixels", "write_pixels",
+  "encode_page", "embed_page", "add_page", "draw_page", "add_text_layer", "save_pdf", "download",
+] as const;
+export type PdfMonochromeStep = (typeof MONOCHROME_STEPS)[number];
 
 const SAFE_ERROR_NAMES = new Set([
   "Error",
@@ -128,6 +141,90 @@ function safeErrorName(error: unknown): string {
     const name = (error as { name?: unknown } | null)?.name;
     return typeof name === "string" && SAFE_ERROR_NAMES.has(name) ? name : "Other";
   } catch { return "Other"; }
+}
+
+// Keep only fixed categories, never an arbitrary parser/browser message, which
+// can include a file name, document text or a local media URL.
+function safeErrorReason(error: unknown): string {
+  try {
+    const message = (error as { message?: unknown } | null)?.message;
+    if (typeof message !== "string") return "other";
+    const text = message.slice(0, 512).trim();
+    if (text === "Load failed") return "load_failed";
+    if (text === "Failed to fetch") return "failed_to_fetch";
+    if (text === "NetworkError when attempting to fetch resource.") return "network_error";
+    if (/^Failed to fetch dynamically imported module(?::|$)|^Importing a module script failed\.?$|^error loading dynamically imported module:/i.test(text)) return "module_load_failed";
+    if (/out of memory|memory allocation|allocation failed|could not allocate|cannot be allocated/i.test(text)) return "out_of_memory_hint";
+    if (/detached.{0,40}(?:buffer|arraybuffer)|(?:buffer|arraybuffer).{0,40}detached/i.test(text)) return "detached_buffer_hint";
+    if (text === "Could not encode the converted page.") return "page_encoding_failed";
+    if (text === "Your browser does not support PDF previews.") return "canvas_unavailable";
+    if (text === "The color conversion worker could not start. Please reload and try again.") return "worker_start_failed";
+  } catch { /* A diagnostic accessor must not affect error handling. */ }
+  return "other";
+}
+
+function safeCodeStack(error: unknown): {
+  frames: string[];
+  status: "captured" | "filtered_out" | "unavailable";
+  format: "v8" | "at_sign" | "mixed" | "other";
+} {
+  const frames: string[] = [];
+  let v8 = false, webkit = false;
+  try {
+    const rawStack = (error as { stack?: unknown } | null)?.stack;
+    if (typeof rawStack !== "string" || !rawStack) return { frames, status: "unavailable", format: "other" };
+    let stack: string = rawStack;
+    const message = (error as { message?: unknown } | null)?.message;
+    const name = (error as { name?: unknown } | null)?.name;
+    if (typeof message === "string" && typeof name === "string") {
+      if (message.length > 32768 || name.length > 100) return { frames, status: "filtered_out", format: "other" };
+      const header = name ? `${name}: ${message}` : message;
+      // V8 includes the message, which can span several lines. Never mistake
+      // document text that resembles a stack frame for an actual code frame.
+      if (header && stack.startsWith(header)) stack = stack.slice(header.length);
+    }
+    for (const line of stack.slice(0, 32768).split("\n").slice(0, 100)) {
+      if (/data:|blob:/i.test(line)) continue;
+      const chrome = line.match(/^\s*at\s+(?:.*?\s+\()?((?:https?):\/\/\S+?):(\d+)(?::(\d+))?\)?\s*$/);
+      const safari = line.match(/^\s*[^@\n]*@((?:https?):\/\/\S+?):(\d+)(?::(\d+))?\s*$/);
+      const match = chrome ?? safari;
+      if (!match) continue;
+      v8 ||= !!chrome;
+      webkit ||= !!safari;
+      try {
+        const url = new URL(match[1]);
+        if (url.username || url.password || url.pathname.length > 1024) continue;
+        if (!/^\/_next\/(?:static|server)\/.*\.(?:js|mjs|cjs)$/.test(url.pathname)) continue;
+        const lineNumber = Number(match[2]);
+        const columnNumber = match[3] === undefined ? undefined : Number(match[3]);
+        if (!Number.isSafeInteger(lineNumber) || lineNumber < 1 || lineNumber > 1_000_000_000) continue;
+        if (columnNumber !== undefined && (!Number.isSafeInteger(columnNumber) || columnNumber < 0 || columnNumber > 1_000_000_000)) continue;
+        // Drop query strings, fragments and raw function names. Original code
+        // locations remain available to Sentry's source-map symbolication.
+        frames.push(`    at ${url.origin}${url.pathname}:${lineNumber}${columnNumber === undefined ? "" : `:${columnNumber}`}`);
+        if (frames.length === 40) break;
+      } catch { /* Ignore malformed/non-code locations. */ }
+    }
+    return { frames, status: frames.length ? "captured" : "filtered_out", format: v8 && webkit ? "mixed" : v8 ? "v8" : webkit ? "at_sign" : "other" };
+  } catch {
+    return { frames, status: "unavailable", format: "other" };
+  }
+}
+
+function failureMetadata(diagnostic: PdfFailureDiagnostic): Record<string, number | string> {
+  const result: Record<string, number | string> = {};
+  for (const [source, target] of [
+    ["pageNumber", "page_number"], ["pageWidth", "width"],
+    ["pageHeight", "height"], ["totalPages", "total_pages"],
+  ] as const) {
+    const value = diagnostic[source];
+    if (typeof value === "number" && Number.isSafeInteger(value) && value > 0) result[target] = value;
+  }
+  if (diagnostic.monochromeMode === "grayscale" || diagnostic.monochromeMode === "black-and-white") {
+    result.mode = diagnostic.monochromeMode;
+    if (typeof diagnostic.threshold === "number" && Number.isInteger(diagnostic.threshold) && diagnostic.threshold >= 1 && diagnostic.threshold <= 254) result.threshold = diagnostic.threshold;
+  }
+  return result;
 }
 
 // Associate safe metadata with the original exception without replacing its
@@ -237,15 +334,13 @@ export function capturePdfProcessingException(
   const safe = new Error("PDF processing failed");
   safe.name = "PdfProcessingError";
   try {
-    if (error instanceof Error && typeof error.stack === "string") {
-      const frames = error.stack.split("\n").filter(line => /^\s*at /.test(line) && /https?:\/\/[^\s)]+\/_next\//.test(line) && !/data:|blob:/.test(line));
-      if (frames.length) safe.stack = `${safe.name}: ${safe.message}\n${frames.join("\n")}`;
-    }
-  } catch { /* A non-standard stack getter must not prevent error handling. */ }
-  try {
-    const pageNumber = diagnostic.pageNumber;
+    const codeStack = safeCodeStack(error);
+    if (codeStack.frames.length) safe.stack = `${safe.name}: ${safe.message}\n${codeStack.frames.join("\n")}`;
+    const reason = safeErrorReason(error);
+    const metadata = failureMetadata(diagnostic);
+    const monochromeStep = MONOCHROME_STEPS.includes(diagnostic.monochromeStep as PdfMonochromeStep) ? diagnostic.monochromeStep : undefined;
     const originalErrorType = workerContext?.error_type ?? safeErrorName(error);
-    const failureStep = diagnostic.readerStep ?? diagnostic.invertStep ?? context?.step ?? "unknown";
+    const failureStep = diagnostic.readerStep ?? diagnostic.invertStep ?? monochromeStep ?? context?.step ?? "unknown";
     Sentry.captureException(safe, {
       fingerprint: ["pdf-processing", tags.tool ?? "unknown", stage, failureStep, originalErrorType,
         ...(context ? ["image-read", context.step, context.error_hint] : []),
@@ -255,8 +350,12 @@ export function capturePdfProcessingException(
         ...tags,
         stage,
         original_error_type: originalErrorType,
+        original_error_reason: reason,
+        original_stack_status: codeStack.status,
+        pdf_diagnostic_version: "2",
         ...(diagnostic.readerStep ? { reader_step: diagnostic.readerStep } : {}),
         ...(diagnostic.invertStep ? { invert_step: diagnostic.invertStep } : {}),
+        ...(monochromeStep ? { monochrome_step: monochromeStep } : {}),
         ...(context ? { image_step: context.step, image_error_hint: context.error_hint } : {}),
         ...(workerContext ? {
           worker_step: workerContext.step,
@@ -265,10 +364,18 @@ export function capturePdfProcessingException(
         } : {}),
       },
       contexts: {
+        pdf_exception: {
+          version: 2,
+          error_reason: reason,
+          original_stack_status: codeStack.status,
+          original_stack_format: codeStack.format,
+          original_code_frames: codeStack.frames.length,
+          ...readImageMemorySnapshot(),
+        },
         ...(context ? { pdf_image_processing: context } : {}),
         ...(workerContext ? { pdf_dark_worker: { ...workerContext, ...workerEnvironment } } : {}),
-        ...(typeof pageNumber === "number" && Number.isInteger(pageNumber) && pageNumber > 0
-          ? { pdf_failure: { page_number: pageNumber } }
+        ...(Object.keys(metadata).length
+          ? { pdf_failure: metadata }
           : {}),
       },
     });
