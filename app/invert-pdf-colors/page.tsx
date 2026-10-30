@@ -49,7 +49,7 @@ const FAQ = [
   },
   {
     q: "Which setting gives a true, exact inversion?",
-    a: "The OLED theme. With OLED the mapping is exactly out = 255 − in for grayscale content: pure white becomes pure black, pure black becomes pure white, and running the output back through returns the original. Midnight, Sepia and Solarized land white on a tinted background instead — easier to read for long sessions, but not a mathematically exact inversion.",
+    a: "For grayscale content, choose OLED with Darkness at 100% and Warmth at 0%. This uses a 255 − input color mapping, turning white into black and black into white. Set Images to Invert if scanned pages and embedded images should change too. Colored content uses a different mapping, and rendering or compression means converting twice may not restore the original.",
   },
   {
     q: "Can it turn a black background PDF back to white?",
@@ -61,11 +61,11 @@ const FAQ = [
   },
   {
     q: "Can I invert the text and background but leave images alone?",
-    a: "Yes — set Images to Original. Every embedded image stays pixel-identical to the source, including full-page scans, and only text and background are flipped. Round-cropped images such as resume headshots are restored through their circular frame, so no bright corners leak onto the dark page.",
+    a: "Yes — set Images to Original to keep embedded images in their original colors while changing text and page backgrounds. A full-page scan keeps its original appearance because the whole page is an image; use Images to Invert if you want that scanned page to change too. Some pages are re-rendered or compressed, so pixel-for-pixel preservation is not guaranteed.",
   },
   {
     q: "Does the downloaded PDF keep selectable text?",
-    a: "Yes, wherever the source page allows it. Text-based pages are recolored as vector objects, so the output text stays selectable and searchable. Scanned pages are images to begin with, so their pixels are color-mapped instead.",
+    a: "Usually, on supported text-based pages. Some pages are rendered as images and may lose text selection or search, including pages with unsupported layouts or characters. Image-only scans do not gain selectable text because this tool does not add OCR. Check the downloaded copy before relying on text search.",
   },
   {
     q: "Can I print the result?",
@@ -73,7 +73,7 @@ const FAQ = [
   },
   {
     q: "Is there a file size limit?",
-    a: "No hard limit. The conversion runs entirely on your device, so the practical ceiling is your browser's memory — large documents just take longer.",
+    a: "There is no fixed file-size limit. Conversion runs on your device and depends on available browser memory. Very large PDFs may take longer or fail, especially on phones. If conversion fails, try a smaller document or a desktop browser.",
   },
   {
     q: "Is my PDF uploaded to a server?",
