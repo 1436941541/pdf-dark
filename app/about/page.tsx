@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { LegalFrame } from "@/components/legal-frame";
 
 export const metadata: Metadata = {
@@ -122,11 +123,13 @@ export default function AboutPage() {
           Why it&apos;s free
         </h2>
         <p>
-          Right now, nothing — PDF Dark runs on free-tier hosting and costs me
-          very little to keep online. If usage grows enough that it stops being
-          free, the most likely next step is a small, unobtrusive ad on the
-          landing page (never inside the PDF viewer). There will never be a
-          paywall on the conversion itself.
+          PDF Dark currently offers free conversion. Display ads through Google
+          AdSense help cover paid hosting and other running costs. Ads appear
+          on the website, not in the PDF files you download. See our{" "}
+          <Link href="/privacy" className="text-amber-400 hover:underline">
+            privacy policy
+          </Link>{" "}
+          for details about advertising and website data handling.
         </p>
       </article>
     </LegalFrame>

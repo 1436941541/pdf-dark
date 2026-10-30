@@ -42,7 +42,7 @@ export default function BlackAndWhitePage() {
     name: "PDF to Black and White Converter",
     url: `${getSiteUrl()}${SLUG}`,
     description: DESCRIPTION,
-    applicationCategory: "UtilityApplication",
+    applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any modern browser",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };

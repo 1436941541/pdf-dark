@@ -7,7 +7,7 @@ import { CHANGELOG_UPDATED_AT } from "@/lib/changelog";
 // The /tr and /id locales were retired 2026-09-21 (their pages 404 now).
 const HOME_UPDATED_AT = "2026-09-20";
 const INVERT_UPDATED_AT = "2026-09-21";
-const ABOUT_UPDATED_AT = "2026-06-26";
+const ABOUT_UPDATED_AT = "2026-10-30";
 const PRIVACY_UPDATED_AT = "2026-10-29";
 const TERMS_UPDATED_AT = "2026-07-21";
 const ES_HOME_UPDATED_AT = "2026-09-21";

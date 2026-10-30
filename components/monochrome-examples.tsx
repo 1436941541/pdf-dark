@@ -11,7 +11,17 @@ const EXAMPLES = [
 ] as const;
 
 const BASE = "/examples/black-and-white";
-const PREVIEW_FILES = EXAMPLES.flatMap(({ id }) => ["original", "gray", "bw128"].map((file) => `${BASE}/${file}-${id}.png`)).concat(`${BASE}/bw190-4.png`);
+
+function previewSrc(file: string, id: number) {
+  const extension = file === "original" && id === 3 ? "webp" : "png";
+  return `${BASE}/${file}-${id}.${extension}`;
+}
+
+const PREVIEW_FILES_BY_ID = new Map<number, string[]>(EXAMPLES.map(({ id }) => [
+  id,
+  ["original", "gray", "bw128", ...(id === 4 ? ["bw190"] : [])].map((file) => previewSrc(file, id)),
+]));
+const PREVIEW_FILES = [...PREVIEW_FILES_BY_ID.values()].flat();
 
 export function MonochromeExamples({ onTrySample }: { onTrySample: (id: number) => void }) {
   const [selected, setSelected] = useState<number>(2);
@@ -21,7 +31,7 @@ export function MonochromeExamples({ onTrySample }: { onTrySample: (id: number) 
   const decodedImages = useRef(new Map<string, HTMLImageElement>());
 
   function markLoaded(id: number, src: string) {
-    if (!src.endsWith(`-${id}.png`)) return;
+    if (!PREVIEW_FILES_BY_ID.get(id)?.includes(src)) return;
     const group = loadedGroups.current.get(id) ?? new Set<string>();
     group.add(src);
     loadedGroups.current.set(id, group);
@@ -62,7 +72,6 @@ export function MonochromeExamples({ onTrySample }: { onTrySample: (id: number) 
   }, [preloadReady]);
 
   const example = EXAMPLES.find((item) => item.id === selected)!;
-  const base = BASE;
   return (
     <section id="examples" className="mx-auto max-w-5xl border-t border-neutral-900 px-6 py-12">
       <div className="text-center">
@@ -82,7 +91,7 @@ export function MonochromeExamples({ onTrySample }: { onTrySample: (id: number) 
             { label: "Original", file: "original", detail: "Before conversion" },
             { label: "Grayscale", file: "gray", detail: "Shades of gray" },
             { label: "Pure black & white", file: selected === 4 && threshold === 190 ? "bw190" : "bw128", detail: `Threshold ${selected === 4 ? threshold : 128}` },
-          ].map(({ label, file, detail }) => <figure key={label} className="min-w-0"><figcaption className="mb-2 flex flex-wrap items-baseline justify-between gap-1 text-sm"><span className="font-medium text-neutral-200">{label}</span><span className="text-xs text-neutral-500">{detail}</span></figcaption><div className="overflow-hidden rounded-lg border border-neutral-700 bg-white"><Image src={`${base}/${file}-${selected}.png`} alt={`${example.label}: ${label.toLowerCase()} conversion example`} width={720} height={614} sizes="(max-width: 639px) 90vw, 30vw" unoptimized decoding="async" onLoad={(event) => markLoaded(selected, new URL(event.currentTarget.currentSrc).pathname)} className="h-auto w-full" /></div></figure>)}
+          ].map(({ label, file, detail }) => <figure key={label} className="min-w-0"><figcaption className="mb-2 flex flex-wrap items-baseline justify-between gap-1 text-sm"><span className="font-medium text-neutral-200">{label}</span><span className="text-xs text-neutral-500">{detail}</span></figcaption><div className="overflow-hidden rounded-lg border border-neutral-700 bg-white"><Image src={previewSrc(file, selected)} alt={`${example.label}: ${label.toLowerCase()} conversion example`} width={720} height={614} sizes="(max-width: 639px) 90vw, 30vw" unoptimized decoding="async" onLoad={(event) => markLoaded(selected, new URL(event.currentTarget.currentSrc).pathname)} className="h-auto w-full" /></div></figure>)}
         </div>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-800 pt-4">
           <p className="max-w-lg text-xs leading-relaxed text-neutral-500">{selected === 3 ? <>Photo: Grace Hopper, U.S. Navy portrait, via the Pillow test collection. </> : selected === 4 ? "Illustrative scan with controlled faint text and paper shading. " : "Sample document created for this comparison. "}Your results depend on the original PDF.</p>
