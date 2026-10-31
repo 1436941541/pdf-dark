@@ -46,7 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${base}/whiten-pdf`,
-      lastModified: "2026-10-14",
+      lastModified: "2026-10-31",
       changeFrequency: "monthly",
       priority: 0.9,
     },

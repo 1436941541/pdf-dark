@@ -220,7 +220,7 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
           {(preview.loading || preview.key !== previewKey) && <p role="status" className="mt-2 text-xs text-neutral-400">Updating preview…</p>}
           <div className="mt-6"><button type="button" onClick={download} disabled={busy || preview.loading || preview.key !== previewKey || !preview.converted || !!preview.error} className="w-full rounded-xl bg-amber-400 px-6 py-3 font-semibold text-neutral-950 transition-colors hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto">Download cleaned PDF</button>{downloaded && <p role="status" className="mt-3 text-sm text-amber-300">Your cleaned PDF is ready.</p>}</div>
         </>}
-        <p className="mt-5 text-xs leading-relaxed text-neutral-500">For light paper backgrounds and mild shading. Heavy shadows, pale handwriting and photos need careful review. Output is an image-based PDF: selectable text, links, forms and signatures are not preserved, including on pages with cleaning disabled. Page dimensions stay the same; file size may increase. No OCR, transparent output or PDF background-object deletion.</p>
+        <p className="mt-5 text-xs leading-relaxed text-neutral-500">For light paper backgrounds and mild shading. Heavy shadows, pale handwriting and photos need careful review. Output is an image-based PDF: selectable text, links, forms and digital signatures are not preserved, including on pages with cleaning disabled. Page dimensions stay the same; file size may increase. No OCR, transparent output or PDF background-object deletion.</p>
       </div>
     </div>
   );

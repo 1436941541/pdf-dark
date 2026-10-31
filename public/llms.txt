@@ -10,6 +10,8 @@ PDF Dark (pdfdark.org) is an independent, free web app. Unlike viewer-level dark
 - [Invert PDF Colors](https://pdfdark.org/invert-pdf-colors): flip a PDF's colors and download the result — a permanent dark (or light) copy. Choose how far the inversion reaches: everything including images, text and background only, or per-image automatic
 - [PDF to Black and White](https://pdfdark.org/pdf-to-black-and-white): convert a PDF to grayscale or pure black and white, preview the result and adjust the threshold for pure black and white, then download a new PDF copy. The selected PDF is processed locally in the browser
 
+- [Whiten PDF](https://pdfdark.org/whiten-pdf): lighten gray or yellow scanned paper, compare previews and download an image-based PDF. Adjust cleaning strength, protect colored marks and disable cleaning on individual pages. Document processing stays in the browser
+
 ## Other languages
 
 - [PDF Modo Oscuro (Spanish)](https://pdfdark.org/es): same reader tool, Spanish UI
