@@ -20,6 +20,49 @@ import type { PDFPageProxy } from "pdfjs-dist";
 import type { PDFFont, PDFPage } from "pdf-lib";
 
 type Matrix = [number, number, number, number, number, number];
+type PageTextContent = Awaited<ReturnType<PDFPageProxy["getTextContent"]>>;
+
+async function getPageTextContent(pageProxy: PDFPageProxy): Promise<PageTextContent> {
+  // pdf.js 5 uses for-await on the stream; older Safari has readers but no
+  // stream async iterator. Keep pdf.js's own path for supported streams/XFA.
+  if (
+    typeof ReadableStream === "undefined" ||
+    typeof (ReadableStream.prototype as Partial<AsyncIterable<unknown>>)[
+      Symbol.asyncIterator
+    ] === "function" ||
+    pageProxy.isPureXfa
+  ) {
+    return pageProxy.getTextContent();
+  }
+
+  const reader: ReadableStreamDefaultReader<PageTextContent> = pageProxy
+    .streamTextContent()
+    .getReader();
+  const textContent: PageTextContent = {
+    items: [],
+    styles: Object.create(null),
+    lang: null,
+  };
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) return textContent;
+      // Match PDFPageProxy.getTextContent's chunk aggregation semantics.
+      textContent.lang ??= value.lang;
+      Object.assign(textContent.styles, value.styles);
+      textContent.items.push(...value.items);
+    }
+  } catch (error) {
+    try {
+      await reader.cancel(error);
+    } catch {
+      // Cancellation must not replace the original extraction error.
+    }
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+}
 
 function applyPoint(m: number[], x: number, y: number): [number, number] {
   return [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
@@ -45,7 +88,7 @@ export async function drawInvisibleTextLayer(
     "pdf-lib"
   );
 
-  const textContent = await pageProxy.getTextContent();
+  const textContent = await getPageTextContent(pageProxy);
 
   // Map PDF user space → output-page space. The output page equals the
   // render canvas, so derive the scale from the page's unit-1 viewport
