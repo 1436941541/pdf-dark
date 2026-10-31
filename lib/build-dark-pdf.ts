@@ -30,10 +30,12 @@ import { recolorPageInPlace } from "./content-recolor";
 export const RENDER_SCALE = 1.5;
 
 export type PageRender = {
-  /** Darkened page JPEG at RENDER_SCALE, without a Base64 copy. */
+  /** Darkened page JPEG at the chosen render scale, without a Base64 copy. */
   displayBlob: Blob;
   width: number;
   height: number;
+  /** Upright page size in source PDF user units, only for limited renders. */
+  rasterPageSize?: { width: number; height: number; userUnit: number };
   imageRects: ImageRect[];
   scannedPage: boolean;
 };
@@ -160,9 +162,13 @@ export async function buildDarkPdf(
     page.node.set(PDFName.of("Contents"), doc.context.obj([]));
     if (rotated) {
       // The rendered bitmap is already upright; neutralize /Rotate so it
-      // isn't rotated a second time by the viewer.
+      // isn't rotated a second time by the viewer. Limited bitmaps carry
+      // their original size separately from their reduced pixel dimensions.
       page.setRotation(degrees(0));
-      page.setSize(p.width / RENDER_SCALE, p.height / RENDER_SCALE);
+      page.setSize(
+        p.rasterPageSize?.width ?? p.width / RENDER_SCALE,
+        p.rasterPageSize?.height ?? p.height / RENDER_SCALE,
+      );
     }
     const mb = page.getMediaBox();
     await drawRasterPage(doc, page, p, imageMode, pageProxy, textFont, nativeCache, {
@@ -243,7 +249,12 @@ async function drawRasterPage(
   // Invisible (searchable) text layer; skips rotated pages internally.
   if (pageProxy) {
     try {
-      await drawInvisibleTextLayer(page, textFont, pageProxy);
+      await drawInvisibleTextLayer(
+        page,
+        textFont,
+        pageProxy,
+        p.rasterPageSize?.userUnit,
+      );
     } catch (err) {
       console.warn("[pdf-dark] text layer failed", err);
     }
@@ -258,14 +269,20 @@ async function buildRasterOnly(
   imageMode: ImageMode,
   pdfProxy: PDFDocumentProxy | null,
 ): Promise<Uint8Array> {
-  const { PDFDocument, StandardFonts } = pdfLib;
+  const { PDFDocument, PDFName, PDFNumber, StandardFonts } = pdfLib;
   const doc = await PDFDocument.create();
   const textFont = await doc.embedFont(StandardFonts.Helvetica);
   const nativeCache = new Map<string, NativeImageResult>();
 
   for (let i = 0; i < pages.length; i++) {
     const p = pages[i];
-    const page = doc.addPage([p.width, p.height]);
+    const width = p.rasterPageSize?.width ?? p.width;
+    const height = p.rasterPageSize?.height ?? p.height;
+    const page = doc.addPage([width, height]);
+    if (p.rasterPageSize && p.rasterPageSize.userUnit !== 1) {
+      // The stored dimensions are PDF user units, so retain their physical scale.
+      page.node.set(PDFName.of("UserUnit"), PDFNumber.of(p.rasterPageSize.userUnit));
+    }
     let pageProxy = null;
     if (pdfProxy) {
       try {
@@ -277,8 +294,8 @@ async function buildRasterOnly(
     await drawRasterPage(doc, page, p, imageMode, pageProxy, textFont, nativeCache, {
       x: 0,
       y: 0,
-      width: p.width,
-      height: p.height,
+      width,
+      height,
     });
   }
   return doc.save();

@@ -9,6 +9,7 @@ import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
 import type { DarkifyRequest, DarkifyResponse } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
 import { canvasToJpegBlob, yieldToMain } from "@/lib/main-thread";
+import { getPdfRenderScale } from "@/lib/pdf-render-limits";
 import {
   buildDarkPdf,
   imageTreatment,
@@ -228,7 +229,13 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           pageNumber = i;
           invertStep = "get_page";
           const page = await pdf.getPage(i);
-          const viewport = page.getViewport({ scale: RENDER_SCALE });
+          const baseViewport = page.getViewport({ scale: 1 });
+          const renderScale = getPdfRenderScale(
+            baseViewport.width,
+            baseViewport.height,
+            RENDER_SCALE,
+          );
+          const viewport = page.getViewport({ scale: renderScale });
 
           // Locate raster images before page.render() — see pdf-viewer.tsx.
           let imageRects: ImageRect[] = [];
@@ -244,8 +251,8 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
 
           invertStep = "render_page";
           const canvas = document.createElement("canvas");
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
+          canvas.width = Math.max(1, Math.floor(viewport.width));
+          canvas.height = Math.max(1, Math.floor(viewport.height));
           try {
             const ctx = canvas.getContext("2d");
             if (!ctx) throw new Error("2D canvas not supported");
@@ -300,6 +307,13 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
               height: canvas.height,
               imageRects,
               scannedPage,
+              ...(renderScale < RENDER_SCALE ? {
+                rasterPageSize: {
+                  width: baseViewport.width / page.userUnit,
+                  height: baseViewport.height / page.userUnit,
+                  userUnit: page.userUnit,
+                },
+              } : {}),
             });
             setStatus({
               kind: "processing",

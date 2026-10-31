@@ -12,6 +12,7 @@ import type {
 } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
 import { canvasToJpegDataUrl, yieldToMain } from "@/lib/main-thread";
+import { getPdfRenderScale } from "@/lib/pdf-render-limits";
 import {
   imageTreatment,
   RENDER_SCALE,
@@ -28,6 +29,9 @@ type PageImage = {
   originalDataUrl: string;
   width: number;
   height: number;
+  /** Reading layout stays at the original zoom even if the bitmap is reduced. */
+  layoutWidth: number;
+  layoutHeight: number;
   /** Current dark-themed version shown to the user. */
   displayDataUrl: string;
   /** Cache of already-darkified dataUrls keyed by `${theme}:${imageMode}` —
@@ -427,7 +431,13 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           pageNumber = i;
           readerStep = "get_page";
           const page = await pdf.getPage(i);
-          const viewport = page.getViewport({ scale: RENDER_SCALE });
+          const baseViewport = page.getViewport({ scale: 1 });
+          const renderScale = getPdfRenderScale(
+            baseViewport.width,
+            baseViewport.height,
+            RENDER_SCALE,
+          );
+          const viewport = page.getViewport({ scale: renderScale });
 
           // Locate raster images so the worker can keep them full-color.
           // MUST run before page.render(): rendering converts the operator
@@ -447,8 +457,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
           readerStep = "render_page";
           const canvas = document.createElement("canvas");
-          canvas.width = viewport.width;
-          canvas.height = viewport.height;
+          canvas.width = Math.max(1, Math.floor(viewport.width));
+          canvas.height = Math.max(1, Math.floor(viewport.height));
           const ctx = canvas.getContext("2d");
           if (!ctx) throw new Error("2D canvas not supported");
           await page.render({ canvas, canvasContext: ctx, viewport }).promise;
@@ -488,6 +498,12 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             originalDataUrl,
             width: canvas.width,
             height: canvas.height,
+            layoutWidth: renderScale < RENDER_SCALE
+              ? Math.max(1, Math.floor(baseViewport.width * RENDER_SCALE))
+              : canvas.width,
+            layoutHeight: renderScale < RENDER_SCALE
+              ? Math.max(1, Math.floor(baseViewport.height * RENDER_SCALE))
+              : canvas.height,
             displayDataUrl: "",
             byTheme: {},
             imageRects,
@@ -1029,14 +1045,14 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
                 pageRefs.current[i] = el;
               }}
               className="mx-auto overflow-hidden rounded-lg shadow-2xl"
-              style={{ maxWidth: p.width * zoom, background: themeBg }}
+              style={{ maxWidth: p.layoutWidth * zoom, background: themeBg }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={p.displayDataUrl}
                 alt={t.viewer.pageAlt(i + 1)}
-                width={p.width}
-                height={p.height}
+                width={p.layoutWidth}
+                height={p.layoutHeight}
                 className="block w-full h-auto"
               />
             </div>

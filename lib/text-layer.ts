@@ -29,12 +29,14 @@ function applyPoint(m: number[], x: number, y: number): [number, number] {
  * @param pdfPage  pdf-lib page being assembled (sized to the rendered canvas)
  * @param font     an embedded pdf-lib font (Helvetica)
  * @param pageProxy the source pdf.js page
+ * @param fontScaleMultiplier preserves source UserUnit sizing on limited renders
  * @returns number of text runs written (0 = layer skipped or nothing to write)
  */
 export async function drawInvisibleTextLayer(
   pdfPage: PDFPage,
   font: PDFFont,
   pageProxy: PDFPageProxy,
+  fontScaleMultiplier = 1,
 ): Promise<number> {
   // Page-level /Rotate would require rotating every run; skip for now.
   if (((pageProxy.rotate ?? 0) % 360) + 360 !== 360) return 0;
@@ -70,7 +72,9 @@ export async function drawInvisibleTextLayer(
       if (item.dir === "ttb") continue; // vertical scripts need a different layout
 
       const t = item.transform as Matrix;
-      const size = Math.hypot(t[2], t[3]) * scale;
+      // Viewport transforms include UserUnit; opt in to matching font sizes
+      // when the caller preserves that unit on a limited raster page.
+      const size = Math.hypot(t[2], t[3]) * scale * fontScaleMultiplier;
       if (!Number.isFinite(size) || size < 1) continue;
 
       const [dx, dy] = applyPoint(vp.transform, t[4], t[5]);
