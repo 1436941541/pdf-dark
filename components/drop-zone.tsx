@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { T, type Locale } from "@/lib/i18n";
+import { markPdfFileSource, type PdfFileSelectionSource } from "@/lib/pdf-file-read-diagnostics";
 
 type Props = {
   onFile: (file: File) => void;
@@ -13,7 +14,7 @@ export function DropZone({ onFile, locale = "en" }: Props) {
   const t = T[locale].dropzone;
 
   const accept = useCallback(
-    (file: File | null | undefined) => {
+    (file: File | null | undefined, source: PdfFileSelectionSource) => {
       if (!file) return;
       if (
         file.type !== "application/pdf" &&
@@ -22,6 +23,7 @@ export function DropZone({ onFile, locale = "en" }: Props) {
         alert(t.notPdf);
         return;
       }
+      markPdfFileSource(file, source);
       onFile(file);
     },
     [onFile, t.notPdf],
@@ -37,7 +39,7 @@ export function DropZone({ onFile, locale = "en" }: Props) {
       onDrop={(e) => {
         e.preventDefault();
         setIsOver(false);
-        accept(e.dataTransfer.files?.[0]);
+        accept(e.dataTransfer.files?.[0], "drop");
       }}
       className={`group mx-auto max-w-xl rounded-2xl border-2 p-10 transition-all bg-neutral-900/90
         ${
@@ -52,7 +54,7 @@ export function DropZone({ onFile, locale = "en" }: Props) {
           type="file"
           accept="application/pdf"
           className="sr-only"
-          onChange={(e) => accept(e.target.files?.[0])}
+          onChange={(e) => accept(e.target.files?.[0], "picker")}
         />
         <div className="text-5xl mb-4 transition-transform group-hover:scale-110">📄</div>
         <div className="text-xl font-semibold text-neutral-50">

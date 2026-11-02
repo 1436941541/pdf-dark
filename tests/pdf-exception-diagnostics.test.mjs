@@ -1,3 +1,4 @@
+import { diagnosticTestImports } from './helpers/diagnostic-test-imports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -5,6 +6,7 @@ import ts from 'typescript';
 import { defaultStackParser, eventFromException } from '@sentry/browser';
 
 function compile(file, imports = {}) {
+  imports = { ...diagnosticTestImports, ...imports };
   const code = ts.transpileModule(fs.readFileSync(new URL(file, import.meta.url), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;
@@ -44,7 +46,7 @@ for (const [format, stack] of [
     assert.equal(scope.tags.original_stack_status, 'captured');
     assert.equal(scope.contexts.pdf_exception.original_stack_format, format === 'webkit' ? 'at_sign' : 'v8');
     assert.equal(scope.contexts.pdf_exception.original_code_frames, 2);
-    assert.equal(scope.tags.pdf_diagnostic_version, '2');
+    assert.equal(scope.tags.pdf_diagnostic_version, '3');
     assert(!JSON.stringify([event, scope]).match(/PRIVATE|SECRET|token=|data:|blob:/));
     assert.equal(failure.stack, stack, 'do not mutate the original error');
   });
@@ -131,4 +133,20 @@ test('monochrome phase, dimensions and settings are allowlisted in the final Sen
     mode: 'black-and-white', threshold: 140,
   });
   assert(!JSON.stringify(scope).match(/PRIVATE|SECRET/));
+});
+
+
+test('a native exception without code frames never acquires a fabricated reporter stack', async () => {
+  const h = harness();
+  const failure = new DOMException('PRIVATE local file', 'NotFoundError');
+  Object.defineProperty(failure, 'stack', { value: undefined });
+  h.capture(failure, 'read', { tool: 'reader' }, { readerStep: 'read_file' });
+  const [safe, scope] = h.events[0];
+  assert.equal(safe.stack, 'PdfProcessingError: PDF processing failed');
+  assert.equal(scope.tags.original_stack_status, 'unavailable');
+  assert.equal(scope.contexts.pdf_exception.original_code_frames, 0);
+  const event = await eventFromException(defaultStackParser, safe);
+  assert.equal(event.exception.values[0].stacktrace?.frames?.length ?? 0, 0);
+  assert.equal(failure.stack, undefined);
+  assert(!JSON.stringify([safe.stack, scope]).includes('PRIVATE'));
 });

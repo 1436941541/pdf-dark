@@ -1,3 +1,4 @@
+import { diagnosticTestImports } from './helpers/diagnostic-test-imports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -35,6 +36,7 @@ function harness(failAt) {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;
   const imports = {
+    ...diagnosticTestImports,
     './monochrome': monochrome,
     './text-layer': { drawInvisibleTextLayer: async () => {} },
     './main-thread': { yieldToMain: async () => {} },

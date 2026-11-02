@@ -6,10 +6,18 @@ import ts from 'typescript';
 const source = ts.transpileModule(fs.readFileSync(new URL('../lib/main-thread.ts', import.meta.url), 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText;
+const diagnosticsSource = ts.transpileModule(fs.readFileSync(new URL('../lib/pdf-encoding-diagnostics.ts', import.meta.url), 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+}).outputText;
+const diagnostics = {};
+new Function('exports', diagnosticsSource)(diagnostics);
 
 function compile(globals = {}) {
   const exports = {};
-  new Function('exports', ...Object.keys(globals), source)(exports, ...Object.values(globals));
+  new Function('exports', 'require', ...Object.keys(globals), source)(exports, name => {
+    assert.equal(name, './pdf-encoding-diagnostics');
+    return diagnostics;
+  }, ...Object.values(globals));
   return exports;
 }
 

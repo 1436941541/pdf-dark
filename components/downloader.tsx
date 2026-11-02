@@ -1,8 +1,9 @@
 "use client";
 
+import { readPdfFile } from "@/lib/pdf-file-read-diagnostics";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PDFDocumentLoadingTask, PDFDocumentProxy } from "pdfjs-dist";
-import { loadPageBitmap, type PdfInvertStep, type ImageCacheSnapshotProvider } from "@/lib/pdf-image-diagnostics";
+import { loadPageBitmap, type PdfFailureDiagnostic, type PdfInvertStep, type ImageCacheSnapshotProvider } from "@/lib/pdf-image-diagnostics";
 import { summarizeImageCache } from "@/lib/pdf-image-resource-diagnostics";
 import { restoreDarkWorkerError } from "@/lib/dark-worker-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
@@ -189,6 +190,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
       cancelledRef.current = false;
       let invertStep: PdfInvertStep = "load_pdfjs";
       let pageNumber = 0;
+      let failureGeometry: PdfFailureDiagnostic = { inputBytes: file.size };
       operationRef.current?.cancel();
       const operation = beginPdfOperation("invert", "export", { bytes: file.size });
       let pdf: PDFDocumentProxy | undefined;
@@ -206,7 +208,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         ).toString();
 
         invertStep = "read_file";
-        const srcBytes = await file.arrayBuffer();
+        const srcBytes = await readPdfFile(file);
         invertStep = "parse_pdf";
         loadingTask = pdfjs.getDocument({ data: srcBytes.slice(0) });
         pdf = await loadingTask.promise;
@@ -227,6 +229,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         for (let i = 1; i <= pdf.numPages; i++) {
           if (cancelledRef.current) return;
           pageNumber = i;
+          failureGeometry = { inputBytes: file.size, totalPages: pdf.numPages };
           invertStep = "get_page";
           const page = await pdf.getPage(i);
           const baseViewport = page.getViewport({ scale: 1 });
@@ -236,6 +239,11 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             RENDER_SCALE,
           );
           const viewport = page.getViewport({ scale: renderScale });
+          failureGeometry = {
+            ...failureGeometry, pageWidth: Math.max(1, Math.floor(viewport.width)),
+            pageHeight: Math.max(1, Math.floor(viewport.height)), baseWidth: baseViewport.width,
+            baseHeight: baseViewport.height, renderScale, renderScaleLimited: renderScale < RENDER_SCALE,
+          };
 
           // Locate raster images before page.render() — see pdf-viewer.tsx.
           let imageRects: ImageRect[] = [];
@@ -247,6 +255,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           } catch (err) {
             console.warn("[pdf-dark] image-region scan failed", err);
           }
+          failureGeometry.imageRegionCount = imageRects.length;
           await yieldToMain();
 
           invertStep = "render_page";
@@ -327,6 +336,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           }
         }
 
+        failureGeometry = { inputBytes: file.size, totalPages: pdf.numPages };
         setStatus({
           kind: "processing",
           phase: "build",
@@ -371,7 +381,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         const kind = classifyPdfLoadError(e);
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
-        if (!cancelledRef.current) operation.failure(e, { invertStep, pageNumber });
+        if (!cancelledRef.current) operation.failure(e, { ...failureGeometry, invertStep, pageNumber, getCacheSnapshot: () => summarizeImageCache(pages, pdf?.numPages) });
         if (!cancelledRef.current) {
           setStatus({
             kind: "error",

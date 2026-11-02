@@ -1,8 +1,9 @@
 "use client";
 
+import { readPdfFile } from "@/lib/pdf-file-read-diagnostics";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { loadPageBitmap, type PdfReaderStep, type ImageCacheSnapshotProvider } from "@/lib/pdf-image-diagnostics";
+import { loadPageBitmap, type PdfFailureDiagnostic, type PdfReaderStep, type ImageCacheSnapshotProvider } from "@/lib/pdf-image-diagnostics";
 import { summarizeImageCache } from "@/lib/pdf-image-resource-diagnostics";
 import { restoreDarkWorkerError } from "@/lib/dark-worker-diagnostics";
 import { THEMES, THEME_IDS, type ThemeId } from "@/lib/themes";
@@ -372,6 +373,9 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     let cancelled = false;
     let readerStep: PdfReaderStep = "load_pdfjs";
     let pageNumber = 0;
+    let totalPages: number | undefined;
+    let failureGeometry: PdfFailureDiagnostic = { inputBytes: file.size };
+    let failureCachePages: PageImage[] | undefined;
     const operation = beginPdfOperation("reader", "read", { bytes: file.size });
     const cancel = () => {
       cancelled = true;
@@ -394,10 +398,11 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         ).toString();
 
         readerStep = "read_file";
-        const arrayBuffer = await file.arrayBuffer();
+        const arrayBuffer = await readPdfFile(file);
         readerStep = "parse_pdf";
         const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
         if (cancelled) return;
+        totalPages = pdf.numPages;
         setProgress({ done: 0, total: pdf.numPages });
         {
           pageNumber = 1;
@@ -412,6 +417,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         // Stream pages to React as soon as each finishes. The user can start
         // reading after page 1 — they don't have to wait for the whole PDF.
         const rendered: PageImage[] = [];
+        failureCachePages = rendered;
         // Lock the theme/mode combo for the entire initial pass to avoid
         // racing with the variant-switch effect (which is disabled in UI
         // while isInitialRendering is true).
@@ -429,6 +435,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         for (let i = 1; i <= pdf.numPages; i++) {
           if (cancelled) return;
           pageNumber = i;
+          failureGeometry = { inputBytes: file.size, totalPages: pdf.numPages };
           readerStep = "get_page";
           const page = await pdf.getPage(i);
           const baseViewport = page.getViewport({ scale: 1 });
@@ -438,6 +445,11 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             RENDER_SCALE,
           );
           const viewport = page.getViewport({ scale: renderScale });
+          failureGeometry = {
+            ...failureGeometry, pageWidth: Math.max(1, Math.floor(viewport.width)),
+            pageHeight: Math.max(1, Math.floor(viewport.height)), baseWidth: baseViewport.width,
+            baseHeight: baseViewport.height, renderScale, renderScaleLimited: renderScale < RENDER_SCALE,
+          };
 
           // Locate raster images so the worker can keep them full-color.
           // MUST run before page.render(): rendering converts the operator
@@ -453,6 +465,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           } catch (err) {
             console.warn("[pdf-dark] image-region scan failed", err);
           }
+          failureGeometry.imageRegionCount = imageRects.length;
           await yieldToMain();
 
           readerStep = "render_page";
@@ -543,13 +556,14 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
         if (!cancelled && !isCancellationError(e)) {
-          operation.failure(e, { readerStep, pageNumber });
+          operation.failure(e, { ...failureGeometry, readerStep, pageNumber, totalPages, getCacheSnapshot: () => summarizeImageCache(failureCachePages ?? [], totalPages) });
         }
         if (!cancelled) {
           setErrorText(pdfLoadErrorText(kind, locale));
           setStatus("error");
         }
       } finally {
+        failureCachePages = undefined;
         operation.cancel();
       }
     })();

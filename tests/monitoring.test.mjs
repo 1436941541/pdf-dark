@@ -1,3 +1,4 @@
+import { diagnosticTestImports } from './helpers/diagnostic-test-imports.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -5,6 +6,7 @@ import ts from 'typescript';
 import * as analytics from '../lib/analytics-events.ts';
 
 function compile(file, imports) {
+  imports = { ...diagnosticTestImports, ...imports };
   const code = ts.transpileModule(fs.readFileSync(new URL(file, import.meta.url), 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;

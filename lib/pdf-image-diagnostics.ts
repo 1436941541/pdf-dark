@@ -1,5 +1,8 @@
 import * as Sentry from "@sentry/nextjs";
 import { darkWorkerFailure } from "./dark-worker-diagnostics";
+import { getCanvasEncodingFailure } from "./pdf-encoding-diagnostics";
+import { getPdfFileReadFailure } from "./pdf-file-read-diagnostics";
+import { getBackgroundWorkerFailure } from "./background-worker-diagnostics";
 import {
   imageReadErrorHint,
   readImageMemorySnapshot,
@@ -106,6 +109,13 @@ export type PdfFailureDiagnostic = {
   pageWidth?: number;
   pageHeight?: number;
   totalPages?: number;
+  inputBytes?: number;
+  baseWidth?: number;
+  baseHeight?: number;
+  renderScale?: number;
+  renderScaleLimited?: boolean;
+  imageRegionCount?: number;
+  getCacheSnapshot?: ImageCacheSnapshotProvider;
 };
 
 const MONOCHROME_STEPS = [
@@ -123,6 +133,9 @@ const SAFE_ERROR_NAMES = new Set([
   "SyntaxError",
   "NetworkError",
   "NotFoundError",
+  "NotReadableError",
+  "NotAllowedError",
+  "UnknownError",
   "InvalidStateError",
   "AbortError",
   "EncodingError",
@@ -156,7 +169,7 @@ function safeErrorReason(error: unknown): string {
     if (/^Failed to fetch dynamically imported module(?::|$)|^Importing a module script failed\.?$|^error loading dynamically imported module:/i.test(text)) return "module_load_failed";
     if (/out of memory|memory allocation|allocation failed|could not allocate|cannot be allocated/i.test(text)) return "out_of_memory_hint";
     if (/detached.{0,40}(?:buffer|arraybuffer)|(?:buffer|arraybuffer).{0,40}detached/i.test(text)) return "detached_buffer_hint";
-    if (text === "Could not encode the converted page.") return "page_encoding_failed";
+    if (text === "Could not encode the converted page." || text === "JPEG encoding failed") return "page_encoding_failed";
     if (text === "Your browser does not support PDF previews.") return "canvas_unavailable";
     if (text === "The color conversion worker could not start. Please reload and try again.") return "worker_start_failed";
   } catch { /* A diagnostic accessor must not affect error handling. */ }
@@ -211,15 +224,25 @@ function safeCodeStack(error: unknown): {
   }
 }
 
-function failureMetadata(diagnostic: PdfFailureDiagnostic): Record<string, number | string> {
-  const result: Record<string, number | string> = {};
+function failureMetadata(diagnostic: PdfFailureDiagnostic): Record<string, number | string | boolean> {
+  const result: Record<string, number | string | boolean> = {};
   for (const [source, target] of [
     ["pageNumber", "page_number"], ["pageWidth", "width"],
     ["pageHeight", "height"], ["totalPages", "total_pages"],
+    ["inputBytes", "input_bytes"], ["imageRegionCount", "image_region_count"],
+  ] as const) {
+    let value: unknown;
+    try { value = diagnostic[source]; } catch { continue; }
+    const minimum = source === "inputBytes" || source === "imageRegionCount" ? 0 : 1;
+    if (typeof value === "number" && Number.isSafeInteger(value) && value >= minimum) result[target] = value;
+  }
+  for (const [source, target] of [
+    ["baseWidth", "base_width"], ["baseHeight", "base_height"], ["renderScale", "render_scale"],
   ] as const) {
     const value = diagnostic[source];
-    if (typeof value === "number" && Number.isSafeInteger(value) && value > 0) result[target] = value;
+    if (typeof value === "number" && Number.isFinite(value) && value > 0 && value <= Number.MAX_SAFE_INTEGER) result[target] = value;
   }
+  if (typeof diagnostic.renderScaleLimited === "boolean") result.render_scale_limited = diagnostic.renderScaleLimited;
   if (diagnostic.monochromeMode === "grayscale" || diagnostic.monochromeMode === "black-and-white") {
     result.mode = diagnostic.monochromeMode;
     if (typeof diagnostic.threshold === "number" && Number.isInteger(diagnostic.threshold) && diagnostic.threshold >= 1 && diagnostic.threshold <= 254) result.threshold = diagnostic.threshold;
@@ -319,6 +342,9 @@ export function capturePdfProcessingException(
 ) {
   const context = typeof error === "object" && error !== null ? failures.get(error) : undefined;
   const workerContext = darkWorkerFailure(error);
+  const encodingContext = getCanvasEncodingFailure(error);
+  const fileReadContext = getPdfFileReadFailure(error);
+  const backgroundWorkerContext = getBackgroundWorkerFailure(error);
   const workerEnvironment: Record<string, boolean | string> = {};
   if (workerContext) {
     try {
@@ -335,8 +361,15 @@ export function capturePdfProcessingException(
   safe.name = "PdfProcessingError";
   try {
     const codeStack = safeCodeStack(error);
-    if (codeStack.frames.length) safe.stack = `${safe.name}: ${safe.message}\n${codeStack.frames.join("\n")}`;
-    const reason = safeErrorReason(error);
+    // Native file errors can have no JavaScript stack. Do not present the
+    // reporter's freshly-created stack as the original failure location.
+    safe.stack = `${safe.name}: ${safe.message}${codeStack.frames.length ? `\n${codeStack.frames.join("\n")}` : ""}`;
+    const reason = encodingContext ? "page_encoding_failed"
+      : fileReadContext ? `file_read_${fileReadContext.error_kind}`
+      : backgroundWorkerContext ? `background_worker_${backgroundWorkerContext.error_hint}`
+      : safeErrorReason(error);
+    const retainedCache = diagnostic.getCacheSnapshot
+      ? cacheSnapshot(context ? () => context : diagnostic.getCacheSnapshot) : undefined;
     const metadata = failureMetadata(diagnostic);
     const monochromeStep = MONOCHROME_STEPS.includes(diagnostic.monochromeStep as PdfMonochromeStep) ? diagnostic.monochromeStep : undefined;
     const originalErrorType = workerContext?.error_type ?? safeErrorName(error);
@@ -352,7 +385,10 @@ export function capturePdfProcessingException(
         original_error_type: originalErrorType,
         original_error_reason: reason,
         original_stack_status: codeStack.status,
-        pdf_diagnostic_version: "2",
+        pdf_diagnostic_version: "3",
+        ...(encodingContext ? { encoding_phase: encodingContext.phase, encoding_failure_kind: encodingContext.failure_kind } : {}),
+        ...(fileReadContext ? { file_read_reason: fileReadContext.error_kind, file_selection_source: fileReadContext.selection_source } : {}),
+        ...(backgroundWorkerContext ? { background_worker_failure_kind: backgroundWorkerContext.failure_kind } : {}),
         ...(diagnostic.readerStep ? { reader_step: diagnostic.readerStep } : {}),
         ...(diagnostic.invertStep ? { invert_step: diagnostic.invertStep } : {}),
         ...(monochromeStep ? { monochrome_step: monochromeStep } : {}),
@@ -365,7 +401,7 @@ export function capturePdfProcessingException(
       },
       contexts: {
         pdf_exception: {
-          version: 2,
+          version: 3,
           error_reason: reason,
           original_stack_status: codeStack.status,
           original_stack_format: codeStack.format,
@@ -373,6 +409,10 @@ export function capturePdfProcessingException(
           ...readImageMemorySnapshot(),
         },
         ...(context ? { pdf_image_processing: context } : {}),
+        ...(encodingContext ? { pdf_encoding: { ...encodingContext } } : {}),
+        ...(fileReadContext ? { pdf_file_read: fileReadContext } : {}),
+        ...(backgroundWorkerContext ? { pdf_background_worker: backgroundWorkerContext } : {}),
+        ...(retainedCache ? { pdf_cache: retainedCache } : {}),
         ...(workerContext ? { pdf_dark_worker: { ...workerContext, ...workerEnvironment } } : {}),
         ...(Object.keys(metadata).length
           ? { pdf_failure: metadata }

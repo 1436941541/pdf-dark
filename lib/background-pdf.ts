@@ -2,35 +2,56 @@ import type { PDFDocumentProxy } from "pdfjs-dist";
 import type { BackgroundSettings } from "./background";
 import { checkCancelled } from "./monochrome-pdf";
 import { yieldToMain } from "./main-thread";
+import { associateBackgroundWorkerFailure, createBackgroundWorkerDiagnostics, type BackgroundWorkerDiagnosticOptions } from "./background-worker-diagnostics";
 export { loadDeskewPdf as loadBackgroundPdf } from "./deskew-pdf";
 
-export function createBackgroundProcessor() {
-  const worker = new Worker(new URL("./background-worker.ts", import.meta.url), { type: "module" });
+export function createBackgroundProcessor(options?: BackgroundWorkerDiagnosticOptions) {
+  const diagnostic = createBackgroundWorkerDiagnostics(options);
+  let worker: Worker;
+  try { worker = new Worker(new URL("./background-worker.ts", import.meta.url), { type: "module" }); }
+  catch (error) { diagnostic.failed("constructor", error, 0, false); throw error; }
+  diagnostic.created();
   let serial = 0, disposed = false;
-  const pending = new Map<number, { resolve: (data: Uint8ClampedArray<ArrayBuffer>) => void; reject: (error: Error) => void }>();
-  const dispose = () => {
+  const pending = new Map<number, { resolve: (data: Uint8ClampedArray<ArrayBuffer>) => void; reject: (error: Error) => void; diagnostic: ReturnType<typeof diagnostic.request> }>();
+  const dispose = (reason: "cancelled" | "completed" | "worker_error" = "cancelled") => {
+    diagnostic.dispose(reason, pending.size);
     disposed = true; worker.terminate();
     for (const task of pending.values()) task.reject(new DOMException("Cleaning cancelled", "AbortError"));
     pending.clear();
   };
   worker.onmessage = ({ data }: MessageEvent<{ id: number; buffer?: ArrayBuffer; error?: string }>) => {
+    diagnostic.response();
     const task = pending.get(data.id);
-    if (data.error || !data.buffer) task?.reject(new Error(data.error ?? "Could not clean the page."));
+    if (data.error || !data.buffer) {
+      if (task) {
+        const error = new Error(data.error ?? "Could not clean the page.");
+        diagnostic.failed(data.error ? "response_error" : "missing_buffer", error, pending.size, disposed, task.diagnostic);
+        task.reject(error);
+      } else diagnostic.failed(data.error ? "response_error" : "missing_buffer", undefined, pending.size, disposed);
+    }
     else task?.resolve(new Uint8ClampedArray(data.buffer));
     pending.delete(data.id);
   };
-  worker.onerror = () => {
-    for (const task of pending.values()) task.reject(new Error("Background cleaning could not start. Reload or try another browser."));
-    pending.clear(); dispose();
+  worker.onerror = (event) => {
+    const failure = diagnostic.failed("error_event", event, pending.size, disposed);
+    for (const task of pending.values()) {
+      const error = new Error("Background cleaning could not start. Reload or try another browser.");
+      associateBackgroundWorkerFailure(error, failure, task.diagnostic);
+      task.reject(error);
+    }
+    pending.clear(); dispose("worker_error");
   };
+  // Observe serialization failures without introducing a new business rejection.
+  worker.onmessageerror = (event) => { diagnostic.failed("message_error", event, pending.size, disposed); };
   return {
-    process(data: Uint8ClampedArray<ArrayBuffer>, width: number, height: number, settings: BackgroundSettings) {
+    process(data: Uint8ClampedArray<ArrayBuffer>, width: number, height: number, settings: BackgroundSettings, options?: BackgroundWorkerDiagnosticOptions) {
       if (disposed) return Promise.reject(new DOMException("Cleaning cancelled", "AbortError"));
       const id = ++serial;
       return new Promise<Uint8ClampedArray<ArrayBuffer>>((resolve, reject) => {
-        pending.set(id, { resolve, reject });
+        const taskDiagnostic = diagnostic.request(id, width, height, settings, pending.size + 1, options);
+        pending.set(id, { resolve, reject, diagnostic: taskDiagnostic });
         try { worker.postMessage({ id, buffer: data.buffer, width, height, settings }, [data.buffer]); }
-        catch (error) { pending.delete(id); reject(error); }
+        catch (error) { diagnostic.failed("post_message", error, pending.size, disposed, taskDiagnostic); pending.delete(id); reject(error); }
       });
     }, dispose,
   };
@@ -53,14 +74,14 @@ async function renderPage(pdf: PDFDocumentProxy, number: number, settings: Backg
     checkCancelled(signal); await task.promise; checkCancelled(signal);
     const original = preview ? canvas.toDataURL("image/png") : "";
     if (settings.strength > 0) {
-      processor = createBackgroundProcessor();
-      const abortWorker = () => processor?.dispose(); signal.addEventListener("abort", abortWorker, { once: true });
+      processor = createBackgroundProcessor({ pageNumber: number, mode: preview ? "preview" : "export" });
+      const abortWorker = () => processor?.dispose("cancelled"); signal.addEventListener("abort", abortWorker, { once: true });
       try {
         checkCancelled(signal);
         const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const cleaned = await processor.process(pixels.data, canvas.width, canvas.height, settings);
         checkCancelled(signal); ctx.putImageData(new ImageData(cleaned, canvas.width, canvas.height), 0, 0);
-      } finally { signal.removeEventListener("abort", abortWorker); processor.dispose(); }
+      } finally { signal.removeEventListener("abort", abortWorker); processor.dispose("completed"); }
     }
     checkCancelled(signal);
     return { canvas, original, width: size.width, height: size.height };

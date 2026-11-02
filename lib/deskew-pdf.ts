@@ -1,3 +1,4 @@
+import { readPdfFile } from "./pdf-file-read-diagnostics";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { detectDeskew } from "./deskew";
 import { checkCancelled } from "./monochrome-pdf";
@@ -10,7 +11,7 @@ export async function loadDeskewPdf(file: File, signal: AbortSignal) {
   checkCancelled(signal);
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   pdfjs.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/legacy/build/pdf.worker.min.mjs", import.meta.url).toString();
-  const bytes = new Uint8Array(await file.arrayBuffer());
+  const bytes = new Uint8Array(await readPdfFile(file));
   checkCancelled(signal);
   const task = pdfjs.getDocument({ data: bytes });
   const cancel = () => { void task.destroy(); };

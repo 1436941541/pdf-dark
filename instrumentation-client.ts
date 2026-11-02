@@ -1,13 +1,17 @@
 import * as Sentry from "@sentry/nextjs";
+import { browserScriptDiagnostics } from "./lib/browser-script-diagnostics";
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 if (dsn) {
+  browserScriptDiagnostics.observeWindow(window);
   Sentry.init({
     dsn,
 
     // Privacy defaults — we don't want PII or user profiling
     sendDefaultPii: false,
+
+    beforeSend(event, hint) { return browserScriptDiagnostics.enrich(event, hint); },
 
     beforeBreadcrumb(breadcrumb) {
       // Parser/console messages and local media URLs may contain PDF data.

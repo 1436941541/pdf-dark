@@ -1,3 +1,4 @@
+import { readPdfFile } from "./pdf-file-read-diagnostics";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { monochromePixels, type MonochromeResponse, type MonochromeSettings } from "./monochrome";
 import { drawInvisibleTextLayer } from "./text-layer";
@@ -128,7 +129,7 @@ export async function loadMonochromePdf(file: File) {
   pdfjs.GlobalWorkerOptions.workerSrc = new URL(
     "pdfjs-dist/legacy/build/pdf.worker.min.mjs", import.meta.url,
   ).toString();
-  const task = pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) });
+  const task = pdfjs.getDocument({ data: new Uint8Array(await readPdfFile(file)) });
   try {
     return await task.promise;
   } catch (error) {
