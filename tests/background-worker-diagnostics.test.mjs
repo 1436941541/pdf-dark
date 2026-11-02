@@ -134,8 +134,10 @@ test('cancelled old worker late errors remain distinct from an active preview', 
   const current = active.process(pixels(), 2, 2, settings);
   current.then(() => { activeSettled = true; });
   const staleError = new Error('PRIVATE');
-  const staleEvent = { error: staleError };
+  const staleEvent = new Event('error', { cancelable: true });
+  Object.defineProperty(staleEvent, 'error', { value: staleError });
   h.workers[0].onerror(staleEvent);
+  assert.equal(staleEvent.defaultPrevented, true);
   const oldContext = h.getBackgroundWorkerFailure(staleError);
   assert.equal(oldContext.page_number, 1); assert.equal(oldContext.pending_count, 0);
   assert.equal(oldContext.cancelled_before_error, true); assert.equal(oldContext.disposed_before_error, true);
@@ -151,6 +153,79 @@ test('cancelled old worker late errors remain distinct from an active preview', 
   h.workers[1].complete(1, pixels().buffer); await current;
   active.dispose('completed');
   await assert.rejects(old.process(pixels(), 1, 1, settings), { name: 'AbortError' });
+});
+
+test('cancellation stays authoritative across finally cleanup and repeated late errors', async () => {
+  const h = harness(); const processor = h.createBackgroundProcessor();
+  const request = processor.process(pixels(), 1, 1, settings);
+  const cancelled = assert.rejects(request, { name: 'AbortError', message: 'Cleaning cancelled' });
+  processor.dispose('cancelled'); await cancelled;
+  processor.dispose('completed'); // renderPage's existing finally cleanup.
+  for (let i = 0; i < 2; i++) {
+    const event = new Event('error', { cancelable: true });
+    h.workers[0].onerror(event);
+    assert.equal(event.defaultPrevented, true);
+    const context = h.getBackgroundWorkerFailure(event);
+    assert.equal(context.pending_count, 0);
+    assert.equal(context.disposed_before_error, true);
+    assert.equal(context.cancelled_before_error, true);
+  }
+  assert.equal(h.workers[0].terminateCalls, 4);
+  const lateResult = pixels();
+  assert.doesNotThrow(() => h.workers[0].complete(1, lateResult.buffer));
+  const messageError = new Event('messageerror', { cancelable: true });
+  h.workers[0].onmessageerror(messageError);
+  assert.equal(messageError.defaultPrevented, false);
+  assert.equal(h.getBackgroundWorkerFailure(messageError).failure_kind, 'message_error');
+  await assert.rejects(processor.process(pixels(), 1, 1, settings), { name: 'AbortError' });
+  assert.equal(h.workers[0].messages.length, 1);
+});
+
+test('cancelling one worker does not suppress another active worker failure', async () => {
+  const h = harness(); const old = h.createBackgroundProcessor();
+  old.dispose('cancelled');
+  const active = h.createBackgroundProcessor();
+  const request = active.process(pixels(), 1, 1, settings);
+  const rejected = assert.rejects(request, { message: 'Background cleaning could not start. Reload or try another browser.' });
+  const event = new Event('error', { cancelable: true });
+  h.workers[1].onerror(event); await rejected;
+  assert.equal(event.defaultPrevented, false);
+  assert.equal(h.getBackgroundWorkerFailure(event).disposed_before_error, false);
+  assert.equal(h.workers[0].terminateCalls, 1);
+  assert.equal(h.workers[1].terminateCalls, 1);
+});
+
+test('completed or already failed workers never become cancellation suppressions', async () => {
+  for (const reason of ['completed', 'worker_error']) {
+    const h = harness(); const processor = h.createBackgroundProcessor();
+    const request = processor.process(pixels(), 1, 1, settings);
+    if (reason === 'completed') {
+      h.workers[0].complete(1, pixels().buffer); await request;
+      processor.dispose('completed');
+    } else {
+      const rejected = assert.rejects(request, { message: 'Background cleaning could not start. Reload or try another browser.' });
+      const original = new Event('error', { cancelable: true });
+      h.workers[0].onerror(original); await rejected;
+      assert.equal(original.defaultPrevented, false);
+    }
+    processor.dispose('cancelled');
+    const late = new Event('error', { cancelable: true });
+    h.workers[0].onerror(late);
+    assert.equal(late.defaultPrevented, false, reason);
+  }
+});
+
+test('missing, throwing or hostile preventDefault never creates another cancellation error', () => {
+  for (const event of [
+    {}, { preventDefault() { throw new Error('PRIVATE'); } },
+    { get preventDefault() { throw new Error('PRIVATE'); } },
+  ]) {
+    const h = harness(); const processor = h.createBackgroundProcessor();
+    processor.dispose('cancelled');
+    assert.doesNotThrow(() => h.workers[0].onerror(event));
+    assert.equal(h.getBackgroundWorkerFailure(event).disposed_before_error, true);
+    assert.equal(h.workers[0].terminateCalls, 2);
+  }
 });
 
 test('constructor and postMessage exceptions retain the exact original thrown identity', async () => {

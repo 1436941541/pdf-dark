@@ -148,9 +148,17 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
   useEffect(() => {
     const pending = pendingRef.current;
+    let disposed = false;
     const w = new Worker(new URL("../lib/dark-worker.ts", import.meta.url), {
       type: "module",
     });
+    w.onerror = (event) => {
+      // Only this effect's intentionally terminated worker is cancellation.
+      // Active worker failures must still reach the global error monitor.
+      if (disposed) {
+        try { event.preventDefault(); } catch { /* Preserve reporting for non-standard events. */ }
+      }
+    };
     w.onmessage = (e: MessageEvent<DarkifyResponse>) => {
       const { id } = e.data;
       const cb = pending.get(id);
@@ -161,6 +169,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     };
     workerRef.current = w;
     return () => {
+      disposed = true;
       for (const { reject } of pending.values()) reject(cancelledError());
       pending.clear();
       w.terminate();

@@ -12,9 +12,11 @@ export function createBackgroundProcessor(options?: BackgroundWorkerDiagnosticOp
   catch (error) { diagnostic.failed("constructor", error, 0, false); throw error; }
   diagnostic.created();
   let serial = 0, disposed = false;
+  let disposeReason: "cancelled" | "completed" | "worker_error" | undefined;
   const pending = new Map<number, { resolve: (data: Uint8ClampedArray<ArrayBuffer>) => void; reject: (error: Error) => void; diagnostic: ReturnType<typeof diagnostic.request> }>();
   const dispose = (reason: "cancelled" | "completed" | "worker_error" = "cancelled") => {
     diagnostic.dispose(reason, pending.size);
+    disposeReason ??= reason;
     disposed = true; worker.terminate();
     for (const task of pending.values()) task.reject(new DOMException("Cleaning cancelled", "AbortError"));
     pending.clear();
@@ -34,6 +36,13 @@ export function createBackgroundProcessor(options?: BackgroundWorkerDiagnosticOp
   };
   worker.onerror = (event) => {
     const failure = diagnostic.failed("error_event", event, pending.size, disposed);
+    // A terminated preview can still dispatch a queued native error. Cancel its
+    // default propagation only when this exact worker was disposed by cancellation.
+    // Keep the first reason: finally's completed cleanup must not undo cancellation,
+    // and a later cancellation must not hide an already completed/failed worker.
+    if (disposed && disposeReason === "cancelled") {
+      try { event.preventDefault(); } catch { /* Non-standard events retain their normal reporting. */ }
+    }
     for (const task of pending.values()) {
       const error = new Error("Background cleaning could not start. Reload or try another browser.");
       associateBackgroundWorkerFailure(error, failure, task.diagnostic);

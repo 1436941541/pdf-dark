@@ -30,8 +30,10 @@ export async function loadDeskewPdf(file: File, signal: AbortSignal) {
 export function createDeskewProcessor() {
   let worker: Worker | null = null;
   let serial = 0;
+  let disposeReason: "cancelled" | "completed" | "worker_error" | undefined;
   const pending = new Map<number, { resolve: (result: DeskewAnalysis) => void; reject: (error: Error) => void }>();
-  const dispose = () => {
+  const dispose = (reason: "cancelled" | "completed" | "worker_error" = "cancelled") => {
+    disposeReason ??= reason;
     worker?.terminate();
     worker = null;
     for (const task of pending.values()) task.reject(new DOMException("Analysis cancelled", "AbortError"));
@@ -45,7 +47,12 @@ export function createDeskewProcessor() {
       else task?.resolve(data.result);
       pending.delete(data.id);
     };
-    worker.onerror = () => {
+    worker.onerror = (event) => {
+      // Only this instance's intentional cancellation suppresses a queued error.
+      // Completed or failed analysis must not become cancellation on later cleanup.
+      if (disposeReason === "cancelled") {
+        try { event.preventDefault(); } catch { /* Non-standard events keep normal reporting. */ }
+      } else disposeReason ??= "worker_error";
       for (const task of pending.values()) task.reject(new Error("Page analysis could not start. Reload and try again."));
       pending.clear();
       worker?.terminate();

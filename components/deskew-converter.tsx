@@ -102,7 +102,7 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
       if (id === loadId.current && mounted.current && !controller.signal.aborted) setError(pdfLoadErrorText(classifyPdfLoadError(failure)) ?? (failure instanceof Error ? failure.message : "Could not open this PDF."));
     } finally {
       operation.cancel();
-      processor?.dispose();
+      processor?.dispose(controller.signal.aborted ? "cancelled" : "completed");
       if (active.current === controller) {
         active.current = null;
         detector.current = null;
