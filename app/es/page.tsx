@@ -42,12 +42,12 @@ export const metadata: Metadata = {
 
 const COMPARISON_ROWS: [string, string, string, string][] = [
   ["No hace falta instalar nada", "sí", "no", "sí"],
-  ["Leer en el navegador antes de descargar", "sí", "no", "Varía"],
-  ["Guardar como nuevo PDF", "sí", "no", "sí"],
+  ["Leer aquí; descargar con el convertidor", "sí", "no", "Varía"],
+  ["Guardar como nuevo PDF (con el convertidor)", "sí", "no", "sí"],
   ["Las fotos mantienen sus colores originales (no negativos)", "sí", "no", "no"],
-  ["El texto sigue siendo seleccionable y buscable", "sí", "no", "no"],
+  ["Conservar texto seleccionable y buscable al convertir PDFs de texto", "sí", "no", "no"],
   ["Control de imágenes: Original / Auto / Invertir", "sí", "no", "no"],
-  ["Sliders de oscuridad y calidez, guardados en el archivo", "sí", "no", "no"],
+  ["Sliders de oscuridad y calidez, guardados al convertir", "sí", "no", "no"],
   ["Funciona en iOS Safari", "sí", "no", "sí"],
   ["100% local (sin subir archivos)", "sí", "sí", "no"],
 ];
@@ -61,7 +61,7 @@ type FaqItem = {
 const FAQ_ITEMS: FaqItem[] = [
   {
     q: "¿Puedo poner un PDF en modo oscuro?",
-    a: "Sí — gratis y sin instalar nada. Suelta el PDF en esta página para leerlo de inmediato sobre un fondo oscuro, o invierte sus colores y descarga una copia con el tema oscuro escrito en el archivo.",
+    a: "Sí — gratis y sin instalar nada. Suelta el PDF en esta página para leerlo de inmediato sobre un fondo oscuro, o usa el convertidor para invertir sus colores y descargar una copia con el tema oscuro escrito en el archivo.",
   },
   {
     q: "¿Mi PDF se sube a algún servidor?",
@@ -69,7 +69,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "¿Cómo puedo imprimir un PDF en modo oscuro?",
-    a: "Descarga primero una copia con el tema oscuro, luego imprímela desde cualquier lector. Como los colores quedan escritos en el propio archivo, la impresión también sale oscura, no solo la vista en pantalla.",
+    a: "Descarga primero una copia con el tema oscuro desde el convertidor, luego imprímela desde cualquier lector. Como los colores quedan escritos en el propio archivo, la impresión también sale oscura, no solo la vista en pantalla.",
     link: { href: "/es/invert-pdf-colors", text: "Invertir colores de PDF" },
   },
   {
@@ -78,7 +78,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "¿En qué se diferencia de una extensión de modo oscuro del navegador?",
-    a: "Las extensiones solo cambian el estilo de la página mientras está abierta en tu navegador — cierra la pestaña o pásale el archivo a otra persona y vuelve a verse claro. PDF Dark reescribe el PDF de verdad: el texto y el fondo se recolorean según el tema elegido, las imágenes se tratan según tu configuración, y el resultado queda guardado en el archivo. El tema oscuro se mantiene esté donde esté el PDF.",
+    a: "Este lector aplica el tema oscuro al contenido del PDF en tu navegador, sin instalar extensiones ni modificar el archivo original. El texto y el fondo se recolorean según el tema elegido y las imágenes se tratan según tu configuración. Para guardar una copia que se mantenga oscura en otros lectores, usa el convertidor de PDF Dark.",
   },
   {
     q: "¿Funciona con archivos PDF escaneados?",
@@ -86,7 +86,7 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "¿Cómo leo un PDF de noche sin cansar la vista?",
-    a: "Convierte el PDF a modo oscuro aquí y elige OLED o Midnight — ambos convierten el fondo blanco en negro puro o casi puro para que tus ojos no tengan que pelear contra una página brillante en un cuarto oscuro. El texto se invierte a tonos claros; las imágenes se tratan con inteligencia para que las fotos no se conviertan en negativos.",
+    a: "Cambia la vista de tu PDF a modo oscuro y elige OLED o Midnight — ambos convierten el fondo blanco en negro puro o casi puro para que tus ojos no tengan que pelear contra una página brillante en un cuarto oscuro. El texto se invierte a tonos claros; las imágenes se tratan con inteligencia para que las fotos no se conviertan en negativos.",
   },
   {
     q: "¿Mis fotos también se invierten?",
@@ -98,15 +98,15 @@ const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "¿Puedo poner el fondo de un PDF en negro?",
-    a: "Sí. El tema OLED renderiza el fondo en negro puro (#000) y el texto en tonos claros — casi blanco para el texto normal — que es el modo oscuro más agresivo para archivos PDF. También puedes descargar el PDF con ese fondo negro ya escrito en el archivo.",
+    a: "Sí. El tema OLED renderiza el fondo en negro puro (#000) y el texto en tonos claros — casi blanco para el texto normal — que es el modo oscuro más agresivo para archivos PDF. También puedes usar el convertidor para descargar una copia con ese fondo negro aplicado.",
   },
   {
     q: "¿Es esto un modo oscuro para Adobe Acrobat?",
-    a: "No exactamente. Acrobat tiene su propio modo oscuro interno, pero solo cambia cómo ves el PDF dentro de Acrobat — el archivo en sí sigue siendo claro. PDF Dark produce un archivo PDF con modo oscuro de verdad, que puedes abrir en cualquier lector (Acrobat, Preview, navegador) y se mantiene oscuro.",
+    a: "No exactamente. Acrobat tiene su propio modo oscuro interno, pero solo cambia cómo ves el PDF dentro de Acrobat — el archivo en sí sigue siendo claro. Aquí también puedes leer sin modificar el original. El convertidor de PDF Dark produce una copia con modo oscuro que puedes abrir en otros lectores (Acrobat, Preview, navegador) y se mantiene oscura.",
   },
   {
     q: "¿El modo oscuro de PDF funciona en Firefox?",
-    a: "Sí. El visor PDF.js integrado de Firefox solo oscurece la barra de herramientas, no el contenido de la página. PDF Dark convierte el contenido real de la página, así que el archivo se ve oscuro en cualquier visor, incluido Firefox.",
+    a: "Sí. Puedes abrir tu PDF en este lector online desde Firefox y ver el contenido de la página con el tema oscuro elegido. El original no cambia. Para descargar una copia que también se vea oscura en otros visores, usa el convertidor de PDF Dark.",
   },
 ];
 
@@ -131,7 +131,7 @@ function StructuredData() {
     operatingSystem: "Any (browser-based)",
     screenshot: `${site}/compare/pdf-dark.png`,
     description:
-      "Convertidor y lector de PDF en modo oscuro, gratis y del lado del navegador. Lee archivos PDF sobre un fondo oscuro directamente en el navegador o descarga el archivo con el tema aplicado. Funciona 100% en local — pensado para leer archivos PDF de noche.",
+      "Lector de PDF en modo oscuro, gratis y del lado del navegador. Lee archivos PDF sobre un fondo oscuro sin modificar el original; para descargar una copia con el tema aplicado, usa el convertidor de PDF Dark. Funciona 100% en local — pensado para leer archivos PDF de noche.",
     offers: {
       "@type": "Offer",
       price: "0",
@@ -142,9 +142,9 @@ function StructuredData() {
       "Cuatro temas: Midnight, Sepia, Solarized, OLED",
       "Las fotos mantienen sus colores originales — sin imágenes en negativo",
       "Tratamiento por imagen: Original, Auto (inteligente) o Invertir completo",
-      "El texto de salida sigue siendo seleccionable y buscable",
-      "Leer en el navegador antes de descargar",
-      "Descargar como nuevo PDF",
+      "El convertidor puede conservar texto seleccionable y buscable en PDFs de texto",
+      "Leer aquí; descargar una copia con el convertidor",
+      "Descargar como nuevo PDF con el convertidor",
       "Funciona en iOS Safari",
     ],
   };
@@ -308,7 +308,7 @@ export default function HomeEs() {
             Izquierda: la página original tal como se renderiza. Centro: la
             misma página tras una inversión de píxeles RGB — el método que usan
             la mayoría de las herramientas básicas. Derecha: resultado real de
-            este convertidor (tema Midnight, modo de imagen Auto).
+            PDF Dark (tema Midnight, modo de imagen Auto).
           </p>
           <p className="mt-4 text-sm text-center">
             <Link href="/es/invert-pdf-colors" className="text-amber-400 hover:underline">
@@ -427,10 +427,10 @@ export default function HomeEs() {
           <p className="text-neutral-300 leading-relaxed">
             Es una forma de leer documentos PDF con fondo oscuro y texto claro
             en lugar de la página blanca por defecto. También se lo conoce como
-            PDF modo oscuro, PDF modo nocturno, lector de PDF oscuro o PDF
-            invertido — distintos nombres para lo mismo: un tema de poca luz
-            incorporado en el archivo, así se mantiene oscuro en cualquier
-            visor, no solo en el que lo abriste.
+            PDF modo oscuro, PDF modo nocturno o lector de PDF oscuro. Aquí el
+            tema se aplica a la lectura sin modificar el original; para guardar
+            un PDF invertido que se mantenga oscuro en otros visores, usa el
+            convertidor.
           </p>
 
           <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
@@ -443,20 +443,19 @@ export default function HomeEs() {
             documentos cargados de texto o código sean menos duros bajo luz
             brillante de oficina. Las extensiones del navegador pueden simular
             un tema oscuro dentro del visor, pero el archivo PDF subyacente
-            sigue siendo claro. PDF Dark produce un PDF con tema oscuro real que
-            puedes guardar, compartir y reabrir en cualquier lado — un PDF
-            oscuro de verdad, no un truco del visor.
+            sigue siendo claro. Para guardar, compartir y reabrir un PDF oscuro
+            de PDF Dark en otros lectores, usa el convertidor; la lectura de
+            esta página no modifica el archivo.
           </p>
 
           <h3 className="text-lg font-semibold text-neutral-100 mt-8 mb-3">
             Conversión, no solo un truco del visor
           </h3>
           <p className="text-neutral-300 leading-relaxed">
-            Un buen lector en modo oscuro para PDF hace más que pintar la
-            pantalla de oscuro — reescribe el archivo con los colores invertidos
-            para que el documento se mantenga oscuro donde sea que lo abras. Con
-            PDF Dark puedes leer en Chrome, Firefox, Safari o Edge, y luego
-            llevar el archivo convertido a tu teléfono o e-reader. Nunca sale
+            Este lector en modo oscuro para PDF cambia la vista sin reescribir
+            tu archivo. Con PDF Dark puedes leer en Chrome, Firefox, Safari o
+            Edge; si quieres llevar una copia oscura a tu teléfono o e-reader,
+            abre el convertidor y selecciona allí tu PDF. Nunca sale
             de tu dispositivo: toda la conversión ocurre en tu navegador
             mediante un Web Worker, así que nada se sube nunca.
           </p>
