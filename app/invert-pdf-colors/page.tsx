@@ -165,9 +165,9 @@ export default function InvertPdfColorsPage() {
             Invert PDF Colors
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Choose how you want to invert PDF colors, then drop your file. The
-            new copy downloads automatically with the colors written into the
-            file itself, so it stays that way in every viewer — Acrobat,
+            Choose how you want to invert PDF colors online, then drop your file.
+            This PDF color inverter downloads a new copy automatically with the
+            colors written into the file itself, so it stays that way in every viewer — Acrobat,
             Preview, browsers, e-readers. Free, and your file never leaves the
             browser.
           </p>
@@ -215,7 +215,8 @@ export default function InvertPdfColorsPage() {
               How to invert PDF colors
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              Text and background are always flipped. What happens to the
+              This PDF inverter changes the colors of text and page backgrounds.
+              What happens to the
               pictures is your call — that&apos;s what the Images control is
               for: leave them untouched, flip them with the page, or let each
               one be judged separately. Curious how that detection decides?{" "}
