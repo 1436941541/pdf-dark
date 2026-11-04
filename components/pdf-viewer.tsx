@@ -12,7 +12,7 @@ import type {
   DarkifyResponse,
 } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
-import { canvasToJpegDataUrl, yieldToMain } from "@/lib/main-thread";
+import { canvasToJpegBlob, yieldToMain } from "@/lib/main-thread";
 import { getPdfRenderScale } from "@/lib/pdf-render-limits";
 import {
   imageTreatment,
@@ -26,18 +26,20 @@ import { beginPdfOperation, recordPdfFailure } from "@/lib/pdf-monitoring";
 
 type PageImage = {
   pageNumber: number;
-  /** Full-color rendered PDF page (source of truth, never modified). */
-  originalDataUrl: string;
+  /** Full-color rendered PDF page JPEG (source of truth, never modified). */
+  originalBlob: Blob;
   width: number;
   height: number;
   /** Reading layout stays at the original zoom even if the bitmap is reduced. */
   layoutWidth: number;
   layoutHeight: number;
-  /** Current dark-themed version shown to the user. */
-  displayDataUrl: string;
-  /** Cache of already-darkified dataUrls keyed by `${theme}:${imageMode}` —
+  /** Current dark-themed version shown to the user, and its object URL.
+   *  Blobs rather than Base64 strings keep page images out of the JS heap. */
+  displayBlob: Blob;
+  displayUrl: string;
+  /** Cache of already-darkified pages keyed by `${theme}:${imageMode}` —
    *  lets re-applying a known combination skip the worker. */
-  byTheme: Partial<Record<string, string>>;
+  byTheme: Partial<Record<string, Blob>>;
   /**
    * Canvas-space rects of raster images on this page (photos, figures). The
    * worker restores these from the original after darkening so they don't
@@ -288,7 +290,25 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     else setPageInput(String(currentPage));
   }, [pageInput, currentPage, scrollToPage]);
 
-  /** Convert an original dataUrl → worker-processed themed dataUrl. */
+  // One object URL per displayed Blob for the current document. They are all
+  // revoked together when the document is closed or replaced.
+  const objectUrlsRef = useRef(new Map<Blob, string>());
+  const objectUrl = useCallback((blob: Blob) => {
+    const urls = objectUrlsRef.current;
+    let url = urls.get(blob);
+    if (url === undefined) {
+      url = URL.createObjectURL(blob);
+      urls.set(blob, url);
+    }
+    return url;
+  }, []);
+  const revokeObjectUrls = useCallback(() => {
+    const urls = objectUrlsRef.current;
+    for (const url of urls.values()) URL.revokeObjectURL(url);
+    urls.clear();
+  }, []);
+
+  /** Convert an original page JPEG → worker-processed themed JPEG. */
   const darkifyViaWorker = useCallback(
     async (
       p: PageImage,
@@ -298,15 +318,15 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       nextWarmth: number,
       cancelled: () => boolean,
       getCacheSnapshot?: ImageCacheSnapshotProvider,
-    ): Promise<string> => {
+    ): Promise<Blob> => {
       throwIfCancelled(cancelled);
       // "Original" mode treats a scanned page (page == one big image) as an
       // image: the page stays exactly as in the source, no darkening at all.
-      if (nextMode === "original" && p.scannedPage) return p.originalDataUrl;
+      if (nextMode === "original" && p.scannedPage) return p.originalBlob;
 
       const w = workerRef.current;
       if (!w) throw new Error("worker not ready");
-      const bitmap = await loadPageBitmap(p.originalDataUrl, {
+      const bitmap = await loadPageBitmap(p.originalBlob, {
         pageNumber: p.pageNumber,
         width: p.width,
         height: p.height,
@@ -319,34 +339,39 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         (r) => imageTreatment(nextMode, r) !== "invert",
       );
       const id = ++msgIdRef.current;
-      const outBlob = await new Promise<Blob>((resolve, reject) => {
-        pendingRef.current.set(id, { resolve, reject });
-        const req: DarkifyRequest = {
-          id,
-          bitmap,
-          width: p.width,
-          height: p.height,
-          theme: nextTheme,
-          pageNumber: p.pageNumber,
-          imageMode: nextMode,
-          darkness: nextDarkness / 100,
-          warmth: nextWarmth / 100,
-          imageRects: rects,
-          imageDims: rects.map((r) =>
-            imageTreatment(nextMode, r) === "dim"
-              ? imageDimAlpha(r.brightness)
-              : 0,
-          ),
-        };
-        w.postMessage(req, [bitmap]);
-      });
-
-      return await new Promise<string>((resolve, reject) => {
-        const fr = new FileReader();
-        fr.onload = () => resolve(fr.result as string);
-        fr.onerror = () => reject(new Error("FileReader failed"));
-        fr.readAsDataURL(outBlob);
-      });
+      try {
+        return await new Promise<Blob>((resolve, reject) => {
+          pendingRef.current.set(id, { resolve, reject });
+          const req: DarkifyRequest = {
+            id,
+            bitmap,
+            width: p.width,
+            height: p.height,
+            theme: nextTheme,
+            pageNumber: p.pageNumber,
+            sourceBytes: p.originalBlob.size,
+            imageMode: nextMode,
+            darkness: nextDarkness / 100,
+            warmth: nextWarmth / 100,
+            imageRects: rects,
+            imageDims: rects.map((r) =>
+              imageTreatment(nextMode, r) === "dim"
+                ? imageDimAlpha(r.brightness)
+                : 0,
+            ),
+            releaseResources: true,
+          };
+          try {
+            w.postMessage(req, [bitmap]);
+          } catch (error) {
+            pendingRef.current.delete(id);
+            reject(error);
+          }
+        });
+      } finally {
+        // Transferred bitmaps are detached here; close also covers a failed send.
+        bitmap.close();
+      }
     },
     [],
   );
@@ -519,10 +544,10 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
           await yieldToMain();
           readerStep = "encode_page";
-          const originalDataUrl = await canvasToJpegDataUrl(canvas, 0.88);
+          const originalBlob = await canvasToJpegBlob(canvas, 0.88);
           const stub: PageImage = {
             pageNumber: i,
-            originalDataUrl,
+            originalBlob,
             width: canvas.width,
             height: canvas.height,
             layoutWidth: renderScale < RENDER_SCALE
@@ -531,7 +556,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             layoutHeight: renderScale < RENDER_SCALE
               ? Math.max(1, Math.floor(baseViewport.height * RENDER_SCALE))
               : canvas.height,
-            displayDataUrl: "",
+            displayBlob: originalBlob,
+            displayUrl: "",
             byTheme: {},
             imageRects,
             scannedPage,
@@ -555,7 +581,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           readerStep = "commit_page";
           rendered.push({
             ...stub,
-            displayDataUrl: display,
+            displayBlob: display,
+            displayUrl: objectUrl(display),
             byTheme: {
               [variantKey(theme, imageMode, appliedDarkness, appliedWarmth)]:
                 display,
@@ -589,6 +616,9 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     return () => {
       cancel();
       cancellations.delete(cancel);
+      // This document's pages are discarded with this pass (replaced file,
+      // locale change or unmount), so release every page image URL.
+      revokeObjectUrls();
     };
     // theme intentionally omitted — initial pass uses whatever theme is live.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -596,7 +626,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
   // Variant switch (theme or image mode): re-darkify pages, starting from
   // whatever the user is looking at. Fast path: if every page already has
-  // this combination cached, swap dataUrls instantly.
+  // this combination cached, swap the page images instantly.
   useEffect(() => {
     if (status !== "ready" || pages.length === 0) return;
     const vk = variantKey(theme, imageMode, appliedDarkness, appliedWarmth);
@@ -612,8 +642,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       setPages((cur) =>
         cur.map((p) => {
           const cached = p.byTheme[vk];
-          return cached && p.displayDataUrl !== cached
-            ? { ...p, displayDataUrl: cached }
+          return cached && p.displayBlob !== cached
+            ? { ...p, displayBlob: cached, displayUrl: objectUrl(cached) }
             : p;
         }),
       );
@@ -625,7 +655,10 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     const allCached = pages.every((p) => p.byTheme[vk] !== undefined);
     if (allCached) {
       setPages((cur) =>
-        cur.map((p) => ({ ...p, displayDataUrl: p.byTheme[vk]! })),
+        cur.map((p) => {
+          const cached = p.byTheme[vk]!;
+          return { ...p, displayBlob: cached, displayUrl: objectUrl(cached) };
+        }),
       );
       lastAppliedThemeRef.current = vk;
       setThemeApplying(false);
@@ -658,7 +691,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
 
         const cached = p.byTheme[vk2];
         if (cached !== undefined) {
-          next[idx] = { ...p, displayDataUrl: cached };
+          next[idx] = { ...p, displayBlob: cached, displayUrl: objectUrl(cached) };
         } else {
           try {
             const display = await darkifyViaWorker(
@@ -673,7 +706,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             if (aborted || themeVersionRef.current !== version) return;
             next[idx] = {
               ...p,
-              displayDataUrl: display,
+              displayBlob: display,
+              displayUrl: objectUrl(display),
               byTheme: { ...p.byTheme, [vk2]: display },
             };
             computed++;
@@ -1081,7 +1115,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={p.displayDataUrl}
+                src={p.displayUrl}
                 alt={t.viewer.pageAlt(i + 1)}
                 width={p.layoutWidth}
                 height={p.layoutHeight}

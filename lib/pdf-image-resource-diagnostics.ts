@@ -78,7 +78,8 @@ export function readImageMemorySnapshot(): ImageMemorySnapshot {
 export type ImageCachePage = {
   originalDataUrl?: string;
   displayDataUrl?: string;
-  byTheme?: Partial<Record<string, string>>;
+  byTheme?: Partial<Record<string, string | Blob>>;
+  originalBlob?: Blob;
   displayBlob?: Blob;
 };
 
@@ -151,6 +152,20 @@ export function summarizeImageCache(pages: readonly ImageCachePage[], totalPages
           seen.push(value);
         }
       };
+      // The reader keeps the displayed Blob in its variant cache too, so count
+      // each Blob object once per page.
+      const seenBlobs: Blob[] = [];
+      const countBlob = (blob: Blob) => {
+        if (seenBlobs.includes(blob)) return;
+        seenBlobs.push(blob);
+        const size = safeNumber(blob.size);
+        if (size !== undefined && Number.isInteger(size)) add("cached_blob_bytes", size);
+        else result.cache_incomplete = true;
+      };
+      try {
+        const original = page.originalBlob;
+        if (original !== undefined) countBlob(original);
+      } catch { result.cache_incomplete = true; }
       try {
         const original = page.originalDataUrl;
         if (typeof original === "string") { add("cached_original_chars", original.length); countPayload(original); }
@@ -168,6 +183,9 @@ export function summarizeImageCache(pages: readonly ImageCachePage[], totalPages
                 add("cached_variant_chars", value.length);
                 add("cached_variant_count", 1);
                 countPayload(value);
+              } else if (value instanceof Blob) {
+                add("cached_variant_count", 1);
+                countBlob(value);
               } else if (value !== undefined) result.cache_incomplete = true;
             } catch { result.cache_incomplete = true; }
           }
@@ -179,11 +197,7 @@ export function summarizeImageCache(pages: readonly ImageCachePage[], totalPages
       } catch { result.cache_incomplete = true; }
       try {
         const blob = page.displayBlob;
-        if (blob !== undefined) {
-          const size = safeNumber(blob.size);
-          if (size !== undefined && Number.isInteger(size)) add("cached_blob_bytes", size);
-          else result.cache_incomplete = true;
-        }
+        if (blob !== undefined) countBlob(blob);
       } catch { result.cache_incomplete = true; }
     }
   } catch { result.cache_incomplete = true; }

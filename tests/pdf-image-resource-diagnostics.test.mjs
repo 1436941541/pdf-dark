@@ -108,6 +108,21 @@ test('display data outside variant cache is counted once and export blobs use by
   assert.equal(result.cached_pages, 3);
 });
 
+test('reader Blob caches count original and variants by bytes, sharing the displayed Blob once', () => {
+  const original = new Blob([new Uint8Array(5)], { type: 'image/jpeg' });
+  const midnight = new Blob([new Uint8Array(3)], { type: 'image/jpeg' });
+  const sepia = new Blob([new Uint8Array(2)], { type: 'image/jpeg' });
+  const result = helpers.summarizeImageCache([
+    { originalBlob: original, displayBlob: midnight, byTheme: { midnight, sepia } },
+    // "Original" mode on a scanned page displays the source Blob itself.
+    { originalBlob: original, displayBlob: original, byTheme: { original } },
+  ], 2);
+  assert.equal(result.cached_blob_bytes, 5 + 3 + 2 + 5);
+  assert.equal(result.cached_variant_count, 3);
+  assert.equal(result.cached_data_url_chars, 0);
+  assert.equal(result.cache_incomplete, undefined);
+});
+
 test('empty, invalid and adversarial caches return bounded partial scalar metadata', () => {
   assert.deepEqual(helpers.summarizeImageCache([], NaN), { cached_pages: 0, cached_original_chars: 0, cached_display_chars: 0, cached_variant_chars: 0, cached_variant_count: 0, cached_blob_bytes: 0, cached_data_url_chars: 0 });
   for (const input of [undefined, null, {}, new Proxy([], { get() { throw Error('PRIVATE'); } })]) {
