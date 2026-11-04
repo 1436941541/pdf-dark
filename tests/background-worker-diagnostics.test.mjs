@@ -24,6 +24,7 @@ function harness(options = {}) {
   let tick = 1700000000000;
   const diagnostics = compile('../lib/background-worker-diagnostics.ts', {
     '@sentry/nextjs': options.sentry ?? { addBreadcrumb: crumb => crumbs.push(crumb) },
+    './pulse-error-monitoring': { addPulseBreadcrumb() {} },
   }, {
     location: options.location ?? { origin: 'https://pdfdark.org' },
     navigator: options.navigator ?? { onLine: false },

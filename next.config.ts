@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import {
+  isPulseSourceMapsEnabled,
+  withPulseSourceMaps,
+} from "@yj-pulse/error-sdk/next-config";
+
+const pulseSourceMapsEnabled = isPulseSourceMapsEnabled();
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -143,12 +149,16 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+const sentryConfig = withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   silent: !process.env.CI,
   widenClientFileUpload: true,
   sourcemaps: {
     disable: !process.env.SENTRY_AUTH_TOKEN,
+    // Pulse wraps this hook last and removes maps after both uploads finish.
+    ...(pulseSourceMapsEnabled ? { deleteSourcemapsAfterUpload: false } : {}),
   },
 });
+
+export default withPulseSourceMaps(sentryConfig, { enabled: pulseSourceMapsEnabled });

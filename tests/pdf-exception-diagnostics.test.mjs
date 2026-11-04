@@ -46,7 +46,7 @@ for (const [format, stack] of [
     assert.equal(scope.tags.original_stack_status, 'captured');
     assert.equal(scope.contexts.pdf_exception.original_stack_format, format === 'webkit' ? 'at_sign' : 'v8');
     assert.equal(scope.contexts.pdf_exception.original_code_frames, 2);
-    assert.equal(scope.tags.pdf_diagnostic_version, '3');
+    assert.equal(scope.tags.pdf_diagnostic_version, '4');
     assert(!JSON.stringify([event, scope]).match(/PRIVATE|SECRET|token=|data:|blob:/));
     assert.equal(failure.stack, stack, 'do not mutate the original error');
   });

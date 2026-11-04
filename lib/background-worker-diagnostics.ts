@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { addPulseBreadcrumb } from "./pulse-error-monitoring";
 
 export type BackgroundWorkerDiagnosticOptions = {
   pageNumber?: number;
@@ -194,6 +195,7 @@ export function createBackgroundWorkerDiagnostics(options?: BackgroundWorkerDiag
     try {
       if (breadcrumbCount >= 12) return;
       breadcrumbCount++;
+      addPulseBreadcrumb({ category: "pdf.worker", message, data });
       Sentry.addBreadcrumb({ category: "pdf.worker", type: "debug", level: failure ? "error" : "info", message, data });
     } catch { /* missing or failing SDK must not affect PDF processing */ }
   }

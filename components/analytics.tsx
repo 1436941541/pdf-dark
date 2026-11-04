@@ -21,7 +21,9 @@ export function Analytics() {
           })(window, document, "clarity", "script", "${clarityId}");`}
         </Script>
       ) : null}
-      {umamiSrc && umamiId ? <UmamiAnalytics src={umamiSrc} websiteId={umamiId} /> : null}
+      {umamiSrc && umamiId ? <UmamiAnalytics src={umamiSrc} websiteId={umamiId}
+        errors={process.env.NEXT_PUBLIC_PULSE_ERRORS === "true"}
+        release={process.env.NEXT_PUBLIC_PULSE_RELEASE || process.env.VERCEL_GIT_COMMIT_SHA || ""} /> : null}
     </>
   );
 }

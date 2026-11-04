@@ -32,19 +32,22 @@ function harness() {
     captureException: (...args) => events.push(args),
     addBreadcrumb: value => breadcrumbs.push(value),
   };
+  const pulse = { capturePulseException() {}, addPulseBreadcrumb() {} };
   // Each producer and capture share these actual module instances/WeakMaps.
   const encoding = compile('../lib/pdf-encoding-diagnostics.ts', {}, environment);
   const fileRead = compile('../lib/pdf-file-read-diagnostics.ts', {}, environment);
-  const background = compile('../lib/background-worker-diagnostics.ts', { '@sentry/nextjs': sentry }, environment);
+  const background = compile('../lib/background-worker-diagnostics.ts', { '@sentry/nextjs': sentry, './pulse-error-monitoring': pulse }, environment);
   const resources = compile('../lib/pdf-image-resource-diagnostics.ts', {}, environment);
   const encoders = compile('../lib/main-thread.ts', { './pdf-encoding-diagnostics': encoding }, environment);
   const image = compile('../lib/pdf-image-diagnostics.ts', {
+    './pdf-original-error-diagnostics': compile('../lib/pdf-original-error-diagnostics.ts', {}, environment),
     './dark-worker-diagnostics': compile('../lib/dark-worker-diagnostics.ts'),
     './pdf-encoding-diagnostics': encoding,
     './pdf-file-read-diagnostics': fileRead,
     './background-worker-diagnostics': background,
     './pdf-image-resource-diagnostics': resources,
     '@sentry/nextjs': sentry,
+    './pulse-error-monitoring': pulse,
   }, environment);
   return { ...encoding, ...fileRead, ...background, ...encoders, ...resources, ...image, events, breadcrumbs };
 }
@@ -108,7 +111,7 @@ test('real canvas failure reaches Sentry with geometry, 73-page cache counts and
   assert.equal(cacheReads, 1);
   assert.equal(h.events.length, 1);
   const [safe, scope] = h.events[0];
-  assert.equal(scope.tags.pdf_diagnostic_version, '3');
+  assert.equal(scope.tags.pdf_diagnostic_version, '4');
   assert.equal(scope.tags.original_error_reason, 'page_encoding_failed');
   assert.equal(scope.tags.encoding_failure_kind, 'empty_data_url_sentinel');
   assert.equal(scope.contexts.pdf_encoding.api, 'blob');

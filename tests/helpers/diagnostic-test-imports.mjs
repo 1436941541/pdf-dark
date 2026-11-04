@@ -15,9 +15,12 @@ function compile(name, imports = {}) {
 
 // Share each real module instance so WeakMap observations survive reporter tests.
 export const diagnosticTestImports = {
+  './pdf-original-error-diagnostics': compile('pdf-original-error-diagnostics'),
+  './pulse-error-monitoring': { capturePulseException() {}, addPulseBreadcrumb() {} },
   './pdf-encoding-diagnostics': compile('pdf-encoding-diagnostics'),
   './pdf-file-read-diagnostics': compile('pdf-file-read-diagnostics'),
   './background-worker-diagnostics': compile('background-worker-diagnostics', {
     '@sentry/nextjs': { addBreadcrumb() {} },
+    './pulse-error-monitoring': { addPulseBreadcrumb() {} },
   }),
 };

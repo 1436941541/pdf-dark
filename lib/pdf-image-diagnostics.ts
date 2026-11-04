@@ -1,4 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
+import { capturePulseException } from "./pulse-error-monitoring";
+import { summarizeOriginalError, summarizeImageInput, summarizeImageResponse, type ScalarDiagnostic } from "./pdf-original-error-diagnostics";
 import { darkWorkerFailure } from "./dark-worker-diagnostics";
 import { getCanvasEncodingFailure } from "./pdf-encoding-diagnostics";
 import { getPdfFileReadFailure } from "./pdf-file-read-diagnostics";
@@ -253,6 +255,9 @@ function failureMetadata(diagnostic: PdfFailureDiagnostic): Record<string, numbe
 // Associate safe metadata with the original exception without replacing its
 // stack, adding file contents to the error, or keeping document data alive.
 const failures = new WeakMap<object, ImageFailureContext>();
+const imageReads = new WeakMap<object, ScalarDiagnostic>();
+// Page-local sequence for one image-read attempt, not a document/session ID.
+let imageReadAttempt = 0;
 
 export async function loadPageBitmap(
   source: string | Blob,
@@ -265,24 +270,42 @@ export async function loadPageBitmap(
   let step: ImageReadStep = "fetch_image_data";
   let blobBytes: number | undefined;
   let bitmap: ImageBitmap | undefined;
+  let response: Response | undefined;
+  let responseReceived = false;
+  let phase = "blob_input";
+  imageReadAttempt = imageReadAttempt < Number.MAX_SAFE_INTEGER ? imageReadAttempt + 1 : 1;
+  const attemptId = imageReadAttempt;
 
   try {
     checkCancelled();
     let blob: Blob;
     if (typeof source === "string") {
-      const response = await fetch(source);
+      phase = "fetch_call_threw";
+      const pendingResponse = fetch(source);
+      phase = "fetch_promise_rejected";
+      response = await pendingResponse;
+      responseReceived = true;
+      phase = "response_received";
       checkCancelled();
       step = "read_image_blob";
       stepStarted = clockNow();
-      blob = await response.blob();
+      phase = "blob_call_threw";
+      const pendingBlob = response.blob();
+      phase = "blob_promise_rejected";
+      blob = await pendingBlob;
     } else {
       blob = source;
     }
+    phase = "blob_metadata_read_threw";
     blobBytes = blob.size;
     checkCancelled();
     step = "decode_image_bitmap";
     stepStarted = clockNow();
-    bitmap = await createImageBitmap(blob);
+    phase = "bitmap_call_threw";
+    const pendingBitmap = createImageBitmap(blob);
+    phase = "bitmap_promise_rejected";
+    bitmap = await pendingBitmap;
+    phase = "bitmap_received";
     checkCancelled();
     return bitmap;
   } catch (error) {
@@ -326,7 +349,18 @@ export async function loadPageBitmap(
         const online = navigator.onLine;
         if (typeof online === "boolean") context.online = online;
       } catch { /* unavailable network signal */ }
-      if (typeof error === "object" && error !== null) failures.set(error, context);
+      if (typeof error === "object" && error !== null) {
+        failures.set(error, context);
+        try {
+          imageReads.set(error, {
+            attempt_id: attemptId,
+            task_state: "active_at_failure",
+            failure_phase: phase,
+            ...summarizeImageResponse(response, responseReceived),
+            ...summarizeImageInput(source),
+          });
+        } catch { /* Keep the original image diagnostic if a new probe fails. */ }
+      }
       // Never log the source URL, file name, PDF text, or image bytes.
       try { console.error("[pdf-dark] image processing diagnostic", context); } catch { /* unavailable console */ }
     } catch { /* Diagnostics must never replace a PDF failure with a probe failure. */ }
@@ -374,7 +408,9 @@ export function capturePdfProcessingException(
     const monochromeStep = MONOCHROME_STEPS.includes(diagnostic.monochromeStep as PdfMonochromeStep) ? diagnostic.monochromeStep : undefined;
     const originalErrorType = workerContext?.error_type ?? safeErrorName(error);
     const failureStep = diagnostic.readerStep ?? diagnostic.invertStep ?? monochromeStep ?? context?.step ?? "unknown";
-    Sentry.captureException(safe, {
+    let originalSummary: ScalarDiagnostic = { summary_status: "unavailable" };
+    try { originalSummary = summarizeOriginalError(error); } catch { /* Preserve the existing report. */ }
+    const report = {
       fingerprint: ["pdf-processing", tags.tool ?? "unknown", stage, failureStep, originalErrorType,
         ...(context ? ["image-read", context.step, context.error_hint] : []),
         ...(workerContext ? ["dark-worker", workerContext.step, workerContext.error_hint] : []),
@@ -385,7 +421,7 @@ export function capturePdfProcessingException(
         original_error_type: originalErrorType,
         original_error_reason: reason,
         original_stack_status: codeStack.status,
-        pdf_diagnostic_version: "3",
+        pdf_diagnostic_version: "4",
         ...(encodingContext ? { encoding_phase: encodingContext.phase, encoding_failure_kind: encodingContext.failure_kind } : {}),
         ...(fileReadContext ? { file_read_reason: fileReadContext.error_kind, file_selection_source: fileReadContext.selection_source } : {}),
         ...(backgroundWorkerContext ? { background_worker_failure_kind: backgroundWorkerContext.failure_kind } : {}),
@@ -401,13 +437,15 @@ export function capturePdfProcessingException(
       },
       contexts: {
         pdf_exception: {
-          version: 3,
+          version: 4,
           error_reason: reason,
           original_stack_status: codeStack.status,
           original_stack_format: codeStack.format,
           original_code_frames: codeStack.frames.length,
           ...readImageMemorySnapshot(),
         },
+        pdf_original_error: originalSummary,
+        ...(typeof error === "object" && error !== null && imageReads.has(error) ? { pdf_image_read: imageReads.get(error) } : {}),
         ...(context ? { pdf_image_processing: context } : {}),
         ...(encodingContext ? { pdf_encoding: { ...encodingContext } } : {}),
         ...(fileReadContext ? { pdf_file_read: fileReadContext } : {}),
@@ -418,7 +456,9 @@ export function capturePdfProcessingException(
           ? { pdf_failure: metadata }
           : {}),
       },
-    });
+    };
+    capturePulseException(safe, report);
+    Sentry.captureException(safe, report);
   } catch {
     // Monitoring failures must not replace the PDF error shown to the user.
   }
