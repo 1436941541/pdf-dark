@@ -220,7 +220,12 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   const scrollToPage = useCallback((target: number) => {
     const clamped = Math.max(1, Math.min(pageRefs.current.length, target));
     const el = pageRefs.current[clamped - 1];
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!el) return;
+    // A long smooth scroll sweeps every page in between through the viewport,
+    // so lazy images decode all of them at once (crashed iOS Safari on a
+    // 1→400 jump). Jump instantly when the target is more than a few screens away.
+    const far = Math.abs(el.getBoundingClientRect().top) > window.innerHeight * 3;
+    el.scrollIntoView({ behavior: far ? "auto" : "smooth", block: "start" });
   }, []);
 
   // Keyboard navigation. Skip when focus is inside a text input so the user
