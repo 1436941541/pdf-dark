@@ -531,6 +531,10 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             imageRects,
             scannedPage,
           };
+          // The JPEG is the page's source of truth now; release the full-size
+          // backing store instead of waiting for GC (iOS caps canvas memory).
+          canvas.width = 0;
+          canvas.height = 0;
           readerStep = "darkify_page";
           const display = await darkifyViaWorker(
             stub,
@@ -1076,6 +1080,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
                 alt={t.viewer.pageAlt(i + 1)}
                 width={p.layoutWidth}
                 height={p.layoutHeight}
+                loading="lazy"
+                decoding="async"
                 className="block w-full h-auto"
               />
             </div>
