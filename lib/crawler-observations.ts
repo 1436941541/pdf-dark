@@ -1,14 +1,9 @@
 import { createHash, createHmac, randomUUID } from "node:crypto";
 import { isIP } from "node:net";
-import { VARIANTS } from "./variants";
+import sitemap from "../app/sitemap";
 
 // Server-only. The independent collector must never receive PDF data or URL queries.
-const PUBLIC_PATHS = new Set([
-  "/", "/invert-pdf-colors", "/pdf-to-black-and-white", "/deskew-pdf", "/whiten-pdf",
-  "/about", "/privacy", "/terms", "/changelog", "/blog",
-  ...["es", "pt", "de"].flatMap(locale => [`/${locale}`, `/${locale}/invert-pdf-colors`]),
-  ...VARIANTS.map(variant => `/blog/${variant.slug}`),
-]);
+const PUBLIC_PATHS = new Set(sitemap().map(({ url }) => normalizePath(new URL(url).pathname)));
 const BOT_CANDIDATE = /bot\b|crawler|spider|fetcher\b|slurp|Google-InspectionTool|ChatGPT-User|Claude-User|Perplexity-User|facebookexternalhit|WhatsApp|HeadlessChrome/i;
 const TIMEOUT_MS = 1500;
 const MAX_IN_FLIGHT = 8;
@@ -30,6 +25,10 @@ export type CrawlerObservation = {
   userAgent: string;
   sourceIp: string | null;
 };
+
+function normalizePath(pathname: string): string {
+  return pathname.replace(/\/$/, "") || "/";
+}
 
 function configuration(env: Environment): Configuration | null {
   if (env.CRAWLER_COLLECTION_ENABLED !== "true") return null;
@@ -58,7 +57,7 @@ export function createCrawlerObservation(request: ObservationRequest, env: Envir
   if (url.searchParams.has("_rsc") || headers.get("rsc") === "1" || headers.has("next-router-prefetch") ||
       /prefetch/i.test(`${headers.get("purpose") ?? ""} ${headers.get("sec-purpose") ?? ""}`) ||
       headers.has("x-nextjs-data") || /text\/x-component/i.test(headers.get("accept") ?? "")) return null;
-  const pathname = url.pathname.length > 1 ? url.pathname.replace(/\/$/, "") : "/";
+  const pathname = normalizePath(url.pathname);
   const resourceType = pathname === "/robots.txt" ? "robots" : pathname === "/sitemap.xml" ? "sitemap" : "html";
   if (resourceType === "html" && !PUBLIC_PATHS.has(pathname)) return null;
   const destination = headers.get("sec-fetch-dest");

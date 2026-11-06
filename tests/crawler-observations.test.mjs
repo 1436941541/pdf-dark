@@ -22,7 +22,15 @@ function compile(file, imports) {
   return exports;
 }
 const variants = compile('../lib/variants.ts', {});
-const collector = compile('../lib/crawler-observations.ts', { 'node:crypto': crypto, 'node:net': net, './variants': variants });
+const sitemap = compile('../app/sitemap.ts', {
+  '@/lib/site': compile('../lib/site.ts', {}),
+  '@/lib/variants': variants,
+  '@/lib/changelog': compile('../lib/changelog.ts', {}),
+});
+const compileCollector = pageList => compile('../lib/crawler-observations.ts', {
+  'node:crypto': crypto, 'node:net': net, '../app/sitemap': pageList,
+});
+const collector = compileCollector(sitemap);
 const { createCrawlerObservation, signCrawlerObservation, sendCrawlerObservation, observeCrawlerRequest } = collector;
 const env = {
   CRAWLER_COLLECTION_ENABLED: 'true', CRAWLER_ALLOWED_HOSTS: 'pdfdark.org,www.pdfdark.org',
@@ -53,7 +61,18 @@ test('known public paths are recorded without query/hash or user data', () => {
   for (const path of ['/private.pdf', '/api/send', '/_next/data/build/index.json', '/.env', '/blog/private-customer', '/unknown']) {
     assert.equal(createCrawlerObservation(req(path), env), null);
   }
-  for (const variant of variants.VARIANTS) assert(createCrawlerObservation(req(`/blog/${variant.slug}`), env));
+  for (const { url } of sitemap.default()) {
+    assert(createCrawlerObservation(req(new URL(url).pathname), env), url);
+  }
+});
+
+test('a new sitemap page is observed automatically', () => {
+  const path = '/new-public-tool';
+  assert.equal(createCrawlerObservation(req(path), env), null);
+  const updated = compileCollector({
+    default: () => [...sitemap.default(), { url: `https://pdfdark.org${path}/` }],
+  });
+  assert.equal(updated.createCrawlerObservation(req(path), env)?.path, path);
 });
 
 test('robots and sitemap are distinguished from HTML', () => {

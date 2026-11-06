@@ -25,9 +25,10 @@ front of Vercel can hide the crawler's original source and cause an unverified r
 
 ## Scope and failure behavior
 
-- Known public page routes, `robots.txt` and `sitemap.xml`; GET/HEAD only. An explicit
-  public-page allowlist avoids capturing arbitrary paths and document names. New public
-  routes need adding to the allowlist (blog registry entries are included automatically).
+- Public page URLs from `app/sitemap.ts`, plus `robots.txt` and `sitemap.xml`; GET/HEAD
+  only. New pages enter monitoring when published in the sitemap. Paths outside the
+  sitemap are excluded from HTML observations to avoid capturing arbitrary paths and
+  document names.
 - Candidate bot UA only. Normal browser visitors are not proved human by this exclusion.
 - Browser RSC, prefetch, data and non-document fetches do not become HTML crawl records.
   Locale processing still runs for those requests.
