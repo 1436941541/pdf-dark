@@ -1,6 +1,6 @@
 "use client";
 
-import { readPdfFile } from "@/lib/pdf-file-read-diagnostics";
+import { getPdfFileReadFailure, readPdfFile } from "@/lib/pdf-file-read-diagnostics";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PDFDocumentLoadingTask, PDFDocumentProxy } from "pdfjs-dist";
 import { loadPageBitmap, type PdfFailureDiagnostic, type PdfInvertStep, type ImageCacheSnapshotProvider } from "@/lib/pdf-image-diagnostics";
@@ -197,7 +197,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
   const processFile = useCallback(
     async (file: File) => {
       cancelledRef.current = false;
-      let invertStep: PdfInvertStep = "load_pdfjs";
+      let invertStep: PdfInvertStep = "read_file";
       let pageNumber = 0;
       let failureGeometry: PdfFailureDiagnostic = { inputBytes: file.size };
       operationRef.current?.cancel();
@@ -210,14 +210,16 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
       setCopyStatus("idle");
       setStatus({ kind: "processing", phase: "render", done: 0, total: 0 });
       try {
+        const srcBytes = await readPdfFile(file);
+        if (cancelledRef.current) return;
+        invertStep = "load_pdfjs";
         const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
         pdfjs.GlobalWorkerOptions.workerSrc = new URL(
           "pdfjs-dist/legacy/build/pdf.worker.min.mjs",
           import.meta.url,
         ).toString();
 
-        invertStep = "read_file";
-        const srcBytes = await readPdfFile(file);
+        if (cancelledRef.current) return;
         invertStep = "parse_pdf";
         loadingTask = pdfjs.getDocument({ data: srcBytes.slice(0) });
         pdf = await loadingTask.promise;
@@ -394,7 +396,9 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         if (!cancelledRef.current) {
           setStatus({
             kind: "error",
-            message: pdfLoadErrorText(kind, locale) ?? undefined,
+            message: getPdfFileReadFailure(e)?.error_kind === "not_found"
+              ? T[locale].errors.fileUnavailable
+              : pdfLoadErrorText(kind, locale) ?? undefined,
           });
         }
       } finally {

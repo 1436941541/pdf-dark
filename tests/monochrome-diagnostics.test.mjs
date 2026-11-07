@@ -9,12 +9,23 @@ function harness(failAt) {
   const failure = new TypeError('Load failed');
   const canvases = [], progress = [];
   let pageNumber = 0;
+  let pendingImage = false;
   const check = phase => { if (phase === failAt && (phase === 'save_pdf' || pageNumber === 2)) throw failure; };
   const output = {
     setCreator() {}, embedFont: async () => ({}),
-    embedPng: async bytes => { check('embed_page'); assert(bytes.length > 0); return {}; },
+    embedPng: async bytes => {
+      check('embed_page');
+      assert(bytes.length > 0);
+      assert(!pendingImage, 'The previous page still retains its decoded pixels');
+      pendingImage = true;
+      return { embed: async () => { pendingImage = false; } };
+    },
     addPage: () => ({ drawImage() {} }),
-    save: async () => { check('save_pdf'); return new Uint8Array([37, 80, 68, 70]); },
+    save: async () => {
+      check('save_pdf');
+      assert(!pendingImage, 'The last page still retains its decoded pixels');
+      return new Uint8Array([37, 80, 68, 70]);
+    },
   };
   const document = { createElement(tag) {
     assert.equal(tag, 'canvas');

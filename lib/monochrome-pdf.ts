@@ -230,6 +230,9 @@ export async function exportMonochromePdf(
       markStep(diagnostic, "embed_page", index, rendered.canvas.width, rendered.canvas.height);
       const image = await output.embedPng(encoded);
       checkCancelled(signal);
+      // Materialize this page now so PDFImage can release its decoded PNG pixels.
+      await image.embed();
+      checkCancelled(signal);
       // Use PDF points, not canvas pixels: retain physical page dimensions.
       markStep(diagnostic, "add_page", index, rendered.canvas.width, rendered.canvas.height);
       const page = output.addPage([rendered.size.width, rendered.size.height]);
