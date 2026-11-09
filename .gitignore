@@ -21,6 +21,9 @@
 
 # playwright / test artifacts
 /.playwright-mcp/
+/.playwright-cli/
+/output/
+*.tmp.mjs
 
 # Local SEO analysis cache
 /.seo-cache/

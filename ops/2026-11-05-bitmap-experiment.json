@@ -1,0 +1,409 @@
+{
+  "date": "2026-11-05",
+  "timezone": "Asia/Shanghai",
+  "status": "natural_production_failure_not_reproduced",
+  "source_commit": "04fb1c047d3bcc4967495072b1354bde3e5c9cee",
+  "environment": {
+    "os": "macOS 26.6.2",
+    "physical_memory_bytes": 17179869184,
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "real_iphone": false
+  },
+  "methodology": [
+    "Local-only harness; production application code and production issue statuses unchanged. No production monitoring scripts loaded.",
+    "Transpile and reuse actual canvasToJpegBlob, loadPageBitmap, diagnostic modules and dark-worker. Sentry/Pulse sinks replaced with no-ops. Browser APIs are real and are not forced to throw.",
+    "Generate synthetic 677-page PDF containing a shared deterministic noise image and per-page text. JPEG encoder output differs by engine; synthetic visual content is the same, binary PDF fixtures are not identical.",
+    "Render each PDF page through actual pdf.js at 1.5 scale to 918x1188, encode JPEG, decode bitmap, transfer to actual dark Worker, encode dark JPEG, release canvas/bitmap resources.",
+    "Compare retaining all dark JPEG outputs versus dropping references after each page. Zero retained cache means zero accumulated output references; it does not mean zero process memory or forced garbage collection.",
+    "Not an end-to-end UI/download test: bypass React, image-region scanning, buildDarkPdf and final download; failure of interest occurs before PDF assembly.",
+    "Malformed-data cases intentionally modify inputs; reproducing the exception class is not reproducing the production root cause.",
+    "No original failing customer PDF, physical iPhone, native iOS resource budget, process memory measurement or low-memory kill simulation."
+  ],
+  "source_sha256": {
+    "lib/main-thread.ts": "488a1a1c9594ebef5827e0a431659880500fb429881ae973496146350430f8e2",
+    "lib/pdf-image-diagnostics.ts": "eac3088cf0601a77149d5e277fcc7455ab1269435571dfe8ded94c96fa078fad",
+    "lib/dark-worker.ts": "2bac66f08dcc4d328c2e08dcb486075c1a8d2896330ce8c57a07c432607192d7"
+  },
+  "unit_check": {
+    "command": "node --test tests/export-memory.test.mjs",
+    "passed": 7,
+    "failed": 0
+  },
+  "runs": [
+    {
+      "state": {
+        "phase": "done",
+        "mode": "input-controls"
+      },
+      "results": [
+        {
+          "mode": "input-controls",
+          "count": 677,
+          "completed": 0,
+          "cacheBytes": 0,
+          "failures": [
+            {
+              "label": "valid",
+              "bytes": 729706,
+              "bitmap": {
+                "ok": true,
+                "width": 918,
+                "height": 1188
+              },
+              "image": {
+                "ok": true,
+                "width": 918,
+                "height": 1188
+              }
+            },
+            {
+              "label": "empty",
+              "bytes": 0,
+              "bitmap": {
+                "ok": false,
+                "name": "InvalidStateError",
+                "message": "Cannot create an ImageBitmap from an empty buffer"
+              },
+              "image": {
+                "ok": false,
+                "name": "EncodingError",
+                "message": "Loading error."
+              }
+            },
+            {
+              "label": "invalid-nonempty",
+              "bytes": 729706,
+              "bitmap": {
+                "ok": false,
+                "name": "InvalidStateError",
+                "message": "Cannot decode the data in the argument to createImageBitmap"
+              },
+              "image": {
+                "ok": false,
+                "name": "EncodingError",
+                "message": "Loading error."
+              }
+            },
+            {
+              "label": "truncated",
+              "bytes": 364853,
+              "bitmap": {
+                "ok": true,
+                "width": 918,
+                "height": 1188
+              },
+              "image": {
+                "ok": true,
+                "width": 918,
+                "height": 1188
+              }
+            }
+          ],
+          "checkpoints": [],
+          "sampleBytes": 729706,
+          "elapsedMs": 274
+        }
+      ],
+      "engine": "webkit",
+      "browserVersion": "26.5",
+      "errors": []
+    },
+    {
+      "state": {
+        "phase": "done",
+        "mode": "retain-cache"
+      },
+      "results": [
+        {
+          "mode": "retain-cache",
+          "count": 677,
+          "completed": 677,
+          "cacheBytes": 481862769,
+          "failures": [],
+          "checkpoints": [
+            {
+              "page": 1,
+              "cacheBytes": 710833,
+              "elapsedMs": 1265
+            },
+            {
+              "page": 50,
+              "cacheBytes": 35568749,
+              "elapsedMs": 9924
+            },
+            {
+              "page": 100,
+              "cacheBytes": 71142703,
+              "elapsedMs": 18128
+            },
+            {
+              "page": 150,
+              "cacheBytes": 106724877,
+              "elapsedMs": 26760
+            },
+            {
+              "page": 200,
+              "cacheBytes": 142308995,
+              "elapsedMs": 34727
+            },
+            {
+              "page": 250,
+              "cacheBytes": 177901757,
+              "elapsedMs": 43193
+            },
+            {
+              "page": 300,
+              "cacheBytes": 213495848,
+              "elapsedMs": 51694
+            },
+            {
+              "page": 350,
+              "cacheBytes": 249089016,
+              "elapsedMs": 62318
+            },
+            {
+              "page": 400,
+              "cacheBytes": 284683283,
+              "elapsedMs": 69141
+            },
+            {
+              "page": 450,
+              "cacheBytes": 320273142,
+              "elapsedMs": 76032
+            },
+            {
+              "page": 500,
+              "cacheBytes": 355864189,
+              "elapsedMs": 82682
+            },
+            {
+              "page": 550,
+              "cacheBytes": 391456787,
+              "elapsedMs": 89338
+            },
+            {
+              "page": 600,
+              "cacheBytes": 427050492,
+              "elapsedMs": 95455
+            },
+            {
+              "page": 650,
+              "cacheBytes": 462642604,
+              "elapsedMs": 101584
+            },
+            {
+              "page": 677,
+              "cacheBytes": 481862769,
+              "elapsedMs": 104965
+            }
+          ],
+          "sampleBytes": 729706,
+          "pdfBytes": 1039064,
+          "elapsedMs": 104974
+        }
+      ],
+      "engine": "webkit",
+      "browserVersion": "26.5",
+      "errors": []
+    },
+    {
+      "state": {
+        "phase": "done",
+        "mode": "release-cache"
+      },
+      "results": [
+        {
+          "mode": "release-cache",
+          "count": 677,
+          "completed": 677,
+          "cacheBytes": 0,
+          "failures": [],
+          "checkpoints": [
+            {
+              "page": 1,
+              "cacheBytes": 0,
+              "elapsedMs": 1461
+            },
+            {
+              "page": 50,
+              "cacheBytes": 0,
+              "elapsedMs": 10754
+            },
+            {
+              "page": 100,
+              "cacheBytes": 0,
+              "elapsedMs": 20249
+            },
+            {
+              "page": 150,
+              "cacheBytes": 0,
+              "elapsedMs": 28857
+            },
+            {
+              "page": 200,
+              "cacheBytes": 0,
+              "elapsedMs": 36942
+            },
+            {
+              "page": 250,
+              "cacheBytes": 0,
+              "elapsedMs": 44212
+            },
+            {
+              "page": 300,
+              "cacheBytes": 0,
+              "elapsedMs": 51540
+            },
+            {
+              "page": 350,
+              "cacheBytes": 0,
+              "elapsedMs": 58776
+            },
+            {
+              "page": 400,
+              "cacheBytes": 0,
+              "elapsedMs": 66876
+            },
+            {
+              "page": 450,
+              "cacheBytes": 0,
+              "elapsedMs": 75936
+            },
+            {
+              "page": 500,
+              "cacheBytes": 0,
+              "elapsedMs": 84204
+            },
+            {
+              "page": 550,
+              "cacheBytes": 0,
+              "elapsedMs": 93109
+            },
+            {
+              "page": 600,
+              "cacheBytes": 0,
+              "elapsedMs": 101537
+            },
+            {
+              "page": 650,
+              "cacheBytes": 0,
+              "elapsedMs": 109747
+            },
+            {
+              "page": 677,
+              "cacheBytes": 0,
+              "elapsedMs": 114345
+            }
+          ],
+          "sampleBytes": 729706,
+          "pdfBytes": 1039065,
+          "elapsedMs": 114384
+        }
+      ],
+      "engine": "webkit",
+      "browserVersion": "26.5",
+      "errors": []
+    },
+    {
+      "state": {
+        "phase": "done",
+        "mode": "retain-cache"
+      },
+      "results": [
+        {
+          "mode": "retain-cache",
+          "count": 677,
+          "completed": 677,
+          "cacheBytes": 325859151,
+          "failures": [],
+          "checkpoints": [
+            {
+              "page": 1,
+              "cacheBytes": 480609,
+              "elapsedMs": 864
+            },
+            {
+              "page": 50,
+              "cacheBytes": 24051747,
+              "elapsedMs": 6227
+            },
+            {
+              "page": 100,
+              "cacheBytes": 48107286,
+              "elapsedMs": 11057
+            },
+            {
+              "page": 150,
+              "cacheBytes": 72170061,
+              "elapsedMs": 15986
+            },
+            {
+              "page": 200,
+              "cacheBytes": 96234563,
+              "elapsedMs": 19505
+            },
+            {
+              "page": 250,
+              "cacheBytes": 120304351,
+              "elapsedMs": 23252
+            },
+            {
+              "page": 300,
+              "cacheBytes": 144374814,
+              "elapsedMs": 26862
+            },
+            {
+              "page": 350,
+              "cacheBytes": 168444584,
+              "elapsedMs": 30545
+            },
+            {
+              "page": 400,
+              "cacheBytes": 192515224,
+              "elapsedMs": 34123
+            },
+            {
+              "page": 450,
+              "cacheBytes": 216583093,
+              "elapsedMs": 37683
+            },
+            {
+              "page": 500,
+              "cacheBytes": 240651634,
+              "elapsedMs": 41288
+            },
+            {
+              "page": 550,
+              "cacheBytes": 264721317,
+              "elapsedMs": 45563
+            },
+            {
+              "page": 600,
+              "cacheBytes": 288791662,
+              "elapsedMs": 49839
+            },
+            {
+              "page": 650,
+              "cacheBytes": 312861389,
+              "elapsedMs": 54072
+            },
+            {
+              "page": 677,
+              "cacheBytes": 325859151,
+              "elapsedMs": 56405
+            }
+          ],
+          "sampleBytes": 491179,
+          "pdfBytes": 800530,
+          "elapsedMs": 56422
+        }
+      ],
+      "engine": "chromium",
+      "browserVersion": "151.0.7922.34",
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "created_at": "2026-10-29T02:13:41.107Z",
+  "display_timezone": "Asia/Shanghai",
+  "status": "completed_original_error_not_reproduced",
+  "target": "https://pdfdark.org/",
+  "issue": "https://yunjie.sentry.io/issues/7817042792/",
+  "expected_release": "8ce7853cbc3093f271f4476442f932b32469b825",
+  "environment": {
+    "operating_system": "macOS",
+    "physical_memory_bytes": 17179869184,
+    "browser": "Google Chrome 156.0.8078.73",
+    "browser_mode": "Playwright CLI isolated real Chrome, headless",
+    "desktop_viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "tablet_context": {
+      "width": 820,
+      "height": 1180,
+      "touch": true,
+      "device_scale_factor": 2,
+      "actual_android": false
+    },
+    "rss_sampling_interval_seconds": 1,
+    "dom_and_heap_polling_interval_seconds_approximately": 15
+  },
+  "method": [
+    "Navigate to public production homepage, open the actual file chooser and select valid long PDF files.",
+    "Leave production scripts, ad requests and Sentry reporting active; do not intercept requests, replace APIs, inject exceptions, throttle CPU, force GC or impose memory limits.",
+    "Read DOM page-image counts and natural image sizes; observe rendering progress, error UI, page exceptions, diagnostic console events and the test page own Sentry envelopes.",
+    "Sample only the known isolated test browser PID and descendants using host ps RSS; read main-target Runtime.getHeapUsage without requesting garbage collection.",
+    "Run cases sequentially in fresh isolated browsers; close each previous browser before starting the next conversion."
+  ],
+  "cases": [
+    {
+      "name": "1000-page-text-desktop",
+      "fixture": "/tmp/pdf-g-text.pdf",
+      "fixture_pages": 1000,
+      "fixture_bytes": 2525916,
+      "fixture_sha256": "1c199f1c090b70e65823f04afd88239cede8ed5a33635d3f1a67064f4f20a686",
+      "mode": "desktop",
+      "browser_version": "156.0.8078.73",
+      "observed_releases_in_own_envelopes": [],
+      "upload_started": "2026-10-29T01:59:25.406Z",
+      "first_full_completion_observed_at": "2026-10-29T02:01:50.361Z",
+      "approximate_seconds_to_completion_observation": 144.955,
+      "max_single_renderer_rss_mib": 1163.75,
+      "all_renderer_rss_sum_peak_mib": 1551.73,
+      "main_target_heap_used_at_completion_mib": 85.14,
+      "main_target_backing_storage_at_completion_mib": 565.72,
+      "generated_and_loaded_page_images": 1000,
+      "theme_controls_enabled": {
+        "midnightEnabled": true,
+        "autoEnabled": true
+      },
+      "last_page_loaded": {
+        "alt": "Page 1000 of your PDF, rendered in dark mode",
+        "complete": true,
+        "naturalWidth": 918,
+        "naturalHeight": 1188,
+        "rectTop": 441778.625
+      },
+      "last_page_navigation_verified": false,
+      "final_jump_input_value": "603",
+      "exceptions": [],
+      "diagnostics": [],
+      "sentry_exceptions_sent_by_test_page": [],
+      "crashes": [],
+      "failed_requests": [],
+      "screenshot": "output/playwright/reader-live-text-1000.png",
+      "source_summary": "/tmp/pdf-reader-text-final-summary.json",
+      "rss_samples": "/tmp/pdf-reader-text-rss.jsonl",
+      "observations": "/tmp/pdf-reader-text-observations.jsonl"
+    },
+    {
+      "name": "1000-page-shared-image-desktop",
+      "fixture": "/tmp/pdf-g-illustrated.pdf",
+      "fixture_pages": 1000,
+      "fixture_bytes": 652066,
+      "fixture_sha256": "8369cc7adcef6f9543dc9fbfe02d7027d7f7c403eaaa790a5224ef282a352c4d",
+      "mode": "desktop",
+      "browser_version": "156.0.8078.73",
+      "observed_releases_in_own_envelopes": [
+        "8ce7853cbc3093f271f4476442f932b32469b825"
+      ],
+      "upload_started": "2026-10-29T02:02:29.830Z",
+      "first_full_completion_observed_at": "2026-10-29T02:04:34.715Z",
+      "approximate_seconds_to_completion_observation": 124.885,
+      "max_single_renderer_rss_mib": 718.73,
+      "all_renderer_rss_sum_peak_mib": 1195.27,
+      "main_target_heap_used_at_completion_mib": 28.66,
+      "main_target_backing_storage_at_completion_mib": 218.65,
+      "generated_and_loaded_page_images": 1000,
+      "theme_controls_enabled": {
+        "midnightEnabled": true,
+        "autoEnabled": true
+      },
+      "last_page_loaded": {
+        "alt": "Page 1000 of your PDF, rendered in dark mode",
+        "complete": true,
+        "naturalWidth": 918,
+        "naturalHeight": 1188,
+        "rectTop": -0.359375
+      },
+      "last_page_navigation_verified": true,
+      "final_jump_input_value": "1000",
+      "exceptions": [],
+      "diagnostics": [],
+      "sentry_exceptions_sent_by_test_page": [],
+      "crashes": [],
+      "failed_requests": [],
+      "screenshot": "output/playwright/reader-live-illustrated-1000.png",
+      "source_summary": "/tmp/pdf-reader-illustrated-final-summary.json",
+      "rss_samples": "/tmp/pdf-reader-illustrated-rss.jsonl",
+      "observations": "/tmp/pdf-reader-illustrated-observations.jsonl"
+    },
+    {
+      "name": "1000-page-A4-text-tablet-viewport",
+      "fixture": "/tmp/pdf-reader-a4-text.pdf",
+      "fixture_pages": 1000,
+      "fixture_bytes": 2532927,
+      "fixture_sha256": "5bd6ed25c6c108a5426f84dd3a5fb726a025f4104a663f6fa4cd82b9e1c85074",
+      "mode": "tablet-viewport-desktop-chrome",
+      "browser_version": "156.0.8078.73",
+      "observed_releases_in_own_envelopes": [
+        "8ce7853cbc3093f271f4476442f932b32469b825"
+      ],
+      "upload_started": "2026-10-29T02:05:27.097Z",
+      "first_full_completion_observed_at": "2026-10-29T02:07:53.660Z",
+      "approximate_seconds_to_completion_observation": 146.563,
+      "max_single_renderer_rss_mib": 1312.24,
+      "all_renderer_rss_sum_peak_mib": 1689.97,
+      "main_target_heap_used_at_completion_mib": 104.89,
+      "main_target_backing_storage_at_completion_mib": 566.4,
+      "generated_and_loaded_page_images": 1000,
+      "theme_controls_enabled": {
+        "midnightEnabled": true,
+        "autoEnabled": true
+      },
+      "last_page_loaded": {
+        "alt": "Page 1000 of your PDF, rendered in dark mode",
+        "complete": true,
+        "naturalWidth": 892,
+        "naturalHeight": 1262,
+        "rectTop": 0.328125
+      },
+      "last_page_navigation_verified": true,
+      "final_jump_input_value": "1000",
+      "exceptions": [],
+      "diagnostics": [],
+      "sentry_exceptions_sent_by_test_page": [],
+      "crashes": [],
+      "failed_requests": [
+        {
+          "at": "2026-10-29T02:05:11.132Z",
+          "origin": "https://googleads.g.doubleclick.net",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "at": "2026-10-29T02:05:11.242Z",
+          "origin": "https://googleads.g.doubleclick.net",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "screenshot": "output/playwright/reader-live-tablet-1000.png",
+      "source_summary": "/tmp/pdf-reader-tablet-final-summary.json",
+      "rss_samples": "/tmp/pdf-reader-tablet-rss.jsonl",
+      "observations": "/tmp/pdf-reader-tablet-observations.jsonl"
+    },
+    {
+      "name": "520-page-independent-scan-desktop",
+      "fixture": "/tmp/pdf-reader-unique-scans.pdf",
+      "fixture_pages": 520,
+      "fixture_bytes": 53725075,
+      "fixture_sha256": "f87216752286a1f5f8d4cc39da7a8bdd567edd859cd12eb770f37b96b39f4f5e",
+      "mode": "desktop",
+      "browser_version": "156.0.8078.73",
+      "observed_releases_in_own_envelopes": [
+        "8ce7853cbc3093f271f4476442f932b32469b825"
+      ],
+      "upload_started": "2026-10-29T02:10:56.385Z",
+      "first_full_completion_observed_at": "2026-10-29T02:13:10.237Z",
+      "approximate_seconds_to_completion_observation": 133.852,
+      "max_single_renderer_rss_mib": 476.8,
+      "all_renderer_rss_sum_peak_mib": 903.53,
+      "main_target_heap_used_at_completion_mib": 22.8,
+      "main_target_backing_storage_at_completion_mib": 129.81,
+      "generated_and_loaded_page_images": 520,
+      "theme_controls_enabled": {
+        "midnightEnabled": true,
+        "autoEnabled": true
+      },
+      "last_page_loaded": {
+        "alt": "Page 520 of your PDF, rendered in dark mode",
+        "complete": true,
+        "naturalWidth": 892,
+        "naturalHeight": 1262,
+        "rectTop": -0.0625
+      },
+      "last_page_navigation_verified": true,
+      "final_jump_input_value": "520",
+      "exceptions": [],
+      "diagnostics": [],
+      "sentry_exceptions_sent_by_test_page": [],
+      "crashes": [],
+      "failed_requests": [],
+      "screenshot": "output/playwright/reader-live-scans-520.png",
+      "source_summary": "/tmp/pdf-reader-scans-final-summary.json",
+      "rss_samples": "/tmp/pdf-reader-scans-rss.jsonl",
+      "observations": "/tmp/pdf-reader-scans-observations.jsonl"
+    }
+  ],
+  "findings": [
+    "All four valid long PDF documents completed initial rendering and all expected page images loaded. No matching fetch_image_data/read_image_blob TypeError, Worker diagnostic failure or test-page Sentry exception was observed.",
+    "Reader memory grew substantially with document progress. Large measured values support a memory-pressure risk, but do not prove out-of-memory caused the historical events.",
+    "The reader keeps per-page original and display data URLs; the measured main-target backing-storage growth is consistent with retained page data, but measurements do not attribute every byte to a particular application allocation."
+  ],
+  "separate_ui_observation": {
+    "case": "1000-page-A4-text-tablet-viewport",
+    "observation": "An ordinary top anchor advertisement intercepted the reader-settings button after rendering completed. Clicking its visible collapse handle recovered normal controls. No PDF read exception occurred.",
+    "initial_control_check": "/tmp/pdf-reader-tablet-finish.txt",
+    "recovered_control_check": "/tmp/pdf-reader-tablet-finish-retry.txt",
+    "screenshot": "output/playwright/reader-live-tablet-anchor.png",
+    "ad_settings_changed": false
+  },
+  "limitations": [
+    "The original failing user PDF and actual Android/Windows devices were unavailable. Desktop Chrome with tablet viewport does not reproduce a low-memory Android environment.",
+    "The scan fixture contains independent image objects and distinct pixel data, but its background derives from the same public example with per-page rasterized numbers; it does not represent the full content diversity of a real scanned textbook.",
+    "RSS sampled maxima can miss instantaneous peaks. A largest renderer is not proven to be the PDF unique physical memory; renderer sums can double-count shared memory and include ads.",
+    "Main-target JS heap omits some Worker, image, canvas, Blob and GPU memory. Do not add backing storage to RSS as disjoint allocations.",
+    "The first text case previously visited the homepage in its root tab, leaving additional renderer overhead in that browser baseline. Treat its renderer-sum delta cautiously.",
+    "The first text case screenshot was taken during smooth scrolling. Initial rendering is verified, but its jump to the last page was not verified; later cases wait until the last page enters the viewport.",
+    "No error reproduction and no observed OOM do not exclude browser/resource pressure on the original user device. No fix or deployment was made in this task."
+  ],
+  "fixture_verification": "/tmp/pdf-reader-unique-scans-meta.json",
+  "sentry_issue_recheck": {
+    "checked_at": "2026-10-29T02:14:28.519Z",
+    "issue": "PDF-DARK-1J",
+    "url": "https://yunjie.sentry.io/issues/7817042792/",
+    "total_events_after_four_cases": 2,
+    "latest_event_id": "d4f0d17781bb450d9ea63d8547163851",
+    "basis": "Reloaded authenticated Sentry issue UI after all four cases. Events remained 2; the latest selected event was the original Windows event."
+  },
+  "independent_review": {
+    "result": "No material evidence inconsistency found",
+    "scope": "Read-only comparison of report with original case summaries and scan fixture verification",
+    "conclusion_boundary": "This Mac production test did not reproduce the original error. Observed memory growth cannot confirm or rule out OOM on original Android/Windows devices."
+  }
+}

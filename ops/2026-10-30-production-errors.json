@@ -1,0 +1,612 @@
+{
+  "date": "2026-10-30",
+  "timezone": "Asia/Shanghai",
+  "source": "Live Sentry GET API through the existing authenticated browser session; Gmail alert read only",
+  "mail": {
+    "messageId": "1a18876f321f89e5",
+    "receivedLocal": "2026-10-30 00:20:58",
+    "issues": [
+      "7818759426",
+      "7818761779"
+    ]
+  },
+  "issueLinks": {
+    "reader": "https://yunjie.sentry.io/issues/7818759426/",
+    "monochrome": "https://yunjie.sentry.io/issues/7818761779/"
+  },
+  "events": [
+    {
+      "contextKeys": [
+        "browser",
+        "culture",
+        "device",
+        "os",
+        "pdf_failure",
+        "pdf_image_processing",
+        "react",
+        "trace"
+      ],
+      "dateCreated": "2026-10-29T16:17:27.499000Z",
+      "device": {
+        "brand": "Apple",
+        "family": "iPad",
+        "model": "iPad"
+      },
+      "eventID": "8061b1f466b74ea4a388e559d3181ed3",
+      "exceptions": [
+        {
+          "frames": [
+            {
+              "filename": "components/pdf-viewer.tsx",
+              "function": "<anonymous>",
+              "lineNo": 530
+            },
+            {
+              "filename": "lib/pdf-monitoring.ts",
+              "function": "<object>.failure",
+              "lineNo": 36
+            },
+            {
+              "filename": "lib/pdf-monitoring.ts",
+              "function": "recordPdfFailure",
+              "lineNo": 9
+            },
+            {
+              "filename": "lib/pdf-image-diagnostics.ts",
+              "function": "<anonymous>",
+              "lineNo": 237
+            }
+          ],
+          "handled": true,
+          "type": "PdfProcessingError"
+        }
+      ],
+      "extraKeys": [],
+      "fingerprints": [
+        "3d957346d1ed83b4249d9d3d56f3a098"
+      ],
+      "pdfContexts": {
+        "pdf_failure": {
+          "page_number": 23,
+          "type": "default"
+        },
+        "pdf_image_processing": {
+          "cache_snapshot_status": "captured",
+          "cached_blob_bytes": 0,
+          "cached_data_url_chars": 12338444,
+          "cached_display_chars": 6124174,
+          "cached_original_chars": 6214270,
+          "cached_pages": 22,
+          "cached_variant_chars": 6124174,
+          "cached_variant_count": 22,
+          "document_focused": true,
+          "elapsed_ms": 41,
+          "error_hint": "fetch_failed",
+          "height": 1188,
+          "image_format": "jpeg",
+          "image_region_count": 0,
+          "memory_api": "unavailable",
+          "online": true,
+          "page_number": 23,
+          "source_empty": false,
+          "source_kind": "data",
+          "source_length": 465275,
+          "step": "fetch_image_data",
+          "step_elapsed_ms": 41,
+          "total_pages": 407,
+          "type": "default",
+          "visibility": "visible",
+          "width": 918
+        }
+      },
+      "release": "25c8d3541786163f2a7d21d27ca391c5caee72b3",
+      "tags": [
+        {
+          "key": "browser",
+          "value": "Mobile Safari 18.1"
+        },
+        {
+          "key": "environment",
+          "value": "vercel-production"
+        },
+        {
+          "key": "image_error_hint",
+          "value": "fetch_failed"
+        },
+        {
+          "key": "image_step",
+          "value": "fetch_image_data"
+        },
+        {
+          "key": "original_error_type",
+          "value": "TypeError"
+        },
+        {
+          "key": "os",
+          "value": "iOS 18.1"
+        },
+        {
+          "key": "reader_step",
+          "value": "darkify_page"
+        },
+        {
+          "key": "replayId",
+          "value": "8844c343133946929b8eb68664b7c5cf"
+        },
+        {
+          "key": "stage",
+          "value": "read"
+        },
+        {
+          "key": "tool",
+          "value": "reader"
+        }
+      ]
+    },
+    {
+      "contextKeys": [
+        "browser",
+        "culture",
+        "device",
+        "os",
+        "pdf_failure",
+        "pdf_image_processing",
+        "react",
+        "trace"
+      ],
+      "dateCreated": "2026-10-29T16:48:01.137000Z",
+      "device": {
+        "brand": "Apple",
+        "family": "iPhone",
+        "model": "iPhone"
+      },
+      "eventID": "4aeeaa40f6c348e8a46287fd2cecf32a",
+      "exceptions": [
+        {
+          "frames": [
+            {
+              "filename": "components/pdf-viewer.tsx",
+              "function": "<anonymous>",
+              "lineNo": 530
+            },
+            {
+              "filename": "lib/pdf-monitoring.ts",
+              "function": "<object>.failure",
+              "lineNo": 36
+            },
+            {
+              "filename": "lib/pdf-monitoring.ts",
+              "function": "recordPdfFailure",
+              "lineNo": 9
+            },
+            {
+              "filename": "lib/pdf-image-diagnostics.ts",
+              "function": "<anonymous>",
+              "lineNo": 237
+            }
+          ],
+          "handled": true,
+          "type": "PdfProcessingError"
+        }
+      ],
+      "extraKeys": [],
+      "fingerprints": [
+        "3d957346d1ed83b4249d9d3d56f3a098"
+      ],
+      "pdfContexts": {
+        "pdf_failure": {
+          "page_number": 33,
+          "type": "default"
+        },
+        "pdf_image_processing": {
+          "cache_snapshot_status": "captured",
+          "cached_blob_bytes": 0,
+          "cached_data_url_chars": 28459612,
+          "cached_display_chars": 14222104,
+          "cached_original_chars": 14237508,
+          "cached_pages": 32,
+          "cached_variant_chars": 14222104,
+          "cached_variant_count": 32,
+          "document_focused": true,
+          "elapsed_ms": 12,
+          "error_hint": "fetch_failed",
+          "height": 1261,
+          "image_format": "jpeg",
+          "image_region_count": 0,
+          "memory_api": "unavailable",
+          "online": true,
+          "page_number": 33,
+          "source_empty": false,
+          "source_kind": "data",
+          "source_length": 448311,
+          "step": "fetch_image_data",
+          "step_elapsed_ms": 12,
+          "total_pages": 361,
+          "type": "default",
+          "visibility": "visible",
+          "width": 892
+        }
+      },
+      "release": "25c8d3541786163f2a7d21d27ca391c5caee72b3",
+      "tags": [
+        {
+          "key": "browser",
+          "value": "Chrome Mobile iOS 156.0.8078"
+        },
+        {
+          "key": "environment",
+          "value": "vercel-production"
+        },
+        {
+          "key": "image_error_hint",
+          "value": "fetch_failed"
+        },
+        {
+          "key": "image_step",
+          "value": "fetch_image_data"
+        },
+        {
+          "key": "original_error_type",
+          "value": "TypeError"
+        },
+        {
+          "key": "os",
+          "value": "iOS 26.2.0"
+        },
+        {
+          "key": "reader_step",
+          "value": "darkify_page"
+        },
+        {
+          "key": "replayId",
+          "value": "c185183bc68a4da18d0956a83c9914dc"
+        },
+        {
+          "key": "stage",
+          "value": "read"
+        },
+        {
+          "key": "tool",
+          "value": "reader"
+        }
+      ]
+    },
+    {
+      "contextKeys": [
+        "browser",
+        "culture",
+        "device",
+        "os",
+        "react",
+        "trace"
+      ],
+      "dateCreated": "2026-10-29T16:18:50.700000Z",
+      "device": {
+        "brand": "Apple",
+        "family": "iPad",
+        "model": "iPad"
+      },
+      "eventID": "19fc6f48a3414009bfb6bce19c9c4ffd",
+      "exceptions": [
+        {
+          "frames": [
+            {
+              "filename": "components/monochrome-converter.tsx",
+              "function": "download",
+              "lineNo": 170
+            },
+            {
+              "filename": "lib/pdf-monitoring.ts",
+              "function": "<object>.failure",
+              "lineNo": 36
+            },
+            {
+              "filename": "lib/pdf-monitoring.ts",
+              "function": "recordPdfFailure",
+              "lineNo": 9
+            },
+            {
+              "filename": "lib/pdf-image-diagnostics.ts",
+              "function": "<anonymous>",
+              "lineNo": 237
+            }
+          ],
+          "handled": true,
+          "type": "PdfProcessingError"
+        }
+      ],
+      "extraKeys": [],
+      "fingerprints": [
+        "1bca885c037688fc220ea9d3198895bc"
+      ],
+      "pdfContexts": {},
+      "release": "25c8d3541786163f2a7d21d27ca391c5caee72b3",
+      "tags": [
+        {
+          "key": "browser",
+          "value": "Mobile Safari 18.1"
+        },
+        {
+          "key": "environment",
+          "value": "vercel-production"
+        },
+        {
+          "key": "original_error_type",
+          "value": "TypeError"
+        },
+        {
+          "key": "os",
+          "value": "iOS 18.1"
+        },
+        {
+          "key": "replayId",
+          "value": "79651005899a4f5fb87e6b3fdc9da351"
+        },
+        {
+          "key": "stage",
+          "value": "export"
+        },
+        {
+          "key": "tool",
+          "value": "monochrome"
+        }
+      ]
+    },
+    {
+      "contextKeys": [
+        "browser",
+        "culture",
+        "device",
+        "os",
+        "react",
+        "trace"
+      ],
+      "dateCreated": "2026-10-29T16:18:52.633000Z",
+      "dateReceived": "2026-10-29T16:18:54.953081Z",
+      "entryTypes": [
+        "exception",
+        "breadcrumbs",
+        "request",
+        "debugmeta"
+      ],
+      "eventID": "3f96ec4fcb3b4d12ad6c7a08ed06bf50",
+      "exceptions": [
+        {
+          "frames": [
+            {
+              "colNo": 56,
+              "filename": "components/monochrome-converter.tsx",
+              "function": "download",
+              "lineNo": 170
+            },
+            {
+              "colNo": 7,
+              "filename": "lib/pdf-monitoring.ts",
+              "function": "<object>.failure",
+              "lineNo": 36
+            },
+            {
+              "colNo": 54,
+              "filename": "lib/pdf-monitoring.ts",
+              "function": "recordPdfFailure",
+              "lineNo": 9
+            },
+            {
+              "colNo": 20,
+              "filename": "lib/pdf-image-diagnostics.ts",
+              "function": "<anonymous>",
+              "lineNo": 237
+            }
+          ],
+          "handled": true,
+          "type": "PdfProcessingError",
+          "value": "PDF processing failed"
+        }
+      ],
+      "extraKeys": [],
+      "pdfContexts": {},
+      "release": "25c8d3541786163f2a7d21d27ca391c5caee72b3",
+      "tagKeys": [
+        "browser",
+        "browser.name",
+        "device",
+        "device.family",
+        "environment",
+        "handled",
+        "interface_type",
+        "level",
+        "mechanism",
+        "original_error_type",
+        "os",
+        "os.name",
+        "release",
+        "replayId",
+        "stage",
+        "tool",
+        "transaction",
+        "turbopack",
+        "url"
+      ],
+      "tags": [
+        {
+          "key": "browser",
+          "value": "Mobile Safari 18.1"
+        },
+        {
+          "key": "environment",
+          "value": "vercel-production"
+        },
+        {
+          "key": "original_error_type",
+          "value": "TypeError"
+        },
+        {
+          "key": "os",
+          "value": "iOS 18.1"
+        },
+        {
+          "key": "release",
+          "value": "25c8d3541786163f2a7d21d27ca391c5caee72b3"
+        },
+        {
+          "key": "replayId",
+          "value": "79651005899a4f5fb87e6b3fdc9da351"
+        },
+        {
+          "key": "stage",
+          "value": "export"
+        },
+        {
+          "key": "tool",
+          "value": "monochrome"
+        },
+        {
+          "key": "url",
+          "value": "https://pdfdark.org/pdf-to-black-and-white"
+        }
+      ],
+      "device": {
+        "brand": "Apple",
+        "family": "iPad",
+        "model": "iPad"
+      }
+    }
+  ],
+  "requestSummary": {
+    "monochromeOwnSiteRequests": [
+      {
+        "category": "navigation",
+        "from": "https://pdfdark.org/",
+        "level": "info",
+        "time": "2026-10-29T16:18:16.014000Z",
+        "to": "https://pdfdark.org/"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:16.383000Z",
+        "url": "https://pdfdark.org/pdf-to-black-and-white"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:16.463000Z",
+        "url": "https://pdfdark.org/invert-pdf-colors"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:16.697000Z",
+        "url": "https://pdfdark.org/pdf-to-black-and-white"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:16.791000Z",
+        "url": "https://pdfdark.org/invert-pdf-colors"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:30.091000Z",
+        "url": "https://pdfdark.org/"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:30.093000Z",
+        "url": "https://pdfdark.org/whiten-pdf"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:30.094000Z",
+        "url": "https://pdfdark.org/blog"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:30.310000Z",
+        "url": "https://pdfdark.org/deskew-pdf"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:30.422000Z",
+        "url": "https://pdfdark.org/blog"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:30.423000Z",
+        "url": "https://pdfdark.org/whiten-pdf"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:30.606000Z",
+        "url": "https://pdfdark.org/deskew-pdf"
+      },
+      {
+        "category": "fetch",
+        "level": "info",
+        "method": "GET",
+        "status": 200,
+        "time": "2026-10-29T16:18:33.837000Z",
+        "url": "https://pdfdark.org/pdf-to-black-and-white"
+      },
+      {
+        "category": "navigation",
+        "from": "https://pdfdark.org/",
+        "level": "info",
+        "time": "2026-10-29T16:18:34.508000Z",
+        "to": "https://pdfdark.org/pdf-to-black-and-white"
+      }
+    ],
+    "failedThirdPartyHosts": [
+      "www.google-analytics.com",
+      "s.clarity.ms"
+    ],
+    "notEvidenceOfPdfDownloadFailure": "The status 0 requests observed were analytics endpoints, not PDF document downloads."
+  },
+  "findings": {
+    "newImageDiagnosticsPresent": true,
+    "readerFailurePoint": "fetch_image_data on non-empty local JPEG data URLs, during darkify_page",
+    "cachedPayloadUnits": "logical characters, not measured RAM",
+    "actualMemoryReadings": "unavailable in both reader events",
+    "memoryExhaustionConfirmed": false,
+    "monochromeFailurePoint": "export TypeError; no pdf_image_processing or per-export-step context attached",
+    "noWorkerFailureEstablished": true,
+    "release": "25c8d3541786163f2a7d21d27ca391c5caee72b3",
+    "beforeFaqDeployment": true
+  },
+  "limitations": [
+    "No user PDF was available and no reproduction was performed in this inspection.",
+    "Long-document resource pressure is a hypothesis; the events do not prove OOM or exclude browser/data-URL compatibility failures.",
+    "Monochrome and reader incidents must not be assumed to have the same root cause.",
+    "Unrelated uncommitted client-diagnostics code in the local working tree is not part of release 25c8d35; released source was used for analysis."
+  ],
+  "codeChanges": false
+}

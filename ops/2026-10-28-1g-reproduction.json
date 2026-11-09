@@ -1,0 +1,242 @@
+{
+  "date": "2026-10-28",
+  "issue": "PDF-DARK-1G",
+  "issue_url": "https://yunjie.sentry.io/issues/7814246655/",
+  "deployed": false,
+  "browser": {
+    "actual_test_version": "155.0.8059.84",
+    "os": "macOS x86_64",
+    "ram_gib": 16,
+    "download_source": {
+      "version": "155.0.8059.84",
+      "url": "https://storage.googleapis.com/chrome-for-testing-public/155.0.8059.84/mac-x64/chrome-mac-x64.zip"
+    },
+    "original_environment": "Windows Chrome 155; exact patch, GPU and PDF unavailable"
+  },
+  "before_commit": "efd7ba13e9ddb3637066173d0637ea3cb2524a9a",
+  "after_commit": "292323aa00d82507bb9b05b9cbf4ee1edabc138b",
+  "method": {
+    "online": "Normal public-site UI file selection and download. No mocked requests, altered APIs, simulated errors or memory limits.",
+    "local": "Separate production builds of exact Git snapshots, same browser and fixtures, one active conversion at a time.",
+    "timing": "seconds in logs are time at observation, not conversion-duration comparisons.",
+    "inputs": "Valid generated PDFs, not the unavailable original visitor document.",
+    "comparison": "PDF indirect objects and image bytes compared after normalizing timestamps, stream lengths and excluding xref containers."
+  },
+  "cases": {
+    "before-text": {
+      "log": "/tmp/pdf-g-before-text-status4.txt",
+      "result": {
+        "file": "/tmp/pdf-g-text.pdf",
+        "seconds": 168,
+        "saved": true,
+        "progress": [
+          "Saved pdf-g-text-midnight.pdf"
+        ],
+        "errors": [],
+        "console": [],
+        "sentry": []
+      }
+    },
+    "before-illustrated": {
+      "log": "/tmp/pdf-g-before-illustrated-status3.txt",
+      "result": {
+        "file": "/tmp/pdf-g-illustrated.pdf",
+        "url": "http://localhost:4120/invert-pdf-colors",
+        "seconds": 158,
+        "saved": true,
+        "progress": [
+          "Saved pdf-g-illustrated-midnight.pdf"
+        ],
+        "errors": [],
+        "console": [],
+        "sentry": []
+      }
+    },
+    "before-mixed": {
+      "log": "/tmp/pdf-g-before-mixed-status2.txt",
+      "result": {
+        "file": "/tmp/pdf-g-mixed.pdf",
+        "url": "http://localhost:4120/invert-pdf-colors",
+        "seconds": 59,
+        "saved": true,
+        "progress": [
+          "Saved pdf-g-mixed-midnight.pdf"
+        ],
+        "errors": [],
+        "console": [],
+        "sentry": []
+      }
+    },
+    "after-text": {
+      "log": "/tmp/pdf-g-after-text-status4.txt",
+      "result": {
+        "file": "/tmp/pdf-g-text.pdf",
+        "url": "http://localhost:4121/invert-pdf-colors",
+        "seconds": 176,
+        "saved": true,
+        "progress": [
+          "Saved pdf-g-text-midnight.pdf"
+        ],
+        "errors": [],
+        "console": [],
+        "sentry": []
+      }
+    },
+    "after-illustrated": {
+      "log": "/tmp/pdf-g-after-illustrated-status4.txt",
+      "result": {
+        "file": "/tmp/pdf-g-illustrated.pdf",
+        "url": "http://localhost:4121/invert-pdf-colors",
+        "seconds": 170,
+        "saved": true,
+        "progress": [
+          "Saved pdf-g-illustrated-midnight.pdf"
+        ],
+        "errors": [],
+        "console": [],
+        "sentry": []
+      }
+    },
+    "after-mixed": {
+      "log": "/tmp/pdf-g-after-mixed-status2.txt",
+      "result": {
+        "file": "/tmp/pdf-g-mixed.pdf",
+        "url": "http://localhost:4121/invert-pdf-colors",
+        "seconds": 70,
+        "saved": true,
+        "progress": [
+          "Saved pdf-g-mixed-midnight.pdf"
+        ],
+        "errors": [],
+        "console": [],
+        "sentry": []
+      }
+    },
+    "online-text": {
+      "log": "/tmp/pdf-g-text-online-status4.txt",
+      "result": {
+        "file": "/tmp/pdf-g-text.pdf",
+        "seconds": 135,
+        "saved": true,
+        "progress": [
+          "Saved pdf-g-text-midnight.pdf"
+        ],
+        "errors": [],
+        "console": [],
+        "sentry": []
+      }
+    },
+    "online-illustrated": {
+      "log": "/tmp/pdf-g-illustrated-online-status3.txt",
+      "result": {
+        "file": "/tmp/pdf-g-illustrated.pdf",
+        "seconds": 133,
+        "saved": true,
+        "progress": [
+          "Saved pdf-g-illustrated-midnight.pdf"
+        ],
+        "errors": [],
+        "console": [],
+        "sentry": []
+      }
+    },
+    "online-mixed": {
+      "log": "/tmp/pdf-g-mixed-155-final.txt",
+      "result": {
+        "file": "/tmp/pdf-g-mixed.pdf",
+        "url": "https://pdfdark.org/invert-pdf-colors",
+        "seconds": 60,
+        "saved": true,
+        "progress": [
+          "Saved pdf-g-mixed-midnight.pdf"
+        ],
+        "errors": [],
+        "console": [],
+        "sentry": []
+      }
+    }
+  },
+  "output_checks": [
+    {
+      "kind": "text",
+      "before": {
+        "file": "/tmp/pdf-g-before-text-output.pdf",
+        "bytes": 3601734,
+        "pages": 1000,
+        "sha": "b99aad78c14bfc3d4184bc0030459425ffd469a278a661973d6b53c1c803449f"
+      },
+      "after": {
+        "file": "/tmp/pdf-g-after-text-output.pdf",
+        "bytes": 3601735,
+        "pages": 1000,
+        "sha": "b99aad78c14bfc3d4184bc0030459425ffd469a278a661973d6b53c1c803449f"
+      },
+      "online": {
+        "file": "/tmp/pdf-g-text-online-output.pdf",
+        "bytes": 3601733,
+        "pages": 1000,
+        "sha": "b99aad78c14bfc3d4184bc0030459425ffd469a278a661973d6b53c1c803449f"
+      },
+      "equalBeforeAfter": true,
+      "equalOnlineAfter": true
+    },
+    {
+      "kind": "illustrated",
+      "before": {
+        "file": "/tmp/pdf-g-before-illustrated-output.pdf",
+        "bytes": 82952575,
+        "pages": 1000,
+        "sha": "1832708dc00e48e95fa92a98b5a9472eba42319a90c72d922b58e8a8694f54b2"
+      },
+      "after": {
+        "file": "/tmp/pdf-g-after-illustrated-output.pdf",
+        "bytes": 82952576,
+        "pages": 1000,
+        "sha": "1832708dc00e48e95fa92a98b5a9472eba42319a90c72d922b58e8a8694f54b2"
+      },
+      "online": {
+        "file": "/tmp/pdf-g-illustrated-online-output.pdf",
+        "bytes": 82952575,
+        "pages": 1000,
+        "sha": "1832708dc00e48e95fa92a98b5a9472eba42319a90c72d922b58e8a8694f54b2"
+      },
+      "equalBeforeAfter": true,
+      "equalOnlineAfter": true
+    },
+    {
+      "kind": "mixed",
+      "before": {
+        "file": "/tmp/pdf-g-before-mixed-output.pdf",
+        "bytes": 18365149,
+        "pages": 96,
+        "sha": "00bd41b78eb06483e88e6335c439eb4c1d27135fa152cc4d91bed94780afa4e4"
+      },
+      "after": {
+        "file": "/tmp/pdf-g-after-mixed-output.pdf",
+        "bytes": 18365149,
+        "pages": 96,
+        "sha": "00bd41b78eb06483e88e6335c439eb4c1d27135fa152cc4d91bed94780afa4e4"
+      },
+      "online": {
+        "file": "/tmp/pdf-g-mixed-online-output.pdf",
+        "bytes": 18365149,
+        "pages": 96,
+        "sha": "00bd41b78eb06483e88e6335c439eb4c1d27135fa152cc4d91bed94780afa4e4"
+      },
+      "equalBeforeAfter": true,
+      "equalOnlineAfter": true
+    }
+  ],
+  "sentry_total_before": 4,
+  "sentry_total_after": 4,
+  "findings": [
+    "No PDF processing failure reproduced across the 9 Chrome 155 runs.",
+    "All 3 inputs yielded matching page content and image bytes across old, new and online versions.",
+    "Worker drawing/encoding logic is unchanged. Added resource cleanup is in finally, outside the error-response catch path; this does not exclude indirect resource effects.",
+    "The four original events were reported at pages 378, 83, 499 and 871. Worker error names and internal steps are discarded by current error transport/monitoring.",
+    "No visible navigation/cancellation appears immediately before failures in inspected replay segments. Replay segments do not cover all earlier actions."
+  ],
+  "conclusion": "No reproduced evidence that the memory optimization introduced 1G. Original Windows/PDF-specific failure remains unconfirmed; Worker stage/name/dimensions telemetry is needed for further diagnosis.",
+  "source_code_changed": false,
+  "local_investigation_report_added": true
+}
