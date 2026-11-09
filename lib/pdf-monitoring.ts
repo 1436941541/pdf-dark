@@ -1,6 +1,7 @@
 import { classifyPdfLoadError } from "./pdf-load-error";
 import { capturePdfProcessingException, type PdfFailureDiagnostic } from "./pdf-image-diagnostics";
 import { sizeBucket, trackPdfEvent, type PdfEventData, type PdfInput, type PdfStage, type PdfTool } from "./analytics-events";
+import { clientDiagnostics } from "./client-diagnostics";
 
 export function recordPdfFailure(tool: PdfTool, stage: PdfStage, error: unknown, data: Partial<PdfEventData> = {}, diagnostic: PdfFailureDiagnostic = {}) {
   if ((error as { name?: string } | null)?.name === "AbortError") return;
@@ -10,6 +11,7 @@ export function recordPdfFailure(tool: PdfTool, stage: PdfStage, error: unknown,
 }
 
 export function beginPdfOperation(tool: PdfTool, stage: PdfStage, options: { bytes?: number; pages?: number; input?: PdfInput; signal?: AbortSignal } = {}) {
+  const activity = clientDiagnostics.beginOperation(tool, stage);
   const started = performance.now();
   const data: PdfEventData = {
     tool, stage, page: window.location.pathname, input: options.input ?? "file", pages: options.pages,
@@ -19,6 +21,7 @@ export function beginPdfOperation(tool: PdfTool, stage: PdfStage, options: { byt
   function finish(event: "pdf_success" | "pdf_cancel", pages?: number) {
     if (finished) return;
     finished = true;
+    activity.finish(event === "pdf_success" ? "success" : "cancel");
     options.signal?.removeEventListener("abort", cancel);
     trackPdfEvent(event, { ...data, pages: pages ?? data.pages, duration_ms: performance.now() - started });
   }
@@ -32,6 +35,7 @@ export function beginPdfOperation(tool: PdfTool, stage: PdfStage, options: { byt
       if (finished) return;
       if ((error as { name?: string } | null)?.name === "AbortError") { cancel(); return; }
       finished = true;
+      activity.finish("failure");
       options.signal?.removeEventListener("abort", cancel);
       recordPdfFailure(tool, stage, error, { ...data, duration_ms: performance.now() - started }, diagnostic);
     },

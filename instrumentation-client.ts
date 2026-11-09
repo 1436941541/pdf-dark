@@ -1,9 +1,11 @@
 import * as Sentry from "@sentry/nextjs";
+import { clientDiagnostics } from "./lib/client-diagnostics";
 import { browserScriptDiagnostics } from "./lib/browser-script-diagnostics";
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 if (dsn) {
+  clientDiagnostics.observeWindow(window);
   browserScriptDiagnostics.observeWindow(window);
   Sentry.init({
     dsn,
@@ -11,11 +13,12 @@ if (dsn) {
     // Privacy defaults — we don't want PII or user profiling
     sendDefaultPii: false,
 
-    beforeSend(event, hint) { return browserScriptDiagnostics.enrich(event, hint); },
+    beforeSend(event, hint) { return browserScriptDiagnostics.enrich(clientDiagnostics.enrich(event, hint), hint); },
 
     beforeBreadcrumb(breadcrumb) {
       // Parser/console messages and local media URLs may contain PDF data.
       if (breadcrumb.category === "console") return null;
+      if (breadcrumb.category === "fetch" || breadcrumb.category === "xhr") return clientDiagnostics.networkBreadcrumb(breadcrumb);
       const url = breadcrumb.data?.url;
       if (typeof url === "string") {
         if (url.startsWith("data:") || url.startsWith("blob:")) return null;
@@ -62,6 +65,10 @@ if (dsn) {
 
     tracesSampleRate: 0,
   });
+  clientDiagnostics.instrumentFetch(window);
 }
 
-export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+export const onRouterTransitionStart: typeof Sentry.captureRouterTransitionStart = (...args) => {
+  if (dsn) clientDiagnostics.navigation(args[0]);
+  return Sentry.captureRouterTransitionStart(...args);
+};
