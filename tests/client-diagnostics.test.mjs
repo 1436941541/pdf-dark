@@ -137,6 +137,7 @@ test('client entry point wires diagnostics before Sentry and preserves router ca
   let routerArgs;
   let scriptObserved = false;
   let scriptEnriched = false;
+  let lifecycleHost;
   const sdk = {
     init(value) { assert.equal(typeof listeners.unhandledrejection, 'function'); assert.equal(scriptObserved, true); options = value; },
     replayIntegration: () => ({}),
@@ -150,8 +151,10 @@ test('client entry point wires diagnostics before Sentry and preserves router ca
       observeWindow(target) { assert.equal(target, win); scriptObserved = true; },
       enrich(value) { assert.equal(value.tags.client_diagnostics, 'v1'); scriptEnriched = true; return value; },
     } };
+    if (name === './lib/pdf-operation-lifecycle') return { pdfLifecycle: { install(target) { lifecycleHost = target; } } };
     assert.equal(name, './lib/client-diagnostics'); return { clientDiagnostics: diagnostic };
   }, entryExports, win, { env: { NEXT_PUBLIC_SENTRY_DSN: 'https://public@example.invalid/1' } });
+  assert.equal(lifecycleHost, win);
   assert.notEqual(win.fetch, originalFetch);
   await win.fetch('https://pdfdark.org/deskew-pdf?_rsc=SECRET');
   entryExports.onRouterTransitionStart('/whiten-pdf?secret=SECRET', 'push');

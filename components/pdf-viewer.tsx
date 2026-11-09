@@ -416,6 +416,12 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     let failureGeometry: PdfFailureDiagnostic = { inputBytes: file.size };
     let failureCachePages: PageImage[] | undefined;
     const operation = beginPdfOperation("reader", "read", { bytes: file.size });
+    // Mirrors the step so an unfinished read (closed or killed tab) still reports where it stopped.
+    const markStep = (next: PdfReaderStep) => {
+      readerStep = next;
+      operation.progress(next, pageNumber || undefined, totalPages);
+    };
+    markStep("load_pdfjs");
     const cancel = () => {
       cancelled = true;
       operation.cancel();
@@ -436,16 +442,16 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           import.meta.url,
         ).toString();
 
-        readerStep = "read_file";
+        markStep("read_file");
         const arrayBuffer = await readPdfFile(file);
-        readerStep = "parse_pdf";
+        markStep("parse_pdf");
         const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
         if (cancelled) return;
         totalPages = pdf.numPages;
         setProgress({ done: 0, total: pdf.numPages });
         {
           pageNumber = 1;
-          readerStep = "first_page";
+          markStep("first_page");
           const first = (await pdf.getPage(1)).getViewport({
             scale: RENDER_SCALE,
           });
@@ -475,7 +481,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           if (cancelled) return;
           pageNumber = i;
           failureGeometry = { inputBytes: file.size, totalPages: pdf.numPages };
-          readerStep = "get_page";
+          markStep("get_page");
           const page = await pdf.getPage(i);
           const baseViewport = page.getViewport({ scale: 1 });
           const renderScale = getPdfRenderScale(
@@ -507,7 +513,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           failureGeometry.imageRegionCount = imageRects.length;
           await yieldToMain();
 
-          readerStep = "render_page";
+          markStep("render_page");
           const canvas = document.createElement("canvas");
           canvas.width = Math.max(1, Math.floor(viewport.width));
           canvas.height = Math.max(1, Math.floor(viewport.height));
@@ -543,7 +549,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           }
 
           await yieldToMain();
-          readerStep = "encode_page";
+          markStep("encode_page");
           const originalBlob = await canvasToJpegBlob(canvas, 0.88);
           const stub: PageImage = {
             pageNumber: i,
@@ -566,7 +572,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           // backing store instead of waiting for GC (iOS caps canvas memory).
           canvas.width = 0;
           canvas.height = 0;
-          readerStep = "darkify_page";
+          markStep("darkify_page");
           const display = await darkifyViaWorker(
             stub,
             theme,
@@ -578,7 +584,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
           );
           if (cancelled) return;
 
-          readerStep = "commit_page";
+          markStep("commit_page");
           rendered.push({
             ...stub,
             displayBlob: display,

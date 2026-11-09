@@ -1,8 +1,12 @@
 import * as Sentry from "@sentry/nextjs";
 import { clientDiagnostics } from "./lib/client-diagnostics";
 import { browserScriptDiagnostics } from "./lib/browser-script-diagnostics";
+import { pdfLifecycle } from "./lib/pdf-operation-lifecycle";
 
 const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+
+// Independent of Sentry: reports operations the previous page load left unfinished.
+pdfLifecycle.install(window);
 
 if (dsn) {
   clientDiagnostics.observeWindow(window);

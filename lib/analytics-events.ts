@@ -3,7 +3,7 @@
 export type PdfTool = "reader" | "invert" | "monochrome" | "deskew" | "whiten";
 export type PdfStage = "prepare" | "read" | "preview" | "export" | "sample";
 export type PdfInput = "file" | "sample";
-export type PdfEvent = "pdf_start" | "pdf_success" | "pdf_error" | "pdf_cancel" | "pdf_download";
+export type PdfEvent = "pdf_start" | "pdf_success" | "pdf_error" | "pdf_cancel" | "pdf_download" | "pdf_abandon" | "pdf_interrupted";
 export type PdfEventData = {
   tool: PdfTool;
   stage: PdfStage;
@@ -14,6 +14,13 @@ export type PdfEventData = {
   pages?: number;
   duration_ms?: number;
   reason?: "invalid" | "password" | "processing";
+  // Lifecycle reports for operations that never settled (pdf_abandon / pdf_interrupted).
+  step?: string;
+  at_page?: number;
+  hidden?: 0 | 1;
+  hidden_ms?: number;
+  background?: 0 | 1;
+  persisted?: 0 | 1;
 };
 type Data = Record<string, string | number>;
 type Event = { name: string; data: Data };
@@ -64,5 +71,10 @@ export function trackPdfEvent(name: PdfEvent, data: PdfEventData) {
   if (data.pages !== undefined && Number.isFinite(data.pages)) safe.pages = Math.max(0, Math.round(data.pages));
   if (data.duration_ms !== undefined && Number.isFinite(data.duration_ms)) safe.duration_ms = Math.max(0, Math.round(data.duration_ms));
   if (data.reason) safe.reason = data.reason;
+  if (data.step && /^[a-z][a-z0-9_]{0,39}$/.test(data.step)) safe.step = data.step;
+  for (const key of ["at_page", "hidden", "hidden_ms", "background", "persisted"] as const) {
+    const value = data[key];
+    if (value !== undefined && Number.isFinite(value)) safe[key] = Math.max(0, Math.round(value));
+  }
   track(name, safe);
 }

@@ -23,9 +23,10 @@ const sentry = [];
 const diagnostics = compile('../lib/pdf-image-diagnostics.ts', { './pdf-image-resource-diagnostics': resourceDiagnostics, './dark-worker-diagnostics': workerDiagnostics, '@sentry/nextjs': { captureException: (...args) => sentry.push(args) } });
 const classifier = compile('../lib/pdf-load-error.ts', { './i18n': { T: {} } });
 const clientDiagnostics = compile('../lib/client-diagnostics.ts', { './analytics-events': analytics });
+const lifecycle = compile('../lib/pdf-operation-lifecycle.ts', { './analytics-events': analytics, './pulse-error-monitoring': { capturePulseException() {} } });
 const { beginPdfOperation, recordPdfFailure } = compile('../lib/pdf-monitoring.ts', {
   './analytics-events': analytics, './pdf-load-error': classifier, './pdf-image-diagnostics': diagnostics,
-  './client-diagnostics': clientDiagnostics,
+  './client-diagnostics': clientDiagnostics, './pdf-operation-lifecycle': lifecycle,
 });
 function setup(track) {
   globalThis.window = { location: { pathname: '/whiten-pdf?private=secret' }, umami: { track } };

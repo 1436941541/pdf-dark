@@ -206,6 +206,12 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
       let loadingTask: PDFDocumentLoadingTask | undefined;
       let scratch: HTMLCanvasElement | undefined;
       const pages: PageRender[] = [];
+      // Mirrors the step so an unfinished export (closed or killed tab) still reports where it stopped.
+      const markStep = (next: PdfInvertStep) => {
+        invertStep = next;
+        operation.progress(next, pageNumber || undefined, pdf?.numPages);
+      };
+      markStep("load_pdfjs");
       operationRef.current = operation;
       setCopyStatus("idle");
       setStatus({ kind: "processing", phase: "render", done: 0, total: 0 });
@@ -216,9 +222,9 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           import.meta.url,
         ).toString();
 
-        invertStep = "read_file";
+        markStep("read_file");
         const srcBytes = await readPdfFile(file);
-        invertStep = "parse_pdf";
+        markStep("parse_pdf");
         loadingTask = pdfjs.getDocument({ data: srcBytes.slice(0) });
         pdf = await loadingTask.promise;
         if (cancelledRef.current) return;
@@ -239,7 +245,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           if (cancelledRef.current) return;
           pageNumber = i;
           failureGeometry = { inputBytes: file.size, totalPages: pdf.numPages };
-          invertStep = "get_page";
+          markStep("get_page");
           const page = await pdf.getPage(i);
           const baseViewport = page.getViewport({ scale: 1 });
           const renderScale = getPdfRenderScale(
@@ -267,7 +273,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           failureGeometry.imageRegionCount = imageRects.length;
           await yieldToMain();
 
-          invertStep = "render_page";
+          markStep("render_page");
           const canvas = document.createElement("canvas");
           canvas.width = Math.max(1, Math.floor(viewport.width));
           canvas.height = Math.max(1, Math.floor(viewport.height));
@@ -301,10 +307,10 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             }
 
             await yieldToMain();
-            invertStep = "encode_page";
+            markStep("encode_page");
             const originalBlob = await canvasToJpegBlob(canvas, 0.88);
             // "Original" mode keeps scanned pages exactly as in the source.
-            invertStep = "darkify_page";
+            markStep("darkify_page");
             const displayBlob =
               imageMode === "original" && scannedPage
                 ? originalBlob
@@ -352,7 +358,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           done: pdf.numPages,
           total: pdf.numPages,
         });
-        invertStep = "build_pdf";
+        markStep("build_pdf");
         const { bytes: outBytes, objectPages, rasterPages } = await buildDarkPdf(
           srcBytes,
           pages,
@@ -363,7 +369,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           warmth / 100,
         );
         if (cancelledRef.current) return;
-        invertStep = "download";
+        markStep("download");
         console.info(
           `[pdf-dark] download built: ${objectPages} vector page(s), ${rasterPages} raster page(s)`,
         );
