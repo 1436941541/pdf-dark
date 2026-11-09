@@ -96,6 +96,7 @@ export type PdfInvertStep =
   | "parse_pdf"
   | "get_page"
   | "render_page"
+  | "recolor_page"
   | "encode_page"
   | "darkify_page"
   | "build_pdf"

@@ -29,14 +29,17 @@ function compile(file, imports) {
 
 const textLayer = compile('../lib/text-layer.ts', { 'pdf-lib': pdfLib });
 
-function builder(objectPages = []) {
+function builderModule(objectPages = [], recolorCalls = []) {
   return compile('../lib/build-dark-pdf.ts', {
     'pdf-lib': pdfLib,
     './dark-color': { classifyImage: () => 'keep', imageDimAlpha: () => 0 },
     './native-image': { extractNativeImage: async () => ({ format: 'jpg', bytes: jpegBytes }) },
     './text-layer': textLayer,
-    './content-recolor': { recolorPageInPlace: async (_doc, index) => objectPages.includes(index) },
-  }).buildDarkPdf;
+    './content-recolor': { recolorPageInPlace: async (_doc, index) => { recolorCalls.push(index); return objectPages.includes(index); } },
+  });
+}
+function builder(objectPages = []) {
+  return builderModule(objectPages).buildDarkPdf;
 }
 
 async function loadProxy(bytes) {
@@ -240,6 +243,61 @@ test('ordinary mixed rotated raster pages retain their RENDER_SCALE-derived dime
     const doc = await PDFDocument.load(result.bytes);
     assert.deepEqual(doc.getPage(1).getSize(), { width: 300, height: 200 });
     assert.equal(doc.getPage(1).getRotation().angle, 0);
+  } finally {
+    await source.proxy.destroy();
+  }
+});
+
+test('a draft prepared before rendering lets vector pages skip their raster image with identical output', async () => {
+  const source = await sourcePages([{ width: 600, height: 400 }, { width: 600, height: 400 }, { width: 600, height: 400 }]);
+  try {
+    const renders = await Promise.all([0, 1, 2].map((index) => pageRender(source.proxy, index, { limited: false, scale: 1.5 })));
+    const baseline = await builder([0, 2])(source.bytes.buffer, renders, 'midnight', 'smart', source.proxy);
+    const calls = [];
+    const { prepareDarkPdf, buildDarkPdf } = builderModule([0, 2], calls);
+    const draft = await prepareDarkPdf(source.bytes.buffer, 3, 'midnight', 'smart');
+    const streamed = [];
+    for (const [index, render] of renders.entries()) {
+      const vector = await draft.recolorPage(index, render);
+      // Vector pages keep no JPEG at all, as in the downloader.
+      const metadata = { ...render };
+      delete metadata.displayBlob;
+      streamed.push(vector ? metadata : render);
+    }
+    assert.deepEqual(streamed.map((page) => 'displayBlob' in page), [false, true, false]);
+    const result = await buildDarkPdf(source.bytes.buffer, streamed, 'midnight', 'smart', source.proxy, 1, 0, draft);
+    assert.deepEqual(calls, [0, 1, 2]);
+    assert.deepEqual([result.objectPages, result.rasterPages], [baseline.objectPages, baseline.rasterPages]);
+    assert.deepEqual([result.objectPages, result.rasterPages], [2, 1]);
+    const [ours, theirs] = await Promise.all([PDFDocument.load(result.bytes), PDFDocument.load(baseline.bytes)]);
+    for (const index of [0, 1, 2]) assert.equal(contentStream(ours, index), contentStream(theirs, index));
+  } finally {
+    await source.proxy.destroy();
+  }
+});
+
+test('scanned pages, inverted images and unloadable documents keep their raster image through a draft', async () => {
+  const source = await sourcePages([{ width: 600, height: 400 }, { width: 600, height: 400 }]);
+  try {
+    const calls = [];
+    const { prepareDarkPdf, buildDarkPdf } = builderModule([0, 1], calls);
+    const draft = await prepareDarkPdf(source.bytes.buffer, 2, 'midnight', 'invert');
+    const scanned = { scannedPage: true, imageRects: [] };
+    const inverted = { scannedPage: false, imageRects: [{ x: 0, y: 0, w: 1, h: 1 }] };
+    assert.equal(await draft.recolorPage(0, scanned), false);
+    assert.equal(await draft.recolorPage(1, inverted), false);
+    assert.deepEqual(calls, []);
+    const broken = await prepareDarkPdf(new Uint8Array([1, 2, 3]).buffer, 2, 'midnight', 'smart');
+    assert.equal(broken.doc, null);
+    assert.equal(await broken.recolorPage(0, { scannedPage: false, imageRects: [] }), false);
+    // Every page kept its image, so the whole-raster fallback still has what it needs.
+    const renders = await Promise.all([0, 1].map((index) => pageRender(source.proxy, index, { limited: false, scale: 1.5 })));
+    const result = await buildDarkPdf(source.bytes.buffer, renders, 'midnight', 'smart', source.proxy, 1, 0, broken);
+    assert.deepEqual([result.objectPages, result.rasterPages], [0, 2]);
+    await assert.rejects(buildDarkPdf(source.bytes.buffer, renders.slice(0, 1), 'midnight', 'smart', source.proxy, 1, 0, broken), /does not match/);
+    const missing = { ...renders[1] };
+    delete missing.displayBlob;
+    await assert.rejects(buildDarkPdf(source.bytes.buffer, [renders[0], missing], 'midnight', 'smart', source.proxy, 1, 0, broken), /no rendered image/);
   } finally {
     await source.proxy.destroy();
   }

@@ -30,8 +30,9 @@ import { recolorPageInPlace } from "./content-recolor";
 export const RENDER_SCALE = 1.5;
 
 export type PageRender = {
-  /** Darkened page JPEG at the chosen render scale, without a Base64 copy. */
-  displayBlob: Blob;
+  /** Darkened page JPEG at the chosen render scale, without a Base64 copy.
+   *  Absent when the page was already recolored as vector (object mode). */
+  displayBlob?: Blob;
   width: number;
   height: number;
   /** Upright page size in source PDF user units, only for limited renders. */
@@ -61,15 +62,26 @@ function veilAlpha(mode: ImageMode, r: ImageRect): number {
   return imageTreatment(mode, r) === "dim" ? imageDimAlpha(r.brightness) : 0;
 }
 
-export async function buildDarkPdf(
+/** Object-mode state for one export. Preparing it before the render loop lets
+ *  each page be recolored as soon as it is rendered, so vector pages never
+ *  keep a raster JPEG: retaining one Blob per page exhausted mobile Chrome's
+ *  Blob storage on long documents (createImageBitmap InvalidStateError). */
+export type DarkPdfDraft = {
+  doc: PDFDocument | null;
+  objectOk: boolean[];
+  /** Recolors page `index` in place when object mode applies. True means the
+   *  page is final as vector content and needs no raster render. */
+  recolorPage(index: number, page: Pick<PageRender, "scannedPage" | "imageRects">): Promise<boolean>;
+};
+
+export async function prepareDarkPdf(
   srcBytes: ArrayBuffer,
-  pages: PageRender[],
+  pageCount: number,
   theme: ThemeId,
   imageMode: ImageMode,
-  pdfProxy: PDFDocumentProxy | null,
   darkness = 1,
   warmth = 0,
-): Promise<{ bytes: Uint8Array; objectPages: number; rasterPages: number }> {
+): Promise<DarkPdfDraft> {
   const pdfLib = await import("pdf-lib");
 
   // --- Try object mode on the original document -------------------------
@@ -82,34 +94,49 @@ export async function buildDarkPdf(
   // vector, rasterized at RENDER_SCALE and blurry). Files with a real user
   // password still throw here and take the raster fallback, as before.
   let doc: PDFDocument | null = null;
-  const objectOk: boolean[] = pages.map(() => false);
   try {
     doc = await pdfLib.PDFDocument.load(srcBytes, { password: "" });
-    if (doc.getPageCount() !== pages.length) doc = null;
+    if (doc.getPageCount() !== pageCount) doc = null;
   } catch {
     doc = null;
   }
-  if (doc) {
-    const formsDone = new Map<string, boolean>();
-    for (let i = 0; i < pages.length; i++) {
+  const objectOk: boolean[] = Array.from({ length: pageCount }, () => false);
+  const formsDone = new Map<string, boolean>();
+  return {
+    doc,
+    objectOk,
+    async recolorPage(index, page) {
       // Scanned pages carry their content as one huge image — recoloring
       // operators would change nothing; they need the raster pipeline. Pages
       // with an image slated for INVERSION (whole "invert" mode, or the Auto
       // classifier flagging a document-like figure) also go raster: object
       // mode never touches image pixels, so it can't invert them.
-      if (pages[i].scannedPage) continue;
-      if (pages[i].imageRects.some((r) => imageTreatment(imageMode, r) === "invert"))
-        continue;
-      objectOk[i] = await recolorPageInPlace(
-        doc,
-        i,
-        theme,
-        formsDone,
-        darkness,
-        warmth,
-      );
-    }
+      if (!doc || page.scannedPage) return false;
+      if (page.imageRects.some((r) => imageTreatment(imageMode, r) === "invert")) return false;
+      objectOk[index] = await recolorPageInPlace(doc, index, theme, formsDone, darkness, warmth);
+      return objectOk[index];
+    },
+  };
+}
+
+export async function buildDarkPdf(
+  srcBytes: ArrayBuffer,
+  pages: PageRender[],
+  theme: ThemeId,
+  imageMode: ImageMode,
+  pdfProxy: PDFDocumentProxy | null,
+  darkness = 1,
+  warmth = 0,
+  prepared?: DarkPdfDraft,
+): Promise<{ bytes: Uint8Array; objectPages: number; rasterPages: number }> {
+  const pdfLib = await import("pdf-lib");
+  let draft = prepared;
+  if (!draft) {
+    draft = await prepareDarkPdf(srcBytes, pages.length, theme, imageMode, darkness, warmth);
+    for (let i = 0; i < pages.length; i++) await draft.recolorPage(i, pages[i]);
   }
+  const { doc, objectOk } = draft;
+  if (objectOk.length !== pages.length) throw new Error("Prepared PDF does not match the rendered pages");
 
   if (!doc || !objectOk.some(Boolean)) {
     const bytes = await buildRasterOnly(pdfLib, pages, imageMode, pdfProxy);
@@ -203,6 +230,8 @@ async function drawRasterPage(
 ): Promise<void> {
   const { rgb } = await import("pdf-lib");
 
+  // Only pages that failed object mode keep their render; see prepareDarkPdf.
+  if (!p.displayBlob) throw new Error("Raster page has no rendered image");
   const jpgBytes = new Uint8Array(await p.displayBlob.arrayBuffer());
   const base = await doc.embedJpg(jpgBytes);
   page.drawImage(base, box);

@@ -13,6 +13,7 @@ import { canvasToJpegBlob, yieldToMain } from "@/lib/main-thread";
 import { getPdfRenderScale } from "@/lib/pdf-render-limits";
 import {
   buildDarkPdf,
+  prepareDarkPdf,
   imageTreatment,
   RENDER_SCALE,
   type ImageMode,
@@ -235,6 +236,11 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           total: pdf.numPages,
         });
 
+        // Recolor vector pages during the render loop instead of retaining a
+        // raster JPEG for every page until assembly (see prepareDarkPdf).
+        const draft = await prepareDarkPdf(srcBytes, pdf.numPages, theme, imageMode, darkness / 100, warmth / 100);
+        if (cancelledRef.current) return;
+
         // Small scratch canvas for per-image brightness sampling.
         scratch = document.createElement("canvas");
         scratch.width = 32;
@@ -307,26 +313,32 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             }
 
             await yieldToMain();
-            markStep("encode_page");
-            const originalBlob = await canvasToJpegBlob(canvas, 0.88);
-            // "Original" mode keeps scanned pages exactly as in the source.
-            markStep("darkify_page");
-            const displayBlob =
-              imageMode === "original" && scannedPage
-                ? originalBlob
-                : await darkify(
-                    originalBlob,
-                    canvas.width,
-                    canvas.height,
-                    imageRects,
-                    () => cancelledRef.current,
-                    i,
-                    () => summarizeImageCache(pages, pdf?.numPages),
-                  );
+            markStep("recolor_page");
+            const vector = await draft.recolorPage(i - 1, { scannedPage, imageRects });
+            throwIfCancelled(() => cancelledRef.current);
+            let displayBlob: Blob | undefined;
+            if (!vector) {
+              markStep("encode_page");
+              const originalBlob = await canvasToJpegBlob(canvas, 0.88);
+              // "Original" mode keeps scanned pages exactly as in the source.
+              markStep("darkify_page");
+              displayBlob =
+                imageMode === "original" && scannedPage
+                  ? originalBlob
+                  : await darkify(
+                      originalBlob,
+                      canvas.width,
+                      canvas.height,
+                      imageRects,
+                      () => cancelledRef.current,
+                      i,
+                      () => summarizeImageCache(pages, pdf?.numPages),
+                    );
+            }
             if (cancelledRef.current) return;
 
             pages.push({
-              displayBlob,
+              ...(displayBlob ? { displayBlob } : {}),
               width: canvas.width,
               height: canvas.height,
               imageRects,
@@ -367,6 +379,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           pdf,
           darkness / 100,
           warmth / 100,
+          draft,
         );
         if (cancelledRef.current) return;
         markStep("download");
