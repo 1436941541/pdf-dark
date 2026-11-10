@@ -12,6 +12,7 @@ import type {
   DarkifyResponse,
 } from "@/lib/dark-worker";
 import { getPageImageRects, type ImageRect } from "@/lib/image-regions";
+import type { PDFDocumentLoadingTask, PDFDocumentProxy } from "pdfjs-dist";
 import { canvasToJpegBlob, yieldToMain } from "@/lib/main-thread";
 import { getPdfRenderScale } from "@/lib/pdf-render-limits";
 import {
@@ -24,21 +25,21 @@ import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
 import { T, type Locale } from "@/lib/i18n";
 import { beginPdfOperation, recordPdfFailure } from "@/lib/pdf-monitoring";
 
-type PageImage = {
+/** Rendered images for one page. Only pages near the reader's view keep one. */
+type PageRender = {
   pageNumber: number;
   /** Full-color rendered PDF page JPEG (source of truth, never modified). */
   originalBlob: Blob;
   width: number;
   height: number;
-  /** Reading layout stays at the original zoom even if the bitmap is reduced. */
-  layoutWidth: number;
-  layoutHeight: number;
   /** Current dark-themed version shown to the user, and its object URL.
    *  Blobs rather than Base64 strings keep page images out of the JS heap. */
   displayBlob: Blob;
   displayUrl: string;
-  /** Cache of already-darkified pages keyed by `${theme}:${imageMode}` —
-   *  lets re-applying a known combination skip the worker. */
+  /** variantKey the display version was rendered with. */
+  displayKey: string;
+  /** Cache of already-darkified versions keyed by variantKey — lets
+   *  re-applying a recent combination skip the worker. */
   byTheme: Partial<Record<string, Blob>>;
   /**
    * Canvas-space rects of raster images on this page (photos, figures). The
@@ -50,6 +51,27 @@ type PageImage = {
    *  take the raster download path, not the object-recolor one. */
   scannedPage: boolean;
 };
+
+type PageImage = {
+  pageNumber: number;
+  /** Reading layout stays at the original zoom even if the bitmap is reduced.
+   *  Known for every page, so unrendered pages hold their exact space. */
+  layoutWidth: number;
+  layoutHeight: number;
+  /** Absent for pages away from the view: a long PDF can't keep every page's
+   *  images (2,500 pages crashed iOS Safari), so they're re-rendered on return. */
+  image?: PageRender;
+  /** Variant whose rendering failed, so the page isn't retried in a loop. */
+  failedKey?: string;
+};
+
+/** Pages within this distance of the viewed page are rendered… */
+const RENDER_RADIUS = 5;
+/** …and released once farther than this (the gap avoids re-rendering pages
+ *  that hover at the edge while scrolling back and forth). */
+const KEEP_RADIUS = 8;
+/** Darkified variants kept per page, so toggling between recent themes stays instant. */
+const MAX_VARIANTS = 3;
 
 type Props = {
   file: File;
@@ -129,8 +151,13 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     height: number;
   } | null>(null);
   const [pageInput, setPageInput] = useState("1");
-  const themeVersionRef = useRef(0);
-  const lastAppliedThemeRef = useRef<string | null>(null);
+  // The open document stays loaded so released pages can be re-rendered.
+  const pdfRef = useRef<PDFDocumentProxy | null>(null);
+  // Source of truth for page slots between awaits; `pages` is its published copy.
+  const slotsRef = useRef<PageImage[]>([]);
+  // Page index the rendered window is centered on — follows currentPage with
+  // a short delay so a fast scroll doesn't start a render for every page passed.
+  const [viewCenter, setViewCenter] = useState(0);
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const scrollRootRef = useRef<HTMLDivElement | null>(null);
   const cancelOperationsRef = useRef(new Set<() => void>());
@@ -217,6 +244,11 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   // Keep the jump-to-page input synced when scroll changes currentPage.
   useEffect(() => {
     setPageInput(String(currentPage));
+  }, [currentPage]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setViewCenter(currentPage - 1), 150);
+    return () => clearTimeout(t);
   }, [currentPage]);
 
   const scrollToPage = useCallback((target: number) => {
@@ -307,11 +339,23 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     for (const url of urls.values()) URL.revokeObjectURL(url);
     urls.clear();
   }, []);
+  const revokeObjectUrl = useCallback((blob: Blob) => {
+    const urls = objectUrlsRef.current;
+    const url = urls.get(blob);
+    if (url === undefined) return;
+    URL.revokeObjectURL(url);
+    urls.delete(blob);
+  }, []);
+  /** Drop a page's images; the map would otherwise keep every Blob alive. */
+  const releasePageRender = useCallback((image: PageRender) => {
+    revokeObjectUrl(image.displayBlob);
+    for (const blob of Object.values(image.byTheme)) if (blob) revokeObjectUrl(blob);
+  }, [revokeObjectUrl]);
 
   /** Convert an original page JPEG → worker-processed themed JPEG. */
   const darkifyViaWorker = useCallback(
     async (
-      p: PageImage,
+      p: PageRender,
       nextTheme: ThemeId,
       nextMode: ImageMode,
       nextDarkness: number,
@@ -376,25 +420,6 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     [],
   );
 
-  /** Find the page index whose center is closest to the viewport center. */
-  const focusedPageIndex = useCallback((): number => {
-    if (typeof window === "undefined") return 0;
-    const viewportCenter = window.innerHeight / 2;
-    let best = 0;
-    let bestDist = Infinity;
-    pageRefs.current.forEach((el, i) => {
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const center = rect.top + rect.height / 2;
-      const dist = Math.abs(center - viewportCenter);
-      if (dist < bestDist) {
-        best = i;
-        bestDist = dist;
-      }
-    });
-    return best;
-  }, []);
-
   /** Build a processing order that starts from `focused` and expands outward. */
   const expandingOrder = useCallback((focused: number, total: number): number[] => {
     const out: number[] = [focused];
@@ -407,14 +432,184 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     return out;
   }, []);
 
-  // Initial render: load PDF, render each page, darkify with starting theme via worker
+  /**
+   * Render one page to its original JPEG plus the image data the worker needs.
+   * `trace` lets the initial pass report its step and page geometry.
+   */
+  const renderPageImage = useCallback(
+    async (
+      pdf: PDFDocumentProxy,
+      pageNumber: number,
+      cancelled: () => boolean,
+      trace?: {
+        markStep: (step: PdfReaderStep) => void;
+        geometry: (g: PdfFailureDiagnostic) => void;
+      },
+    ): Promise<Omit<PageRender, "displayBlob" | "displayUrl" | "displayKey" | "byTheme">> => {
+      trace?.markStep("get_page");
+      const page = await pdf.getPage(pageNumber);
+      try {
+        throwIfCancelled(cancelled);
+        const baseViewport = page.getViewport({ scale: 1 });
+        const renderScale = getPdfRenderScale(
+          baseViewport.width,
+          baseViewport.height,
+          RENDER_SCALE,
+        );
+        const viewport = page.getViewport({ scale: renderScale });
+        trace?.geometry({
+          pageWidth: Math.max(1, Math.floor(viewport.width)),
+          pageHeight: Math.max(1, Math.floor(viewport.height)), baseWidth: baseViewport.width,
+          baseHeight: baseViewport.height, renderScale, renderScaleLimited: renderScale < RENDER_SCALE,
+        });
+
+        // Locate raster images so the worker can keep them full-color.
+        // MUST run before page.render(): rendering converts the operator
+        // list's path payloads to Path2D in place, and the scan needs the
+        // raw path data to recognize circular clips. Non-fatal: on any
+        // hiccup we fall back to darkening everything (the old behavior).
+        let imageRects: ImageRect[] = [];
+        let scannedPage = false;
+        try {
+          const scan = await getPageImageRects(page, viewport);
+          imageRects = scan.rects;
+          scannedPage = scan.scanned;
+        } catch (err) {
+          console.warn("[pdf-dark] image-region scan failed", err);
+        }
+        trace?.geometry({ imageRegionCount: imageRects.length });
+        await yieldToMain();
+        throwIfCancelled(cancelled);
+
+        trace?.markStep("render_page");
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.floor(viewport.width));
+        canvas.height = Math.max(1, Math.floor(viewport.height));
+        try {
+          const ctx = canvas.getContext("2d");
+          if (!ctx) throw new Error("2D canvas not supported");
+          await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+          throwIfCancelled(cancelled);
+          await yieldToMain();
+
+          // Average luminance + saturation per image (drives the Auto
+          // classifier): squash the region into a 32×32 scratch canvas
+          // and read that.
+          if (imageRects.length > 0) {
+            const scratch = document.createElement("canvas");
+            scratch.width = 32;
+            scratch.height = 32;
+            const scratchCtx = scratch.getContext("2d", { willReadFrequently: true });
+            if (scratchCtx) {
+              for (const r of imageRects) {
+                try {
+                  scratchCtx.drawImage(canvas, r.x, r.y, r.w, r.h, 0, 0, 32, 32);
+                  const d = scratchCtx.getImageData(0, 0, 32, 32).data;
+                  let lumSum = 0;
+                  let satSum = 0;
+                  for (let j = 0; j < d.length; j += 4) {
+                    lumSum += 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
+                    const mx = Math.max(d[j], d[j + 1], d[j + 2]);
+                    const mn = Math.min(d[j], d[j + 1], d[j + 2]);
+                    satSum += (mx - mn) / 255;
+                  }
+                  const n = d.length / 4;
+                  r.brightness = lumSum / n;
+                  r.saturation = satSum / n;
+                } catch {
+                  // leave features undefined → classifier falls back to a mild veil
+                }
+              }
+            }
+            scratch.width = 0;
+            scratch.height = 0;
+          }
+
+          await yieldToMain();
+          trace?.markStep("encode_page");
+          const originalBlob = await canvasToJpegBlob(canvas, 0.88);
+          return {
+            pageNumber,
+            originalBlob,
+            width: canvas.width,
+            height: canvas.height,
+            imageRects,
+            scannedPage,
+          };
+        } finally {
+          // The JPEG is the page's source of truth now; release the full-size
+          // backing store instead of waiting for GC (iOS caps canvas memory).
+          canvas.width = 0;
+          canvas.height = 0;
+        }
+      } finally {
+        // PDF.js otherwise keeps every rendered page's operator list and
+        // decoded images for the life of the document.
+        page.cleanup();
+      }
+    },
+    [],
+  );
+
+  /** Darkify a rendered page for one variant and make it the displayed one. */
+  const showVariant = useCallback(
+    async (
+      image: Omit<PageRender, "displayBlob" | "displayUrl" | "displayKey" | "byTheme"> &
+        Partial<Pick<PageRender, "byTheme">>,
+      nextTheme: ThemeId,
+      nextMode: ImageMode,
+      nextDarkness: number,
+      nextWarmth: number,
+      cancelled: () => boolean,
+      getCacheSnapshot: ImageCacheSnapshotProvider,
+    ): Promise<PageRender> => {
+      const key = variantKey(nextTheme, nextMode, nextDarkness, nextWarmth);
+      const byTheme = image.byTheme ?? {};
+      const display =
+        byTheme[key] ??
+        (await darkifyViaWorker(
+          { ...image, displayBlob: image.originalBlob, displayUrl: "", displayKey: "", byTheme },
+          nextTheme,
+          nextMode,
+          nextDarkness,
+          nextWarmth,
+          cancelled,
+          getCacheSnapshot,
+        ));
+      throwIfCancelled(cancelled);
+      // Most recent last; drop the oldest variants beyond the cap.
+      const entries = Object.entries(byTheme).filter(([k]) => k !== key);
+      entries.push([key, display]);
+      for (const [, blob] of entries.splice(0, Math.max(0, entries.length - MAX_VARIANTS))) {
+        if (blob && blob !== display) revokeObjectUrl(blob);
+      }
+      return {
+        ...image,
+        displayBlob: display,
+        displayUrl: objectUrl(display),
+        displayKey: key,
+        byTheme: Object.fromEntries(entries),
+      };
+    },
+    [darkifyViaWorker, objectUrl, revokeObjectUrl],
+  );
+
+  /** Rendered pages only, for failure diagnostics. */
+  const residentImages = useCallback(
+    () => slotsRef.current.flatMap((s) => (s.image ? [s.image] : [])),
+    [],
+  );
+
+  // Initial pass: load the PDF and size every page (cheap — no rendering), so
+  // the whole document can be scrolled and jumped through. Page 1 is rendered
+  // here; the window effect below renders whatever is near the view.
   useEffect(() => {
     let cancelled = false;
     let readerStep: PdfReaderStep = "load_pdfjs";
     let pageNumber = 0;
     let totalPages: number | undefined;
     let failureGeometry: PdfFailureDiagnostic = { inputBytes: file.size };
-    let failureCachePages: PageImage[] | undefined;
+    let loadingTask: PDFDocumentLoadingTask | undefined;
     const operation = beginPdfOperation("reader", "read", { bytes: file.size });
     // Mirrors the step so an unfinished read (closed or killed tab) still reports where it stopped.
     const markStep = (next: PdfReaderStep) => {
@@ -428,11 +623,14 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     };
     const cancellations = cancelOperationsRef.current;
     cancellations.add(cancel);
+    slotsRef.current = [];
     setStatus("loading");
     setErrorText(null);
     setPages([]);
     setFirstPageSize(null);
     setProgress({ done: 0, total: 0 });
+    setCurrentPage(1);
+    setViewCenter(0);
 
     (async () => {
       try {
@@ -445,158 +643,56 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         markStep("read_file");
         const arrayBuffer = await readPdfFile(file);
         markStep("parse_pdf");
-        const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+        loadingTask = pdfjs.getDocument({ data: arrayBuffer });
+        const pdf = await loadingTask.promise;
         if (cancelled) return;
+        pdfRef.current = pdf;
         totalPages = pdf.numPages;
         setProgress({ done: 0, total: pdf.numPages });
-        {
-          pageNumber = 1;
-          markStep("first_page");
-          const first = (await pdf.getPage(1)).getViewport({
-            scale: RENDER_SCALE,
-          });
-          if (cancelled) return;
-          setFirstPageSize({ width: first.width, height: first.height });
-        }
 
-        // Stream pages to React as soon as each finishes. The user can start
-        // reading after page 1 — they don't have to wait for the whole PDF.
-        const rendered: PageImage[] = [];
-        failureCachePages = rendered;
-        // Lock the theme/mode combo for the entire initial pass to avoid
-        // racing with the variant-switch effect (which is disabled in UI
-        // while isInitialRendering is true).
-        lastAppliedThemeRef.current = variantKey(
-          theme,
-          imageMode,
-          appliedDarkness,
-          appliedWarmth,
-        );
-        // Small scratch canvas for per-image brightness sampling.
-        const scratch = document.createElement("canvas");
-        scratch.width = 32;
-        scratch.height = 32;
-        const scratchCtx = scratch.getContext("2d", { willReadFrequently: true });
+        const slots: PageImage[] = [];
+        slotsRef.current = slots;
         for (let i = 1; i <= pdf.numPages; i++) {
           if (cancelled) return;
           pageNumber = i;
           failureGeometry = { inputBytes: file.size, totalPages: pdf.numPages };
-          markStep("get_page");
+          markStep(i === 1 ? "first_page" : "get_page");
           const page = await pdf.getPage(i);
-          const baseViewport = page.getViewport({ scale: 1 });
-          const renderScale = getPdfRenderScale(
-            baseViewport.width,
-            baseViewport.height,
-            RENDER_SCALE,
-          );
-          const viewport = page.getViewport({ scale: renderScale });
-          failureGeometry = {
-            ...failureGeometry, pageWidth: Math.max(1, Math.floor(viewport.width)),
-            pageHeight: Math.max(1, Math.floor(viewport.height)), baseWidth: baseViewport.width,
-            baseHeight: baseViewport.height, renderScale, renderScaleLimited: renderScale < RENDER_SCALE,
-          };
-
-          // Locate raster images so the worker can keep them full-color.
-          // MUST run before page.render(): rendering converts the operator
-          // list's path payloads to Path2D in place, and the scan needs the
-          // raw path data to recognize circular clips. Non-fatal: on any
-          // hiccup we fall back to darkening everything (the old behavior).
-          let imageRects: ImageRect[] = [];
-          let scannedPage = false;
-          try {
-            const scan = await getPageImageRects(page, viewport);
-            imageRects = scan.rects;
-            scannedPage = scan.scanned;
-          } catch (err) {
-            console.warn("[pdf-dark] image-region scan failed", err);
-          }
-          failureGeometry.imageRegionCount = imageRects.length;
-          await yieldToMain();
-
-          markStep("render_page");
-          const canvas = document.createElement("canvas");
-          canvas.width = Math.max(1, Math.floor(viewport.width));
-          canvas.height = Math.max(1, Math.floor(viewport.height));
-          const ctx = canvas.getContext("2d");
-          if (!ctx) throw new Error("2D canvas not supported");
-          await page.render({ canvas, canvasContext: ctx, viewport }).promise;
-          throwIfCancelled(() => cancelled);
-          await yieldToMain();
-
-          // Average luminance + saturation per image (drives the Auto
-          // classifier): squash the region into the 32×32 scratch canvas
-          // and read that.
-          if (scratchCtx) {
-            for (const r of imageRects) {
-              try {
-                scratchCtx.drawImage(canvas, r.x, r.y, r.w, r.h, 0, 0, 32, 32);
-                const d = scratchCtx.getImageData(0, 0, 32, 32).data;
-                let lumSum = 0;
-                let satSum = 0;
-                for (let j = 0; j < d.length; j += 4) {
-                  lumSum += 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
-                  const mx = Math.max(d[j], d[j + 1], d[j + 2]);
-                  const mn = Math.min(d[j], d[j + 1], d[j + 2]);
-                  satSum += (mx - mn) / 255;
-                }
-                const n = d.length / 4;
-                r.brightness = lumSum / n;
-                r.saturation = satSum / n;
-              } catch {
-                // leave features undefined → classifier falls back to a mild veil
-              }
-            }
-          }
-
-          await yieldToMain();
-          markStep("encode_page");
-          const originalBlob = await canvasToJpegBlob(canvas, 0.88);
-          const stub: PageImage = {
-            pageNumber: i,
-            originalBlob,
-            width: canvas.width,
-            height: canvas.height,
-            layoutWidth: renderScale < RENDER_SCALE
-              ? Math.max(1, Math.floor(baseViewport.width * RENDER_SCALE))
-              : canvas.width,
-            layoutHeight: renderScale < RENDER_SCALE
-              ? Math.max(1, Math.floor(baseViewport.height * RENDER_SCALE))
-              : canvas.height,
-            displayBlob: originalBlob,
-            displayUrl: "",
-            byTheme: {},
-            imageRects,
-            scannedPage,
-          };
-          // The JPEG is the page's source of truth now; release the full-size
-          // backing store instead of waiting for GC (iOS caps canvas memory).
-          canvas.width = 0;
-          canvas.height = 0;
-          markStep("darkify_page");
-          const display = await darkifyViaWorker(
-            stub,
-            theme,
-            imageMode,
-            appliedDarkness,
-            appliedWarmth,
-            () => cancelled,
-            () => summarizeImageCache(rendered, pdf.numPages),
-          );
+          const base = page.getViewport({ scale: 1 });
+          page.cleanup();
           if (cancelled) return;
+          const layoutWidth = Math.max(1, Math.floor(base.width * RENDER_SCALE));
+          const layoutHeight = Math.max(1, Math.floor(base.height * RENDER_SCALE));
+          slots.push({ pageNumber: i, layoutWidth, layoutHeight });
 
-          markStep("commit_page");
-          rendered.push({
-            ...stub,
-            displayBlob: display,
-            displayUrl: objectUrl(display),
-            byTheme: {
-              [variantKey(theme, imageMode, appliedDarkness, appliedWarmth)]:
-                display,
-            },
-          });
-          setPages([...rendered]);
-          setProgress({ done: i, total: pdf.numPages });
-          if (i === 1) setStatus("ready");
+          if (i === 1) {
+            setFirstPageSize({ width: layoutWidth, height: layoutHeight });
+            const rendered = await renderPageImage(pdf, 1, () => cancelled, {
+              markStep,
+              geometry: (g) => { failureGeometry = { ...failureGeometry, ...g }; },
+            });
+            markStep("darkify_page");
+            const image = await showVariant(
+              rendered,
+              theme,
+              imageMode,
+              appliedDarkness,
+              appliedWarmth,
+              () => cancelled,
+              () => summarizeImageCache(residentImages(), pdf.numPages),
+            );
+            if (cancelled) return;
+            markStep("commit_page");
+            slots[0] = { ...slots[0], image };
+          }
+          // Publish in batches: thousands of single-page updates would
+          // re-render the list for every page sized.
+          if (i === 1 || i % 50 === 0 || i === pdf.numPages) {
+            setPages([...slots]);
+            setProgress({ done: i, total: pdf.numPages });
+            if (i === 1) setStatus("ready");
+            await yieldToMain();
+          }
         }
         operation.success(pdf.numPages);
       } catch (e) {
@@ -607,139 +703,105 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
         if (!cancelled && !isCancellationError(e)) {
-          operation.failure(e, { ...failureGeometry, readerStep, pageNumber, totalPages, getCacheSnapshot: () => summarizeImageCache(failureCachePages ?? [], totalPages) });
+          operation.failure(e, { ...failureGeometry, readerStep, pageNumber, totalPages, getCacheSnapshot: () => summarizeImageCache(residentImages(), totalPages) });
         }
         if (!cancelled) {
           setErrorText(pdfLoadErrorText(kind, locale));
           setStatus("error");
         }
       } finally {
-        failureCachePages = undefined;
         operation.cancel();
       }
     })();
 
     return () => {
-      cancel();
+      // Settle every render loop (this pass and the window effect) before the
+      // document goes away, so a destroyed PDF doesn't surface as a failure.
+      for (const c of cancellations) c();
       cancellations.delete(cancel);
+      pdfRef.current = null;
+      void loadingTask?.destroy().catch(() => {
+        console.warn("[pdf-dark] PDF cleanup failed");
+      });
       // This document's pages are discarded with this pass (replaced file,
       // locale change or unmount), so release every page image URL.
+      slotsRef.current = [];
       revokeObjectUrls();
     };
     // theme intentionally omitted — initial pass uses whatever theme is live.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file, darkifyViaWorker, locale]);
+  }, [file, renderPageImage, showVariant, locale]);
 
-  // Variant switch (theme or image mode): re-darkify pages, starting from
-  // whatever the user is looking at. Fast path: if every page already has
-  // this combination cached, swap the page images instantly.
+  // Rendered window: keep pages near the view rendered in the current variant
+  // (theme, image mode, sliders), starting from the viewed page, and release
+  // pages that have scrolled far away. Theme switches re-darkify the window.
   useEffect(() => {
     if (status !== "ready" || pages.length === 0) return;
-    const vk = variantKey(theme, imageMode, appliedDarkness, appliedWarmth);
+    const pdf = pdfRef.current;
+    if (!pdf) return;
+    const key = variantKey(theme, imageMode, appliedDarkness, appliedWarmth);
+    const slots = slotsRef.current;
+    const center = Math.min(viewCenter, slots.length - 1);
 
-    // Bump version up-front — aborts any in-flight worker loop from a previous switch.
-    themeVersionRef.current += 1;
-    const version = themeVersionRef.current;
+    let released = false;
+    slots.forEach((slot, idx) => {
+      if (slot.image && Math.abs(idx - center) > KEEP_RADIUS) {
+        releasePageRender(slot.image);
+        slots[idx] = { ...slot, image: undefined };
+        released = true;
+      }
+    });
+    if (released) setPages([...slots]);
 
-    // User toggled back to the already-applied variant (often mid-flight,
-    // when they cancel a switch). Recover any pages that were partially
-    // committed to the canceled one, then reset so Download unlocks.
-    if (lastAppliedThemeRef.current === vk) {
-      setPages((cur) =>
-        cur.map((p) => {
-          const cached = p.byTheme[vk];
-          return cached && p.displayBlob !== cached
-            ? { ...p, displayBlob: cached, displayUrl: objectUrl(cached) }
-            : p;
-        }),
-      );
-      setThemeApplying(false);
-      setThemeProgress({ current: 0, total: 0 });
-      return;
-    }
-
-    const allCached = pages.every((p) => p.byTheme[vk] !== undefined);
-    if (allCached) {
-      setPages((cur) =>
-        cur.map((p) => {
-          const cached = p.byTheme[vk]!;
-          return { ...p, displayBlob: cached, displayUrl: objectUrl(cached) };
-        }),
-      );
-      lastAppliedThemeRef.current = vk;
-      setThemeApplying(false);
-      setThemeProgress({ current: 0, total: 0 });
-      return;
-    }
+    const todo = expandingOrder(center, slots.length).filter(
+      (idx) =>
+        Math.abs(idx - center) <= RENDER_RADIUS &&
+        slots[idx].image?.displayKey !== key &&
+        slots[idx].failedKey !== key,
+    );
+    // Only a variant change on rendered pages is "applying a theme"; pages
+    // rendered for the first time on scroll show their placeholder instead.
+    const retheming = todo.filter((idx) => slots[idx].image).length;
+    setThemeApplying(retheming > 0);
+    setThemeProgress({ current: 0, total: retheming });
+    if (todo.length === 0) return;
 
     let aborted = false;
     const cancel = () => { aborted = true; };
     const cancellations = cancelOperationsRef.current;
     cancellations.add(cancel);
-    setThemeApplying(true);
 
     (async () => {
-      const next: PageImage[] = pages.slice();
-      const focused = focusedPageIndex();
-      const order = expandingOrder(focused, next.length);
-      const VISIBLE_COMMIT = 6; // commit per page for the first N (around user's view)
-      const vk2 = variantKey(theme, imageMode, appliedDarkness, appliedWarmth);
-      const toCompute = order.filter(
-        (idx) => next[idx].byTheme[vk2] === undefined,
-      ).length;
-      setThemeProgress({ current: 0, total: toCompute });
-      let computed = 0;
-
-      for (let k = 0; k < order.length; k++) {
-        if (aborted || themeVersionRef.current !== version) return;
-        const idx = order[k];
-        const p = next[idx];
-
-        const cached = p.byTheme[vk2];
-        if (cached !== undefined) {
-          next[idx] = { ...p, displayBlob: cached, displayUrl: objectUrl(cached) };
-        } else {
-          try {
-            const display = await darkifyViaWorker(
-              p,
-              theme,
-              imageMode,
-              appliedDarkness,
-              appliedWarmth,
-              () => aborted,
-              () => summarizeImageCache(next, progress.total || undefined),
-            );
-            if (aborted || themeVersionRef.current !== version) return;
-            next[idx] = {
-              ...p,
-              displayBlob: display,
-              displayUrl: objectUrl(display),
-              byTheme: { ...p.byTheme, [vk2]: display },
-            };
-            computed++;
-            setThemeProgress({ current: computed, total: toCompute });
-          } catch (err) {
-            if (!aborted && !isCancellationError(err)) {
-              console.error("[pdf-dark] darkify failed", err);
-              recordPdfFailure("reader", "preview", err);
-            }
-          }
+      let rethemed = 0;
+      for (const idx of todo) {
+        if (aborted) return;
+        const slot = slotsRef.current[idx];
+        try {
+          const rendered =
+            slot.image ?? (await renderPageImage(pdf, slot.pageNumber, () => aborted));
+          const image = await showVariant(
+            rendered,
+            theme,
+            imageMode,
+            appliedDarkness,
+            appliedWarmth,
+            () => aborted,
+            () => summarizeImageCache(residentImages(), slotsRef.current.length),
+          );
+          if (aborted) return;
+          // A newer pass may have replaced the slot list (new file).
+          if (slotsRef.current !== slots) return;
+          slots[idx] = { ...slots[idx], image, failedKey: undefined };
+          if (slot.image) setThemeProgress({ current: ++rethemed, total: retheming });
+        } catch (err) {
+          if (aborted || isCancellationError(err)) return;
+          console.error("[pdf-dark] darkify failed", err);
+          recordPdfFailure("reader", "preview", err);
+          slots[idx] = { ...slots[idx], failedKey: key };
         }
-        if (aborted || themeVersionRef.current !== version) return;
-        // Commit frequently near the user's view; batch later pages.
-        if (k < VISIBLE_COMMIT || k % 4 === 0) {
-          setPages([...next]);
-        }
+        setPages([...slots]);
       }
-
-      if (!aborted && themeVersionRef.current === version) {
-        setPages(next);
-        lastAppliedThemeRef.current = variantKey(
-          theme,
-          imageMode,
-          appliedDarkness,
-          appliedWarmth,
-        );
+      if (!aborted) {
         setThemeApplying(false);
         setThemeProgress({ current: 0, total: 0 });
       }
@@ -749,8 +811,20 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       cancel();
       cancellations.delete(cancel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme, imageMode, appliedDarkness, appliedWarmth, status]);
+  }, [
+    status,
+    pages.length,
+    viewCenter,
+    theme,
+    imageMode,
+    appliedDarkness,
+    appliedWarmth,
+    expandingOrder,
+    renderPageImage,
+    showVariant,
+    releasePageRender,
+    residentImages,
+  ]);
 
   // Page-frame background follows the sliders so the frame never mismatches
   // the darkened bitmaps it surrounds.
@@ -1119,16 +1193,25 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
               className="mx-auto overflow-hidden rounded-lg shadow-2xl"
               style={{ maxWidth: p.layoutWidth * zoom, background: themeBg }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={p.displayUrl}
-                alt={t.viewer.pageAlt(i + 1)}
-                width={p.layoutWidth}
-                height={p.layoutHeight}
-                loading="lazy"
-                decoding="async"
-                className="block w-full h-auto"
-              />
+              {p.image ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={p.image.displayUrl}
+                  alt={t.viewer.pageAlt(i + 1)}
+                  width={p.layoutWidth}
+                  height={p.layoutHeight}
+                  loading="lazy"
+                  decoding="async"
+                  className="block w-full h-auto"
+                />
+              ) : (
+                // Not rendered yet, or released far from the view: hold the
+                // page's exact space so scrolling and jumps stay in place.
+                <div
+                  className="w-full"
+                  style={{ aspectRatio: `${p.layoutWidth} / ${p.layoutHeight}` }}
+                />
+              )}
             </div>
           ))}
           {/* While later pages are still rendering, hold the next page's

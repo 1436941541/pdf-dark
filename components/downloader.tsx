@@ -360,6 +360,10 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           } finally {
             canvas.width = 0;
             canvas.height = 0;
+            // PDF.js keeps a rendered page's operator list and decoded images
+            // until asked to drop them; without this a long export holds every
+            // page's render data at once. Assembly re-fetches pages it needs.
+            page.cleanup();
           }
         }
 
