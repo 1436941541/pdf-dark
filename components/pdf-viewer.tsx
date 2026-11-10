@@ -155,8 +155,8 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   // `cancelled` is set when it's replaced, closed or navigated away from.
   const docRef = useRef<{ pdf?: PDFDocumentProxy; cancelled: boolean } | null>(null);
   // In-flight page renders keyed by `${pageIndex}:${variantKey}`. A render
-  // runs to completion even if the view moves on, so pages aren't restarted
-  // whenever the window recomputes; the result is shown if still wanted.
+  // keeps going while its page is still wanted, so pages aren't restarted
+  // whenever the window recomputes; it stops once the view moves away.
   const renderJobsRef = useRef(new Map<string, Promise<PageRender>>());
   // Latest window, read by renders finishing after the view has moved.
   const windowRef = useRef({ center: 0, key: "" });
@@ -817,16 +817,18 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         const jobKey = `${idx}:${key}`;
         let job = jobs.get(jobKey);
         if (!job) {
-          const docCancelled = () => doc.cancelled;
+          // Stop between steps once the page has scrolled away or the
+          // settings changed; renders still wanted always run to completion.
+          const unwanted = () => !stillWanted(idx);
           const started = (async () => {
-            const rendered = base ?? (await renderPageImage(pdf, idx + 1, docCancelled));
+            const rendered = base ?? (await renderPageImage(pdf, idx + 1, unwanted));
             return showVariant(
               rendered,
               theme,
               imageMode,
               appliedDarkness,
               appliedWarmth,
-              docCancelled,
+              unwanted,
               () => summarizeImageCache(residentImages(), slots.length),
             );
           })();
