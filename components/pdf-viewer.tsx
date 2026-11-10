@@ -152,7 +152,14 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
   } | null>(null);
   const [pageInput, setPageInput] = useState("1");
   // The open document stays loaded so released pages can be re-rendered.
-  const pdfRef = useRef<PDFDocumentProxy | null>(null);
+  // `cancelled` is set when it's replaced, closed or navigated away from.
+  const docRef = useRef<{ pdf?: PDFDocumentProxy; cancelled: boolean } | null>(null);
+  // In-flight page renders keyed by `${pageIndex}:${variantKey}`. A render
+  // runs to completion even if the view moves on, so pages aren't restarted
+  // whenever the window recomputes; the result is shown if still wanted.
+  const renderJobsRef = useRef(new Map<string, Promise<PageRender>>());
+  // Latest window, read by renders finishing after the view has moved.
+  const windowRef = useRef({ center: 0, key: "" });
   // Source of truth for page slots between awaits; `pages` is its published copy.
   const slotsRef = useRef<PageImage[]>([]);
   // Page index the rendered window is centered on — follows currentPage with
@@ -551,7 +558,9 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     [],
   );
 
-  /** Darkify a rendered page for one variant and make it the displayed one. */
+  /** Darkify a rendered page for one variant (reusing a cached one). Object
+   *  URLs are only created when the result is committed (commitPage), so a
+   *  result that's no longer wanted can simply be dropped. */
   const showVariant = useCallback(
     async (
       image: Omit<PageRender, "displayBlob" | "displayUrl" | "displayKey" | "byTheme"> &
@@ -580,18 +589,35 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       // Most recent last; drop the oldest variants beyond the cap.
       const entries = Object.entries(byTheme).filter(([k]) => k !== key);
       entries.push([key, display]);
-      for (const [, blob] of entries.splice(0, Math.max(0, entries.length - MAX_VARIANTS))) {
-        if (blob && blob !== display) revokeObjectUrl(blob);
-      }
       return {
         ...image,
         displayBlob: display,
-        displayUrl: objectUrl(display),
+        displayUrl: "",
         displayKey: key,
-        byTheme: Object.fromEntries(entries),
+        byTheme: Object.fromEntries(entries.slice(-MAX_VARIANTS)),
       };
     },
-    [darkifyViaWorker, objectUrl, revokeObjectUrl],
+    [darkifyViaWorker],
+  );
+
+  /** Show a page's new render, revoking URLs of variants it no longer keeps. */
+  const commitPage = useCallback(
+    (slots: PageImage[], idx: number, result: PageRender) => {
+      const prev = slots[idx].image;
+      if (prev) {
+        const kept = new Set<Blob>([result.displayBlob]);
+        for (const blob of Object.values(result.byTheme)) if (blob) kept.add(blob);
+        for (const blob of [prev.displayBlob, ...Object.values(prev.byTheme)]) {
+          if (blob && !kept.has(blob)) revokeObjectUrl(blob);
+        }
+      }
+      slots[idx] = {
+        ...slots[idx],
+        image: { ...result, displayUrl: objectUrl(result.displayBlob) },
+        failedKey: undefined,
+      };
+    },
+    [objectUrl, revokeObjectUrl],
   );
 
   /** Rendered pages only, for failure diagnostics. */
@@ -617,12 +643,16 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       operation.progress(next, pageNumber || undefined, totalPages);
     };
     markStep("load_pdfjs");
+    const doc: { pdf?: PDFDocumentProxy; cancelled: boolean } = { cancelled: false };
+    docRef.current = doc;
     const cancel = () => {
       cancelled = true;
+      doc.cancelled = true;
       operation.cancel();
     };
     const cancellations = cancelOperationsRef.current;
     cancellations.add(cancel);
+    const renderJobs = renderJobsRef.current;
     slotsRef.current = [];
     setStatus("loading");
     setErrorText(null);
@@ -646,7 +676,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         loadingTask = pdfjs.getDocument({ data: arrayBuffer });
         const pdf = await loadingTask.promise;
         if (cancelled) return;
-        pdfRef.current = pdf;
+        doc.pdf = pdf;
         totalPages = pdf.numPages;
         setProgress({ done: 0, total: pdf.numPages });
 
@@ -683,7 +713,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
             );
             if (cancelled) return;
             markStep("commit_page");
-            slots[0] = { ...slots[0], image };
+            commitPage(slots, 0, image);
           }
           // Publish in batches: thousands of single-page updates would
           // re-render the list for every page sized.
@@ -719,7 +749,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
       // document goes away, so a destroyed PDF doesn't surface as a failure.
       for (const c of cancellations) c();
       cancellations.delete(cancel);
-      pdfRef.current = null;
+      renderJobs.clear();
       void loadingTask?.destroy().catch(() => {
         console.warn("[pdf-dark] PDF cleanup failed");
       });
@@ -730,18 +760,20 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     };
     // theme intentionally omitted — initial pass uses whatever theme is live.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file, renderPageImage, showVariant, locale]);
+  }, [file, renderPageImage, showVariant, commitPage, locale]);
 
   // Rendered window: keep pages near the view rendered in the current variant
   // (theme, image mode, sliders), starting from the viewed page, and release
   // pages that have scrolled far away. Theme switches re-darkify the window.
   useEffect(() => {
     if (status !== "ready" || pages.length === 0) return;
-    const pdf = pdfRef.current;
-    if (!pdf) return;
+    const doc = docRef.current;
+    const pdf = doc?.pdf;
+    if (!doc || !pdf || doc.cancelled) return;
     const key = variantKey(theme, imageMode, appliedDarkness, appliedWarmth);
     const slots = slotsRef.current;
     const center = Math.min(viewCenter, slots.length - 1);
+    windowRef.current = { center, key };
 
     let released = false;
     slots.forEach((slot, idx) => {
@@ -770,36 +802,62 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     const cancel = () => { aborted = true; };
     const cancellations = cancelOperationsRef.current;
     cancellations.add(cancel);
+    const jobs = renderJobsRef.current;
+    const stillWanted = (idx: number) => {
+      const view = windowRef.current;
+      return !doc.cancelled && slotsRef.current === slots && view.key === key &&
+        Math.abs(idx - view.center) <= KEEP_RADIUS;
+    };
 
     (async () => {
       let rethemed = 0;
       for (const idx of todo) {
         if (aborted) return;
-        const slot = slotsRef.current[idx];
-        try {
-          const rendered =
-            slot.image ?? (await renderPageImage(pdf, slot.pageNumber, () => aborted));
-          const image = await showVariant(
-            rendered,
-            theme,
-            imageMode,
-            appliedDarkness,
-            appliedWarmth,
-            () => aborted,
-            () => summarizeImageCache(residentImages(), slotsRef.current.length),
-          );
-          if (aborted) return;
-          // A newer pass may have replaced the slot list (new file).
-          if (slotsRef.current !== slots) return;
-          slots[idx] = { ...slots[idx], image, failedKey: undefined };
-          if (slot.image) setThemeProgress({ current: ++rethemed, total: retheming });
-        } catch (err) {
-          if (aborted || isCancellationError(err)) return;
-          console.error("[pdf-dark] darkify failed", err);
-          recordPdfFailure("reader", "preview", err);
-          slots[idx] = { ...slots[idx], failedKey: key };
+        const base = slots[idx].image;
+        const jobKey = `${idx}:${key}`;
+        let job = jobs.get(jobKey);
+        if (!job) {
+          const docCancelled = () => doc.cancelled;
+          const started = (async () => {
+            const rendered = base ?? (await renderPageImage(pdf, idx + 1, docCancelled));
+            return showVariant(
+              rendered,
+              theme,
+              imageMode,
+              appliedDarkness,
+              appliedWarmth,
+              docCancelled,
+              () => summarizeImageCache(residentImages(), slots.length),
+            );
+          })();
+          job = started;
+          jobs.set(jobKey, started);
+          started
+            .then(
+              (result) => {
+                if (!stillWanted(idx)) return;
+                commitPage(slots, idx, result);
+                setPages([...slots]);
+              },
+              (err) => {
+                if (doc.cancelled || isCancellationError(err) || slotsRef.current !== slots) return;
+                console.error("[pdf-dark] darkify failed", err);
+                recordPdfFailure("reader", "preview", err);
+                slots[idx] = { ...slots[idx], failedKey: key };
+                setPages([...slots]);
+              },
+            )
+            .finally(() => {
+              if (jobs.get(jobKey) === started) jobs.delete(jobKey);
+            });
         }
-        setPages([...slots]);
+        try {
+          await job;
+        } catch {
+          // Reported by the job's own handler above.
+        }
+        if (aborted) return;
+        if (base) setThemeProgress({ current: ++rethemed, total: retheming });
       }
       if (!aborted) {
         setThemeApplying(false);
@@ -822,6 +880,7 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
     expandingOrder,
     renderPageImage,
     showVariant,
+    commitPage,
     releasePageRender,
     residentImages,
   ]);
