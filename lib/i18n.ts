@@ -84,6 +84,7 @@ type Dict = {
   errors: {
     password: string;
     invalid: string;
+    fileUnavailable: string;
   };
 };
 
@@ -175,6 +176,7 @@ export const T: Record<Locale, Dict> = {
         "This PDF is password-protected. Remove the password (e.g. print it to a new PDF) and try again.",
       invalid:
         "That file isn't a readable PDF — it may be empty or corrupted. Try re-selecting or re-downloading it.",
+      fileUnavailable: "Your browser couldn't access the selected PDF. Save a copy on this device, then choose it again.",
     },
   },
   es: {
@@ -267,6 +269,7 @@ export const T: Record<Locale, Dict> = {
         "Este PDF está protegido con contraseña. Quita la contraseña (por ejemplo, imprimiéndolo a un PDF nuevo) e inténtalo de nuevo.",
       invalid:
         "Ese archivo no es un PDF legible — puede estar vacío o dañado. Intenta volver a seleccionarlo o descargarlo de nuevo.",
+      fileUnavailable: "El navegador no pudo acceder al PDF seleccionado. Guarda una copia en este dispositivo y vuelve a seleccionarla.",
     },
   },
   pt: {
@@ -358,6 +361,7 @@ export const T: Record<Locale, Dict> = {
         "Este PDF está protegido por senha. Remova a senha (por exemplo, imprimindo-o em um novo PDF) e tente de novo.",
       invalid:
         "Esse arquivo não é um PDF legível — pode estar vazio ou corrompido. Tente selecioná-lo ou baixá-lo de novo.",
+      fileUnavailable: "O navegador não conseguiu acessar o PDF selecionado. Salve uma cópia neste dispositivo e selecione-a novamente.",
     },
   },
   de: {
@@ -406,6 +410,10 @@ export const T: Record<Locale, Dict> = {
       applyingTheme: (themeLabel, cur, total) => `${themeLabel} wird angewendet · ${cur} / ${total}`,
       previousPage: "Vorherige Seite", previousPageTitle: "Vorherige Seite (←)", nextPage: "Nächste Seite", nextPageTitle: "Nächste Seite (→)", jumpToPage: "Zu Seite", closeSettings: "Einstellungen schließen", theme: "Design", waitFirstPass: "Warten Sie, bis der erste Durchlauf abgeschlossen ist", zoom: "Zoom", zoomOut: "Verkleinern", zoomOutTitle: "Verkleinern (−)", reset: "Zurücksetzen", resetTitle: "Zoom zurücksetzen (0)", zoomIn: "Vergrößern", zoomInTitle: "Vergrößern (+)", invertAndDownload: "Umkehren und herunterladen →", invertAndDownloadTitle: "Farben umkehren und eine Kopie dieser PDF speichern", invertHref: "/de/invert-pdf-colors", newFile: "Neue Datei", renderingLoading: (done, total) => `Seite wird gerendert ${done} / ${total}…`, readErrorFallback: "Diese PDF konnte nicht gelesen werden. Andere Datei versuchen?", pageAlt: (n) => `Seite ${n} Ihrer PDF im dunklen Modus`,
     },
-    errors: { password: "Diese PDF ist passwortgeschützt. Entfernen Sie das Passwort und versuchen Sie es erneut.", invalid: "Diese Datei ist keine lesbare PDF — sie ist möglicherweise leer oder beschädigt. Wählen oder laden Sie sie erneut." },
+    errors: {
+      password: "Diese PDF ist passwortgeschützt. Entfernen Sie das Passwort und versuchen Sie es erneut.",
+      invalid: "Diese Datei ist keine lesbare PDF — sie ist möglicherweise leer oder beschädigt. Wählen oder laden Sie sie erneut.",
+      fileUnavailable: "Der Browser konnte nicht auf die ausgewählte PDF zugreifen. Speichern Sie eine Kopie auf diesem Gerät und wählen Sie sie erneut aus.",
+    },
   },
 };

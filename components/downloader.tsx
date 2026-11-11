@@ -20,7 +20,7 @@ import {
   type PageRender,
 } from "@/lib/build-dark-pdf";
 import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
-import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
+import { pdfOpenErrorText } from "@/lib/pdf-load-error";
 import { T, type Locale } from "@/lib/i18n";
 import { DropZone } from "./drop-zone";
 import { beginPdfOperation, trackPdfDownload } from "@/lib/pdf-monitoring";
@@ -410,14 +410,13 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         setStatus({ kind: "done", filename });
       } catch (e) {
         if (!cancelledRef.current) console.error("[pdf-dark] convert failed", e);
-        const kind = classifyPdfLoadError(e);
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
         if (!cancelledRef.current) operation.failure(e, { ...failureGeometry, invertStep, pageNumber, getCacheSnapshot: () => summarizeImageCache(pages, pdf?.numPages) });
         if (!cancelledRef.current) {
           setStatus({
             kind: "error",
-            message: pdfLoadErrorText(kind, locale) ?? undefined,
+            message: pdfOpenErrorText(e, locale) ?? undefined,
           });
         }
       } finally {

@@ -5,6 +5,7 @@
  */
 
 import { T, type Locale } from "./i18n";
+import { getPdfFileReadFailure } from "./pdf-file-read-diagnostics";
 
 export type PdfLoadErrorKind = "password" | "invalid" | "other";
 
@@ -28,4 +29,14 @@ export function pdfLoadErrorText(
     default:
       return null;
   }
+}
+
+/**
+ * Message for a failed open: the browser couldn't read the selected file
+ * itself (moved, locked, cloud placeholder…), or else the pdf.js load kinds.
+ */
+export function pdfOpenErrorText(e: unknown, locale: Locale = "en"): string | null {
+  const readKind = getPdfFileReadFailure(e)?.error_kind;
+  if (readKind === "not_found" || readKind === "not_readable") return T[locale].errors.fileUnavailable;
+  return pdfLoadErrorText(classifyPdfLoadError(e), locale);
 }

@@ -21,7 +21,7 @@ import {
   type ImageMode,
 } from "@/lib/build-dark-pdf";
 import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
-import { classifyPdfLoadError, pdfLoadErrorText } from "@/lib/pdf-load-error";
+import { pdfOpenErrorText } from "@/lib/pdf-load-error";
 import { T, type Locale } from "@/lib/i18n";
 import { beginPdfOperation, recordPdfFailure } from "@/lib/pdf-monitoring";
 
@@ -729,14 +729,13 @@ export function PdfViewer({ file, onReset, locale = "en" }: Props) {
         if (!cancelled && !isCancellationError(e)) {
           console.error("[pdf-dark] render failed", e);
         }
-        const kind = classifyPdfLoadError(e);
         // Encrypted / empty / corrupt uploads are user input, not bugs —
         // keep them out of Sentry error alerts.
         if (!cancelled && !isCancellationError(e)) {
           operation.failure(e, { ...failureGeometry, readerStep, pageNumber, totalPages, getCacheSnapshot: () => summarizeImageCache(residentImages(), totalPages) });
         }
         if (!cancelled) {
-          setErrorText(pdfLoadErrorText(kind, locale));
+          setErrorText(pdfOpenErrorText(e, locale));
           setStatus("error");
         }
       } finally {
