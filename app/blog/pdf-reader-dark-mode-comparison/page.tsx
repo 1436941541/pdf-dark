@@ -46,7 +46,6 @@ const ROWS: Row[] = [
     permanence: "Software setting",
     images: "Unaffected",
     note: "Preferences → Accessibility → Replace Document Colors. The Dark Gray UI theme only recolors the toolbar, not the page.",
-    link: { href: "/blog/pdf-dark-mode-adobe-acrobat", label: "Full Acrobat guide →" },
   },
   {
     name: "Sumatra PDF (Windows)",
@@ -54,7 +53,6 @@ const ROWS: Row[] = [
     permanence: "Temporary (key press) or permanent (config file, this PC only)",
     images: "Transparent images can distort",
     note: "Press i to invert on the fly, or hand-edit settings.txt for a fixed custom color scheme. Windows-only.",
-    link: { href: "/blog/sumatra-pdf-dark-mode", label: "Full Sumatra guide →" },
   },
   {
     name: "Foxit PDF Reader",
@@ -83,7 +81,6 @@ const ROWS: Row[] = [
     permanence: "Viewer effect only, no file produced",
     images: "Left untouched",
     note: "“Use Dark Appearance for PDF” in the View menu inverts text but not images — only works inside Preview, and only on macOS 26+.",
-    link: { href: "/blog/pdf-dark-mode-mac", label: "Full macOS Preview guide →" },
   },
   {
     name: "iOS / iPadOS Files & Books",
@@ -91,7 +88,6 @@ const ROWS: Row[] = [
     permanence: "Viewer effect only, no file produced",
     images: "Unaffected",
     note: "A “Dark Background” toggle appeared in iOS/iPadOS 26. Nothing for older versions.",
-    link: { href: "/blog/pdf-dark-mode-ipad", label: "Full iPad guide →" },
   },
   {
     name: "Chrome built-in viewer",
@@ -107,7 +103,6 @@ const ROWS: Row[] = [
     permanence: "—",
     images: "—",
     note: "The PDF.js viewer's toolbar can go dark, but the page itself always renders on white.",
-    link: { href: "/blog/pdf-dark-mode-firefox", label: "Full Firefox guide →" },
   },
   {
     name: "Microsoft Edge",
@@ -115,7 +110,6 @@ const ROWS: Row[] = [
     permanence: "Experimental flag, browser-wide",
     images: "Distorted by the flag",
     note: "An edge://flags experiment can force dark rendering, but it mangles images and isn't a real per-document setting.",
-    link: { href: "/blog/pdf-dark-mode-edge", label: "Full Edge guide →" },
   },
   {
     name: "Android (Files by Google / Drive viewer)",
@@ -123,7 +117,6 @@ const ROWS: Row[] = [
     permanence: "—",
     images: "—",
     note: "No native dark mode for PDFs. Users have been requesting this in official forums for years without a fix.",
-    link: { href: "/blog/pdf-dark-mode-android", label: "Full Android guide →" },
   },
   {
     name: "Browser extensions (Dark Reader for PDF, etc.)",
@@ -131,7 +124,6 @@ const ROWS: Row[] = [
     permanence: "Viewer effect only, no file produced",
     images: "Become negatives",
     note: "Works, but photos invert into negatives, you must manually allow local-file access, and the permission scope is broad.",
-    link: { href: "/blog/pdf-dark-mode-extension", label: "Full extension guide →" },
   },
   {
     name: "PDF Dark (this site)",

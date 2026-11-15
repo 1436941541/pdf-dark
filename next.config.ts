@@ -122,9 +122,15 @@ const nextConfig: NextConfig = {
         destination: "/blog/pdf-dark-mode-chrome",
         permanent: true,
       },
+      // November 2026: /blog/pdf-dark-mode-firefox is retired along with the
+      // other eight platform posts (mac, windows, android, ipad, edge,
+      // adobe-acrobat, sumatra, extension) — GSC had never crawled any of
+      // them ("URL is unknown to Google"), so the /blog URLs simply 404.
+      // This legacy root URL still takes a few Bing impressions, so it goes
+      // to the home reader, which covers Firefox users directly.
       {
         source: "/pdf-dark-mode-firefox",
-        destination: "/blog/pdf-dark-mode-firefox",
+        destination: "/",
         permanent: true,
       },
       // September 2026: the Indonesian and Turkish locales are retired —

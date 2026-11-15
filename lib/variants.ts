@@ -15,24 +15,10 @@ export type Variant = {
 
 export const VARIANTS: Variant[] = [
   {
-    slug: "pdf-dark-mode-windows",
-    title: "PDF Dark Mode on Windows",
-    blurb:
-      "Windows dark mode themes the apps, never the PDF. Darken the document itself — no install.",
-    updatedAt: "2026-07-30",
-  },
-  {
     slug: "pdf-dark-mode-chrome",
     title: "PDF Dark Mode in Chrome",
     blurb:
       "Chrome's built-in PDF viewer has no dark toggle. Skip the extensions — convert in the browser itself.",
-    updatedAt: "2026-07-30",
-  },
-  {
-    slug: "pdf-dark-mode-firefox",
-    title: "PDF Dark Mode in Firefox",
-    blurb:
-      "Firefox's PDF.js viewer only darkens the toolbar, not the pages. Here's the real fix.",
     updatedAt: "2026-07-30",
   },
   {
@@ -54,55 +40,6 @@ export const VARIANTS: Variant[] = [
     title: "How the Conversion Works",
     blurb:
       "Vector recoloring, image detection, and a per-page fallback chain — the engineering under the hood.",
-    updatedAt: "2026-07-30",
-  },
-  {
-    slug: "pdf-dark-mode-edge",
-    title: "PDF Dark Mode in Microsoft Edge",
-    blurb:
-      "Edge's dark theme skips your PDFs entirely. There's a flags-page hack that forces it — at the cost of every image in the document.",
-    updatedAt: "2026-07-30",
-  },
-  {
-    slug: "pdf-dark-mode-adobe-acrobat",
-    title: "PDF Dark Mode in Adobe Acrobat",
-    blurb:
-      "The 'Dark Gray' theme only skins the toolbar. The real page-darkening setting is buried in Accessibility preferences — and it's per-install, not per-file.",
-    updatedAt: "2026-07-30",
-  },
-  {
-    slug: "pdf-dark-mode-extension",
-    title: "PDF Dark Mode Extensions, Mapped",
-    blurb:
-      "What the Chrome and Edge stores actually offer, what breaks (images, local files, permissions), and a 4-point checklist before you install.",
-    updatedAt: "2026-07-30",
-  },
-  {
-    slug: "pdf-dark-mode-mac",
-    title: "PDF Dark Mode on Mac",
-    blurb:
-      "macOS Tahoe added a dark toggle to Preview. It's Preview-only and needs the latest macOS — here's what actually travels with the file.",
-    updatedAt: "2026-07-30",
-  },
-  {
-    slug: "sumatra-pdf-dark-mode",
-    title: "PDF Dark Mode in Sumatra PDF",
-    blurb:
-      "Sumatra already has two built-in tricks — the i key and a settings.txt edit. Here's why they fall short, and what stays dark everywhere instead.",
-    updatedAt: "2026-07-30",
-  },
-  {
-    slug: "pdf-dark-mode-android",
-    title: "PDF Dark Mode on Android",
-    blurb:
-      "Android's default PDF viewers still don't have a real dark mode, and screen-invert flips everything negative. Convert once, read dark anywhere.",
-    updatedAt: "2026-07-30",
-  },
-  {
-    slug: "pdf-dark-mode-ipad",
-    title: "PDF Dark Mode on iPad & iPhone",
-    blurb:
-      "iOS 26 finally added a Dark Background toggle for PDFs in Files and Books. Here's what it fixes — and what it still doesn't.",
     updatedAt: "2026-07-30",
   },
   {
