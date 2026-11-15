@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
   openGraph: null,
   twitter: null,
+  // yj-pulse engagement tracking reports pages carrying this tag as not_found.
+  other: { "pulse:status": "404" },
 };
 
 export default function NotFound() {
