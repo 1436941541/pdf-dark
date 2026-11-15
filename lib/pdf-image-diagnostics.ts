@@ -100,6 +100,8 @@ export type PdfInvertStep =
   | "encode_page"
   | "darkify_page"
   | "build_pdf"
+  | "release_resources"
+  | "create_blob"
   | "download";
 
 export type PdfFailureDiagnostic = {

@@ -17,6 +17,7 @@ import {
   imageTreatment,
   RENDER_SCALE,
   type ImageMode,
+  type DarkPdfDraft,
   type PageRender,
 } from "@/lib/build-dark-pdf";
 import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
@@ -30,6 +31,9 @@ const bgCss = (c: { r: number; g: number; b: number }) =>
   `rgb(${Math.round(c.r)}, ${Math.round(c.g)}, ${Math.round(c.b)})`;
 
 const SUPPORT_EMAIL = "hello@pdfdark.org";
+
+/** How long a finished download's Blob URL stays alive; Safari may read it after click() returns. */
+const DOWNLOAD_URL_TTL_MS = 60_000;
 
 async function copySupportEmail(): Promise<boolean> {
   if (navigator.clipboard?.writeText) {
@@ -89,6 +93,18 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
 
   const cancelledRef = useRef(false);
   const operationRef = useRef<ReturnType<typeof beginPdfOperation> | null>(null);
+  // The last download's Blob URL, released after its TTL or when the next conversion starts.
+  const downloadUrlRef = useRef<string | null>(null);
+
+  /** Revoke the given Blob URL, or the current one, and forget it if it is the current one. */
+  const releaseDownloadUrl = useCallback((url?: string) => {
+    const target = url ?? downloadUrlRef.current;
+    if (!target) return;
+    URL.revokeObjectURL(target);
+    if (downloadUrlRef.current === target) downloadUrlRef.current = null;
+  }, []);
+
+  useEffect(() => () => releaseDownloadUrl(), [releaseDownloadUrl]);
 
   // Worker setup — same darkify worker the reader uses.
   const workerRef = useRef<Worker | null>(null);
@@ -198,6 +214,8 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
   const processFile = useCallback(
     async (file: File) => {
       cancelledRef.current = false;
+      // A new export must not stack on the previous output still held for Safari.
+      releaseDownloadUrl();
       let invertStep: PdfInvertStep = "load_pdfjs";
       let pageNumber = 0;
       let failureGeometry: PdfFailureDiagnostic = { inputBytes: file.size };
@@ -224,7 +242,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         ).toString();
 
         markStep("read_file");
-        const srcBytes = await readPdfFile(file);
+        let srcBytes: ArrayBuffer | undefined = await readPdfFile(file);
         markStep("parse_pdf");
         loadingTask = pdfjs.getDocument({ data: srcBytes.slice(0) });
         pdf = await loadingTask.promise;
@@ -238,7 +256,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
 
         // Recolor vector pages during the render loop instead of retaining a
         // raster JPEG for every page until assembly (see prepareDarkPdf).
-        const draft = await prepareDarkPdf(srcBytes, pdf.numPages, theme, imageMode, darkness / 100, warmth / 100);
+        let draft: DarkPdfDraft | undefined = await prepareDarkPdf(srcBytes, pdf.numPages, theme, imageMode, darkness / 100, warmth / 100);
         if (cancelledRef.current) return;
 
         // Small scratch canvas for per-image brightness sampling.
@@ -375,7 +393,10 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           total: pdf.numPages,
         });
         markStep("build_pdf");
-        const { bytes: outBytes, objectPages, rasterPages } = await buildDarkPdf(
+        let outBytes: Uint8Array | undefined;
+        let objectPages = 0;
+        let rasterPages = 0;
+        ({ bytes: outBytes, objectPages, rasterPages } = await buildDarkPdf(
           srcBytes,
           pages,
           theme,
@@ -384,17 +405,39 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           darkness / 100,
           warmth / 100,
           draft,
-        );
+        ));
         if (cancelledRef.current) return;
-        markStep("download");
         console.info(
           `[pdf-dark] download built: ${objectPages} vector page(s), ${rasterPages} raster page(s)`,
         );
 
-        const copy = new Uint8Array(outBytes.byteLength);
-        copy.set(outBytes);
-        const blob = new Blob([copy.buffer], { type: "application/pdf" });
+        // The output is complete. Release the source copies, retained page
+        // images and the PDF.js worker before allocating the download Blob:
+        // this is the export's memory peak, where iOS was killing the tab.
+        markStep("release_resources");
+        const totalPages = pdf.numPages;
+        const outputSize = outBytes.byteLength;
+        pages.length = 0;
+        srcBytes = undefined;
+        draft = undefined;
+        const finishedTask = loadingTask;
+        loadingTask = undefined;
+        try {
+          await finishedTask?.destroy();
+        } catch {
+          console.warn("[pdf-dark] PDF cleanup failed");
+        }
+        if (cancelledRef.current) return;
+
+        markStep("create_blob");
+        // pdf-lib's save() returns a fresh, non-shared buffer; passing it
+        // directly avoids holding a second full copy of the output.
+        const blob = new Blob([outBytes as Uint8Array<ArrayBuffer>], { type: "application/pdf" });
+        outBytes = undefined;
+
+        markStep("download");
         const url = URL.createObjectURL(blob);
+        downloadUrlRef.current = url;
         const filename = file.name.replace(/\.pdf$/i, "") + `-${theme}.pdf`;
         const a = document.createElement("a");
         a.href = url;
@@ -404,9 +447,9 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         document.body.appendChild(a);
         a.click();
         a.remove();
-        window.setTimeout(() => URL.revokeObjectURL(url), 0);
-        operation.success(pdf.numPages);
-        trackPdfDownload("invert", pdf.numPages, outBytes.byteLength);
+        window.setTimeout(() => releaseDownloadUrl(url), DOWNLOAD_URL_TTL_MS);
+        operation.success(totalPages);
+        trackPdfDownload("invert", totalPages, outputSize);
         setStatus({ kind: "done", filename });
       } catch (e) {
         if (!cancelledRef.current) console.error("[pdf-dark] convert failed", e);
@@ -434,7 +477,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         }
       }
     },
-    [theme, imageMode, darkness, warmth, darkify, locale],
+    [theme, imageMode, darkness, warmth, darkify, locale, releaseDownloadUrl],
   );
 
   // Slider tracks painted with the actual background colors each end of the
