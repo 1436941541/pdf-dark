@@ -189,8 +189,8 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
           <legend className="mb-3 text-sm font-medium text-neutral-300">Choose your conversion</legend>
           <div className="grid gap-3 sm:grid-cols-2">
             {([
-              ["grayscale", "Grayscale", "Keep the detail. Turn colors into shades of gray.", "Best for photos & reports"],
-              ["black-and-white", "Pure black & white", "Only black or white. Adjust for text and line art.", "Best for scans & text"],
+              ["grayscale", "Grayscale", "256 gray levels (0–255 luminance) for photos, gradients, and shaded charts.", "Photos & charts"],
+              ["black-and-white", "Pure black & white", "Strict #000 and #FFF pixels with a 1–254 threshold slider for scans.", "Scans & stamps"],
             ] as const).map(([value, title, description, badge]) => (
               <label key={value} className={`relative cursor-pointer rounded-xl border p-4 transition-colors ${mode === value ? "border-amber-400/60 bg-amber-400/5" : "border-neutral-700 hover:border-neutral-500"} ${busy ? "cursor-wait opacity-60" : ""}`}>
                 <div className="flex items-center justify-between gap-3">
@@ -206,7 +206,7 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
             <div className="mt-5 rounded-xl border border-neutral-800 bg-neutral-950/50 p-4">
               <label htmlFor="bw-threshold" className="flex justify-between text-sm text-neutral-300"><span>Black &amp; white threshold</span><span>{threshold}</span></label>
               <input id="bw-threshold" type="range" min="1" max="254" value={threshold} onChange={(event) => { setThreshold(Number(event.target.value)); setDownloaded(false); }} className="slider-preview mt-4 w-full" style={{ background: "linear-gradient(to right, #fff, #000)" }} />
-              <div className="mt-2 flex justify-between text-xs text-neutral-500"><span>Less black · lighter text</span><span>More black · darker text</span></div>
+              <div className="mt-2 flex justify-between text-xs text-neutral-500"><span>More white (drops light shading)</span><span>More black (darkens faint strokes)</span></div>
             </div>
           )}
         </fieldset>
@@ -256,9 +256,8 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
           </div>
         )}
         {error && <p role="alert" className="mt-5 rounded-lg border border-red-900/60 bg-red-950/30 p-4 text-sm text-red-300">{error}</p>}
-        <p className="mt-5 text-center text-xs leading-relaxed text-neutral-500">Processed on your device. Your original PDF stays unchanged.</p>
+        <p className="mt-5 text-center text-xs leading-relaxed text-neutral-500">Saves a new file and leaves your original PDF unchanged.</p>
       </div>
-      <p className="mt-4 text-center text-xs leading-relaxed text-neutral-500">This version renders pages for conversion. Fine details may soften at high zoom, and links, forms and some searchable text may not carry over.</p>
     </div>
   );
 }
