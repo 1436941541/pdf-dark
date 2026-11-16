@@ -180,15 +180,15 @@ export default function BlackAndWhitePage() {
             ))}
           </div>
           <p className="mt-8 text-center text-sm text-neutral-500">
-            Tilted scan?{" "}
+            Tilted scan? Straighten pages with{" "}
             <Link href="/deskew-pdf" className="text-amber-400 hover:underline">
-              Deskew PDF pages
+              Deskew PDF
             </Link>{" "}
-            first, or{" "}
+            first. Reading on screen instead of printing? Open the{" "}
             <Link href="/" className="text-amber-400 hover:underline">
-              read PDFs in dark mode
-            </Link>{" "}
-            on screen.
+              PDF dark mode reader
+            </Link>
+            .
           </p>
         </section>
       </main>
