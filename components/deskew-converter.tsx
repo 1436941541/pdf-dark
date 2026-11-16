@@ -191,11 +191,11 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
     <div className="mx-auto max-w-4xl px-6 text-left">
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-8">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div><h2 className="text-lg font-semibold text-neutral-100">Straighten your scanned PDF</h2><p className="mt-1 text-sm text-neutral-400">Automatic detection, with manual control for every page.</p></div>
-          <span className="rounded-full border border-amber-400/20 bg-amber-400/5 px-3 py-1 text-xs text-amber-300">Files stay in your browser</span>
+          <div><h2 className="text-lg font-semibold text-neutral-100">Page-by-page scan alignment</h2></div>
+          <span className="rounded-full border border-amber-400/20 bg-amber-400/5 px-3 py-1 text-xs text-amber-300">Files stay on your device</span>
         </div>
         {!source && !busy && <DropZone onFile={selectFile} />}
-        {source && <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-950/40 p-4"><div className="min-w-0"><p className="break-all text-sm font-medium text-neutral-200">{source.file.name}</p><p className="mt-1 text-xs text-neutral-400">{source.pdf.numPages} {source.pdf.numPages === 1 ? "page" : "pages"} · Check each preview before downloading</p></div><button type="button" onClick={reset} disabled={busy} className={buttonClass}>Choose another PDF</button></div>}
+        {source && <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-950/40 p-4"><div className="min-w-0"><p className="break-all text-sm font-medium text-neutral-200">{source.file.name}</p><p className="mt-1 text-xs text-neutral-400">{source.pdf.numPages} {source.pdf.numPages === 1 ? "page" : "pages"}</p></div><button type="button" onClick={reset} disabled={busy} className={buttonClass}>Choose another PDF</button></div>}
         {activity && <div role="status" aria-live="polite" className="mb-5 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-amber-200">{activity.kind === "loading" ? "Opening your PDF…" : `${activity.kind === "detecting" ? "Analyzing" : "Exporting"} pages ${activity.done} / ${source?.pdf.numPages ?? "…"}`}</p><button type="button" onClick={cancel} className={buttonClass}>Cancel</button></div>{source && activity.kind !== "loading" && <progress aria-label={activity.kind === "detecting" ? "Analysis progress" : "Export progress"} value={activity.done} max={source.pdf.numPages} className="mt-3 h-2 w-full accent-amber-400" />}</div>}
         {error && <p role="alert" className="mb-5 rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-sm text-red-300">{error}</p>}
         {source && <>
@@ -216,7 +216,6 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
           {(preview.loading || preview.key !== previewKey) && <p role="status" className="mt-2 text-xs text-neutral-400">Updating preview…</p>}
           <div className="mt-6"><button type="button" onClick={download} disabled={busy || preview.loading || preview.key !== previewKey || !preview.converted || !!preview.error} className="w-full rounded-xl bg-amber-400 px-6 py-3 font-semibold text-neutral-950 transition-colors hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto">Download straightened PDF</button>{downloaded && <p role="status" className="mt-3 text-sm text-amber-300">Your straightened PDF is ready.</p>}</div>
         </>}
-        <p className="mt-5 text-xs leading-relaxed text-neutral-500">Best for scanned text pages with a small tilt. Photos, diagrams and sparse pages may need manual adjustment. Output pages are flattened images, up to 144 dpi; searchable text, links and forms are not retained. White margins are added to preserve the full page, so page sizes can increase. No OCR.</p>
       </div>
     </div>
   );

@@ -40,16 +40,31 @@ export const metadata: Metadata = {
   },
 };
 
+const STEPS = [
+  [
+    "Configura tema e imágenes",
+    "Elige Midnight, Sepia, Solarized u OLED, ajusta Oscuridad (50-100%) y Calidez (0-100%), y define el modo de Imágenes.",
+  ],
+  [
+    "Suelta tu PDF local",
+    "Selecciona o arrastra tu archivo; la conversión corre en tu navegador sin subir documentos.",
+  ],
+  [
+    "Recibe tu copia lista",
+    "La descarga arranca sola con el sufijo del tema (-midnight.pdf, -oled.pdf) lista para leer, enviar o imprimir.",
+  ],
+] as const;
+
 const MODE_ROWS: { caso: string; ajuste: ReactNode; resultado: string }[] = [
   {
     caso: "Apuntes, libros o informes con fotos y diagramas",
     ajuste: (
       <span className="font-medium text-neutral-100">
-        Midnight / Sepia + Imágenes: Auto
+        Midnight / Sepia / Solarized + Auto
       </span>
     ),
     resultado:
-      "Oscurece fondo y texto, invierte diagramas sobre fondo blanco y mantiene las fotografías en sus colores originales.",
+      "Oscurece fondo y texto (o añade tono cálido con Calidez), invierte esquemas sobre fondo blanco y mantiene las fotografías en sus colores reales.",
   },
   {
     caso: "Diapositivas o apuntes con fondo negro para imprimir",
@@ -59,23 +74,23 @@ const MODE_ROWS: { caso: string; ajuste: ReactNode; resultado: string }[] = [
       </span>
     ),
     resultado:
-      "Aplica 255 − entrada a los grises: el fondo negro pasa a blanco puro y las letras claras a negro para ahorrar tinta o tóner.",
+      "Pasa el fondo negro a blanco puro y las letras claras a negro para ahorrar tinta o tóner.",
   },
   {
-    caso: "PDF escaneado o foto de pizarrón / cuaderno",
+    caso: "Fotos de pizarrón o escaneos con margen amplio",
     ajuste: (
       <span className="font-medium text-neutral-100">Imágenes: Invertir</span>
     ),
     resultado:
-      "Como toda la página escaneada es una sola imagen, Invertir transforma todos sus píxeles a fondo oscuro sin requerir OCR.",
+      "Fuerza la inversión sobre fotos incrustadas o capturas con borde ancho (< 85% de la página) que el modo Auto conservaría como fotografía.",
   },
   {
-    caso: "Catálogos donde ninguna ilustración debe cambiar",
+    caso: "Catálogos o escaneos donde ninguna imagen debe cambiar",
     ajuste: (
       <span className="font-medium text-neutral-100">Imágenes: Original</span>
     ),
     resultado:
-      "Recolorea únicamente texto y fondo del documento; cada foto o figura incrustada conserva sus píxeles intactos.",
+      "Recolorea solo vectores de texto y fondo; deja intactas todas las fotos incrustadas y las páginas escaneadas completas.",
   },
   {
     caso: "Opción de color de Adobe Reader o tecla i de Sumatra PDF",
@@ -87,24 +102,20 @@ const MODE_ROWS: { caso: string; ajuste: ReactNode; resultado: string }[] = [
 
 const FAQ = [
   {
-    q: "¿Cómo invertir colores PDF online sin que las fotos salgan en negativo?",
-    a: "Deja Imágenes en Auto (activo por defecto) antes de soltar tu archivo. El clasificador analiza brillo y saturación en cada figura: las fotografías conservan su color, las imágenes muy brillantes se atenúan ligeramente y las capturas o esquemas blancos se invierten con la página.",
+    q: "¿Cómo decide el modo Auto qué imágenes invertir y cuáles conservar?",
+    a: "El clasificador analiza brillo y saturación en cada imagen incrustada: conserva fotografías reales, atenúa ligeramente figuras muy brillantes e invierte capturas o diagramas claros. Si una sola imagen cubre el 85% o más de la hoja (un escaneo de página completa), Auto también oscurece la página entera; pasa Imágenes a Invertir solo cuando quieras invertir fotos sueltas o capturas con márgenes grandes.",
   },
   {
-    q: "¿Cómo cambiar el fondo negro de un PDF a blanco para imprimir?",
-    a: "Elige el tema OLED con Oscuridad al 100% y Calidez al 0%. En tonos grises aplica salida = 255 − entrada, pasando el fondo negro a blanco y el texto claro a negro. Los colores saturados mantienen su matiz y algunas páginas se recomponen en JPEG, así que invertir dos veces seguidas no restaura el archivo original byte a byte.",
-  },
-  {
-    q: "¿Cómo invertir los colores de una imagen o un PDF escaneado?",
-    a: "Cambia Imágenes a Invertir. En un documento escaneado la página entera es un mapa de bits; con Auto u Original una foto de página completa puede conservar su aspecto original, mientras que Invertir pasa toda la hoja a fondo oscuro y trazos claros.",
+    q: "¿Por qué usar OLED al pasar un PDF oscuro a blanco, y es reversible?",
+    a: "Con Oscuridad al 100% y Calidez al 0%, el tema OLED aplica salida = 255 − entrada en tonos grises sin añadir tinte azulado ni sepia. Como los colores saturados conservan su matiz y las páginas rasterizadas se guardan en JPEG, volver a invertir el archivo descargado no restaura el PDF original byte a byte.",
   },
   {
     q: "¿El PDF descargado conserva el texto seleccionable y los enlaces?",
-    a: "En páginas vectoriales compatibles cuyas imágenes no requieren inversión, PDF Dark recolorea el flujo del PDF directamente (incluso en manuales con bloqueo de permisos sin contraseña de apertura), conservando letras nítidas, búsqueda y enlaces. Las páginas escaneadas o con imágenes invertidas se exportan como JPEG a escala 1.5x con una capa Helvetica invisible para texto latino sin rotación (sin OCR para escaneos puros ni soporte CJK).",
+    a: "En páginas vectoriales compatibles cuyas imágenes no requieren inversión, PDF Dark recolorea el flujo del PDF directamente (incluso en manuales con bloqueo de permisos sin contraseña de apertura), conservando letras nítidas, búsqueda y enlaces. Las páginas escaneadas o con imágenes invertidas se exportan como JPEG hasta escala 1.5x (límite de 4096 px por lado) con una capa Helvetica invisible para texto latino en páginas sin rotación, sin OCR ni soporte CJK.",
   },
   {
     q: "¿Se sube mi PDF a algún servidor o hay límite por hora?",
-    a: "No se sube nada: todo el proceso corre en un Web Worker dentro de tu navegador, sin límite de tareas por hora ni marca de agua. El único límite práctico es la memoria libre de tu dispositivo; en escaneos de cientos de páginas conviene usar una computadora y mantener la pestaña activa.",
+    a: "No se sube nada: todo el proceso se ejecuta en un Web Worker dentro de tu navegador, sin registro, marca de agua ni límite de tareas por hora.",
   },
 ];
 
@@ -253,9 +264,24 @@ export default function InvertPdfColorsEsPage() {
           </div>
         </section>
 
+        <section id="como-usar" className="max-w-4xl mx-auto px-6 py-12 border-b border-neutral-900">
+          <h2 className="text-2xl font-bold text-center sm:text-3xl">
+            Cómo invertir colores PDF
+          </h2>
+          <ol className="mt-8 grid gap-5 sm:grid-cols-3">
+            {STEPS.map(([title, text], i) => (
+              <li key={title} className="rounded-xl border border-neutral-800 bg-neutral-900/30 p-5">
+                <span className="font-mono text-sm text-amber-400">0{i + 1}</span>
+                <h3 className="mt-2 font-semibold text-neutral-100">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-400">{text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
         <section id="ajustes" className="max-w-5xl mx-auto px-6 py-14">
           <h2 className="text-2xl font-bold text-center sm:text-3xl">
-            Qué ajuste usar al invertir colores PDF
+            Qué ajuste elegir según tu documento
           </h2>
           <div
             role="region"

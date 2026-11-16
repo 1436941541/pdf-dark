@@ -29,10 +29,17 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // Scan-paper whitening is more specific than background removal.
+      // Scan-paper whitening moved from /pdf-background-remover -> /whiten-pdf
+      // -> /whiten-pdf-background (calibrated away from "white-out" redaction SERP).
+      // Both legacy paths redirect directly to the live route with no chain.
       {
         source: "/pdf-background-remover",
-        destination: "/whiten-pdf",
+        destination: "/whiten-pdf-background",
+        statusCode: 301,
+      },
+      {
+        source: "/whiten-pdf",
+        destination: "/whiten-pdf-background",
         statusCode: 301,
       },
       // August 2026: /converter and /invert-pdf-colors were the same tool —

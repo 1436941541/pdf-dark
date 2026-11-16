@@ -4,12 +4,12 @@ import Link from "next/link";
 import { MonochromeWorkspace } from "@/components/monochrome-workspace";
 import { Footer } from "@/components/footer";
 import { ToolNavigation } from "@/components/tool-navigation";
-import { IconLock, IconDownload } from "@/components/icons";
+import { IconLock } from "@/components/icons";
 import { getSiteUrl } from "@/lib/site";
 
 const TITLE = "Convert PDF to Black and White (Pure B&W or Grayscale)";
 const DESCRIPTION =
-  "Convert a color PDF to pure black and white (not grayscale) with a 1-254 threshold preview, or keep gray tones for photos. Runs in your browser.";
+  "Convert PDF to black and white (pure 2-color, not grayscale) with a live 1-254 threshold preview, or keep gray tones for photos. Runs in your browser.";
 const SLUG = "/pdf-to-black-and-white";
 const SOCIAL_IMAGE = {
   url: `${SLUG}/opengraph-image`,
@@ -28,12 +28,18 @@ export const metadata: Metadata = {
 
 const inlineLink = "text-amber-400 underline decoration-amber-400/30 underline-offset-4 hover:decoration-amber-400";
 
+const STEPS = [
+  ["Pick your mode & PDF", "Select Pure black & white or Grayscale, then choose a local PDF or load a sample scan."],
+  ["Tune the 1-254 cutoff", "Browse pages with the arrows and drag the threshold slider (128 default) beside the live preview."],
+  ["Save your new copy", "Click Convert & download PDF to save a -black-and-white.pdf or -grayscale.pdf file in your browser."],
+] as const;
+
 const MODE_ROWS: { doc: string; choice: ReactNode; detail: string }[] = [
   {
     doc: "Color scans, stamped pages, or phone photos of paper",
     choice: <span className="font-medium text-neutral-100">Pure black &amp; white (1–254 slider)</span>,
     detail:
-      "Forces every pixel to #000 or #FFF on your device without uploading sensitive scans. Use the side-by-side preview to darken pale red or blue ink without blackening page edges.",
+      "Forces every pixel to #000 or #FFF on your device without uploading sensitive scans. Raise or lower the cutoff to darken pale red or blue ink without blackening page edges.",
   },
   {
     doc: "Reports with photos, gradients, or shaded charts",
@@ -44,7 +50,7 @@ const MODE_ROWS: { doc: string; choice: ReactNode; detail: string }[] = [
   {
     doc: "Yellowed or gray scan paper with faint writing",
     choice: (
-      <Link href="/whiten-pdf" className={inlineLink}>
+      <Link href="/whiten-pdf-background" className={inlineLink}>
         Whiten PDF background
       </Link>
     ),
@@ -59,27 +65,27 @@ const MODE_ROWS: { doc: string; choice: ReactNode; detail: string }[] = [
       </Link>
     ),
     detail:
-      "Grayscale leaves a black slide background black and burns toner; inversion flips dark backgrounds to white before printing.",
+      "Grayscale leaves a black slide background black and wastes toner; inversion flips dark backgrounds to white before printing.",
   },
   {
-    doc: "Vector CAD drawings, fillable forms, or strict size limits",
-    choice: <span className="text-neutral-300">Keep original or use a vector tool</span>,
+    doc: "Vector CAD drawings, fillable forms, or interactive PDFs",
+    choice: <span className="text-neutral-300">Keep original vector PDF</span>,
     detail:
-      "This converter rasterizes pages to PNG (up to 2x scale, 16 MP per page), which drops links, form fields, and vector sharpness and can make compact text PDFs larger.",
+      "Exported pages are converted into flat bitmap images, so CAD line weights, bookmarks, clickable links, and fillable form fields are not preserved.",
   },
 ];
 
 const FAQ: { q: string; a: ReactNode }[] = [
   {
-    q: "How do I convert a PDF to pure black and white, not grayscale?",
-    a: "Select Pure black & white before exporting. Grayscale keeps 256 shades of gray, so pale paper tint and scan noise stay gray; two-color mode compares each pixel's 0–255 brightness against your cutoff (default 128) and writes only #000 or #FFF, saving the copy with a -black-and-white.pdf suffix.",
+    q: "Why does Grayscale still look gray instead of pure black and white?",
+    a: "Grayscale retains 256 shades from 0 to 255, so off-white scan paper and halftone background noise stay gray. Switching to Pure black & white compares every pixel's brightness against your 1–254 cutoff (128 default) and writes only #000 or #FFF.",
   },
   {
     q: "How can I make faint scanned text or pale colored lines darker?",
     a: (
       <>
-        Switch to Pure black &amp; white and drag the threshold slider upward from 128 toward 254 while checking the side-by-side preview across representative pages. Higher cutoffs pull lighter gray, red, or yellow strokes into black; stop before binding shadows turn into solid blocks, or lift uneven paper tint first in the{" "}
-        <Link href="/whiten-pdf" className={inlineLink}>
+        Select Pure black &amp; white and move the threshold slider upward from 128 toward 254. Higher cutoffs pull lighter gray, red, or yellow strokes into solid black; stop before binding shadows turn into dark bars, or clean uneven paper tint first in the{" "}
+        <Link href="/whiten-pdf-background" className={inlineLink}>
           PDF background whitener
         </Link>
         .
@@ -87,12 +93,12 @@ const FAQ: { q: string; a: ReactNode }[] = [
     ),
   },
   {
-    q: "Does PDF Dark upload my file, or limit tasks per hour?",
-    a: "No. Conversion runs inside a browser Web Worker on your device with no server upload and no hourly task cap. This page processes one unencrypted PDF at a time across all its pages, so capacity depends on your browser's available memory rather than a server upload limit.",
+    q: "Does PDF Dark upload my file or cap conversions per hour?",
+    a: "No. Rendering and pixel conversion run inside a browser Web Worker on your computer, with no server upload, signup, or hourly task quota.",
   },
   {
-    q: "Will the downloaded PDF stay searchable, keep clickable links, or shrink in size?",
-    a: "Each page is rebuilt as a PNG image (up to 2x scale, 8192 px max side) at its original page dimensions, with an invisible Helvetica text layer re-applied for non-rotated Latin text. Search and copy still work on standard English PDFs, whereas image-only scans are not OCR'd, CJK and rotated text layers are skipped, clickable links, bookmarks, and form fields are dropped, and compact vector-text PDFs can grow in file size.",
+    q: "Will the downloaded PDF stay searchable or shrink in file size?",
+    a: "Pages are rebuilt as PNG images (up to 2x scale, capped at 8,192 px / 16 MP per page) at their original physical dimensions, with an invisible Helvetica layer re-applied for existing Latin text on upright pages. Search and copy still work on standard upright English PDFs, whereas image-only scans are not OCR'd, rotated pages and CJK text skip the text layer, and compact born-digital text PDFs can grow in byte size.",
   },
 ];
 
@@ -128,21 +134,33 @@ export default function BlackAndWhitePage() {
             Convert PDF to<br className="sm:hidden" /> Black and White
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-300">
-            Convert PDF to black and white with strict two-color thresholding (no shades of gray) for scans, or choose grayscale to keep photo and chart tones. Tune the 1–254 slider against a live side-by-side page preview before you export.
+            Convert PDF to black and white with strict two-color thresholding (no shades of gray) for scans, or choose grayscale to keep photo and chart tones. Tune the 1–254 slider with a live side-by-side page preview before you export.
           </p>
           <div className="mb-8 mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 px-3 py-1">
-              <IconDownload className="text-neutral-500" /> 1–254 live threshold preview
+            <span className="rounded-full border border-neutral-800 px-3 py-1">
+              1–254 live threshold preview
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 px-3 py-1">
-              <IconLock className="text-neutral-500" /> Processed in your browser (no upload)
+              <IconLock className="text-neutral-500" /> Processed on your device (no upload)
             </span>
             <span className="rounded-full border border-neutral-800 px-3 py-1">No hourly cap or signup</span>
           </div>
         </section>
         <MonochromeWorkspace />
+        <section id="how-to" className="mx-auto max-w-4xl border-t border-neutral-900 px-6 py-12">
+          <h2 className="text-center text-2xl font-bold sm:text-3xl">How to convert PDF to black and white</h2>
+          <ol className="mt-8 grid gap-5 sm:grid-cols-3">
+            {STEPS.map(([title, text], i) => (
+              <li key={title} className="rounded-xl border border-neutral-800 bg-neutral-900/30 p-5">
+                <span className="font-mono text-sm text-amber-400">0{i + 1}</span>
+                <h3 className="mt-2 font-semibold text-neutral-100">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-400">{text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
         <section id="mode-guide" className="mx-auto max-w-5xl border-t border-neutral-900 px-6 py-12">
-          <h2 className="text-center text-2xl font-bold sm:text-3xl">Choosing a PDF to black and white mode</h2>
+          <h2 className="text-center text-2xl font-bold sm:text-3xl">Choosing between two-color, grayscale, and other tools</h2>
           <div
             role="region"
             aria-label="PDF black and white mode selection table"
@@ -180,11 +198,11 @@ export default function BlackAndWhitePage() {
             ))}
           </div>
           <p className="mt-8 text-center text-sm text-neutral-500">
-            Tilted scan? Straighten pages with{" "}
+            If your scan pages are crooked, straighten them in{" "}
             <Link href="/deskew-pdf" className="text-amber-400 hover:underline">
               Deskew PDF
             </Link>{" "}
-            first. Reading on screen instead of printing? Open the{" "}
+            first. For night screen reading instead of printing, open the{" "}
             <Link href="/" className="text-amber-400 hover:underline">
               PDF dark mode reader
             </Link>

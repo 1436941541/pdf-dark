@@ -54,6 +54,7 @@ test('PDF metadata allowlist excludes raw properties, query strings and invalid 
   assert.deepEqual(events[0].data, { tool: 'whiten', stage: 'preview', page: '/whiten-pdf', pages: 2 });
   assert.equal(analytics.telemetryPage('/private-secret.pdf'), '/other');
   assert.equal(analytics.telemetryPage('/es/invert-pdf-colors?secret=yes'), '/es/invert-pdf-colors');
+  assert.equal(analytics.telemetryPage('/whiten-pdf-background?secret=yes'), '/whiten-pdf-background');
 });
 
 test('sync and async analytics failures never affect a successful operation', async () => {

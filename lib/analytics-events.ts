@@ -34,7 +34,7 @@ const MAX_PENDING = 50;
 
 export function telemetryPage(path: string): string {
   const pathname = path.split(/[?#]/, 1)[0];
-  if (/^\/(?:((es|pt|de)\/?)?|(es\/|pt\/|de\/)?invert-pdf-colors|pdf-to-black-and-white|deskew-pdf|whiten-pdf|about|privacy|terms|changelog)$/.test(pathname)) return pathname;
+  if (/^\/(?:((es|pt|de)\/?)?|(es\/|pt\/|de\/)?invert-pdf-colors|pdf-to-black-and-white|deskew-pdf|whiten-pdf-background|whiten-pdf|about|privacy|terms|changelog)$/.test(pathname)) return pathname;
   return pathname.startsWith("/blog") ? "/blog" : "/other";
 }
 

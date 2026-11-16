@@ -1,17 +1,92 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import { BackgroundConverter } from "./background-converter";
+
 const CASES = [
-  { id: "gray", title: "Gray paper and faint text", text: "This generated scan has a gray paper background and several lighter text lines. Cleaning brightens the paper while retaining gray strokes. Look closely at the faint line before choosing a stronger setting." },
-  { id: "yellow", title: "Yellow paper with colored marks", text: "This sample combines yellow paper, blue ink and a yellow highlight. With color protection enabled, the cleaner targets the paper tint while retaining the colored marks. Always check your own stamps and highlights in the preview." },
-  { id: "shadow", title: "Mild uneven scan shading", text: "A gradual shadow runs across this sample. Local paper-brightness estimation reduces the shading without turning every pixel black or white. Deep folds, heavy shadows and damaged paper may need a different tool or a new scan." },
+  {
+    id: "gray",
+    title: "Gray photocopy paper (RGB 220 to 243)",
+    button: "Load gray-paper sample",
+    text: "Lifts a gray scan sheet from RGB 220/220/220 to 243/243/243. Faint gray text strokes stay readable instead of getting clipped to harsh black-and-white.",
+  },
+  {
+    id: "yellow",
+    title: "Yellowed page with blue stamp and highlight",
+    button: "Load yellow-paper sample",
+    text: "Clears aged yellow paper tint toward white, keeping the blue APPROVED stamp and yellow highlighter band intact.",
+  },
+  {
+    id: "shadow",
+    title: "Uneven edge shadow",
+    button: "Load shadow sample",
+    text: "Tracks paper brightness across the page to even out dark binding or margin shadows without washing out nearby text.",
+  },
 ];
+
 export function BackgroundWorkspace() {
   const [sample, setSample] = useState<{ url: string; name: string; id: number } | null>(null);
-  function open(id: string) { setSample({ url: `/examples/background-remover/${id}.pdf`, name: `${id}-paper.pdf`, id: Date.now() }); document.querySelector("#background-tool")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }); }
-  return <><div className="mb-5 px-6 text-center"><button type="button" onClick={() => open("gray")} className="inline-flex min-h-11 items-center justify-center px-3 py-2 text-sm text-amber-400 underline decoration-amber-400/30 underline-offset-4">Try a gray-paper sample</button></div><div id="background-tool" className="scroll-mt-6"><BackgroundConverter sample={sample} /></div>
-    <section className="mx-auto max-w-4xl px-6 py-12"><h2 className="text-center text-2xl font-bold">Whiten PDF examples</h2><p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-neutral-400">These sample documents were generated for this tool. The after images show its actual output at the default 65% strength with color protection enabled, rather than a simulated before-and-after effect.</p><div className="mt-7 space-y-6">{CASES.map(item => <article key={item.id} className="rounded-xl border border-neutral-800 bg-neutral-900/30 p-5 sm:p-6"><h3 className="font-semibold">{item.title}</h3><p className="mt-3 text-sm leading-relaxed text-neutral-400">{item.text}</p><div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5">{["before", "after"].map(label => <figure key={label} className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-950"><figcaption className="border-b border-neutral-800 px-3 py-2 text-xs capitalize text-neutral-400">{label}</figcaption><div className="flex h-52 items-center justify-center p-3 sm:h-72"><Image unoptimized src={`/examples/background-remover/${item.id}-${label}.webp`} alt={`${item.title} ${label} PDF whitening`} width={600} height={780} loading="lazy" className="h-full w-full object-contain" /></div></figure>)}</div><button type="button" onClick={() => open(item.id)} className="mt-4 inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-left text-sm text-amber-400 underline decoration-amber-400/30 underline-offset-4">Try this sample: {item.title.toLowerCase()}</button></article>)}</div><p className="mt-4 text-xs text-neutral-500">Sample results are specific to these files. Review every page of your own document, especially faint text and photographs.</p><p className="mt-3 text-sm leading-relaxed text-neutral-400">Samples created and checked by <Link href="/about" className="text-amber-400 hover:underline">PDF Dark</Link>. At the default setting, the sampled gray-paper pixel changed from RGB 220/220/220 to 243/243/243 in the downloaded PDF. The yellow-paper sample became lighter while its tested blue stamp and yellow highlight retained their colors. These checks cover the samples, not every document. Last checked <time dateTime="2026-10-14">October 14, 2026</time>.</p></section>
-  </>;
+  function open(id: string) {
+    setSample({ url: `/examples/background-remover/${id}.pdf`, name: `${id}-paper.pdf`, id: Date.now() });
+    document.querySelector("#background-tool")?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+  }
+  return (
+    <>
+      <div className="mb-5 px-6 text-center">
+        <button
+          type="button"
+          onClick={() => open("gray")}
+          className="inline-flex min-h-11 items-center justify-center px-3 py-2 text-sm text-amber-400 underline decoration-amber-400/30 underline-offset-4 hover:decoration-amber-400"
+        >
+          Try a gray-paper sample
+        </button>
+      </div>
+      <div id="background-tool" className="scroll-mt-6">
+        <BackgroundConverter sample={sample} />
+      </div>
+      <section className="mx-auto max-w-4xl px-6 py-12">
+        <h2 className="text-center text-2xl font-bold sm:text-3xl">Before and after on scanned test pages</h2>
+        <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-relaxed text-neutral-400">
+          Rendered at the default 65% strength with color protection on. Click any sample to load the PDF into the workspace and test the slider yourself.
+        </p>
+        <div className="mt-7 space-y-6">
+          {CASES.map((item, idx) => (
+            <article key={item.id} className="rounded-xl border border-neutral-800 bg-neutral-900/30 p-5 sm:p-6">
+              <h3 className="font-semibold text-neutral-100">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-400">{item.text}</p>
+              <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5">
+                {(["before", "after"] as const).map((label) => (
+                  <figure key={label} className="overflow-hidden rounded-lg border border-neutral-800 bg-neutral-950">
+                    <figcaption className="border-b border-neutral-800 px-3 py-2 text-xs capitalize text-neutral-400">
+                      {label}
+                    </figcaption>
+                    <div className="flex h-52 items-center justify-center p-3 sm:h-72">
+                      <Image
+                        unoptimized
+                        src={`/examples/background-remover/${item.id}-${label}.webp`}
+                        alt={`${item.title} (${label})`}
+                        width={600}
+                        height={780}
+                        loading={idx === 0 ? "eager" : "lazy"}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  </figure>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => open(item.id)}
+                className="mt-4 inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-left text-sm text-amber-400 underline decoration-amber-400/30 underline-offset-4 hover:decoration-amber-400"
+              >
+                {item.button}
+              </button>
+            </article>
+          ))}
+        </div>
+      </section>
+    </>
+  );
 }
