@@ -14,9 +14,9 @@ import type { MonochromeDiagnostic } from "@/lib/monochrome-pdf";
 type Source = { file: File; pdf: PDFDocumentProxy; input: PdfInput };
 type Preview = { original: string; converted: string; loading: boolean; error: string | null; key: string };
 
-export function MonochromeConverter({ sample }: { sample?: { url: string; name: string; id: number } | null }) {
+export function MonochromeConverter({ sample }: { sample?: { url: string; name: string; mode?: MonochromeMode; id: number } | null }) {
   const [source, setSource] = useState<Source | null>(null);
-  const [mode, setMode] = useState<MonochromeMode>("grayscale");
+  const [mode, setMode] = useState<MonochromeMode>("black-and-white");
   const [threshold, setThreshold] = useState(128);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -113,6 +113,7 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
       await yieldToMain();
       if (controller.signal.aborted) return;
       exportController.current?.abort();
+      if (sample!.mode) setMode(sample!.mode);
       setLoading(true);
       setError(null);
       try {
@@ -189,8 +190,8 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
           <legend className="mb-3 text-sm font-medium text-neutral-300">Choose your conversion</legend>
           <div className="grid gap-3 sm:grid-cols-2">
             {([
-              ["grayscale", "Grayscale", "256 gray levels (0–255 luminance) for photos, gradients, and shaded charts.", "Photos & charts"],
-              ["black-and-white", "Pure black & white", "Strict #000 and #FFF pixels with a 1–254 threshold slider for scans.", "Scans & stamps"],
+              ["black-and-white", "Pure black & white", "Strict #000 and #FFF pixels with a 1–254 cutoff slider.", "Scans & printing"],
+              ["grayscale", "Grayscale", "256 gray levels (0–255 luminance) for photos and gradients.", "Photos & charts"],
             ] as const).map(([value, title, description, badge]) => (
               <label key={value} className={`relative cursor-pointer rounded-xl border p-4 transition-colors ${mode === value ? "border-amber-400/60 bg-amber-400/5" : "border-neutral-700 hover:border-neutral-500"} ${busy ? "cursor-wait opacity-60" : ""}`}>
                 <div className="flex items-center justify-between gap-3">
