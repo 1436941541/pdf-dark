@@ -40,13 +40,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${base}/deskew-pdf`,
-      lastModified: "2026-11-16",
+      lastModified: "2026-11-19",
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${base}/whiten-pdf-background`,
-      lastModified: "2026-11-16",
+      lastModified: "2026-11-19",
       changeFrequency: "monthly",
       priority: 0.9,
     },

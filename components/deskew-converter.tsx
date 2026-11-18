@@ -25,6 +25,8 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
   const [preview, setPreview] = useState<Preview>(emptyPreview);
   const [error, setError] = useState<string | null>(null);
   const [downloaded, setDownloaded] = useState(false);
+  const [handledSampleId, setHandledSampleId] = useState<number | null>(null);
+  const sampleFetch = useRef<AbortController | null>(null);
   const mounted = useRef(true);
   const loadId = useRef(0);
   const active = useRef<AbortController | null>(null);
@@ -33,7 +35,8 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
   const correction = corrections[page - 1];
   const angle = correction?.angle ?? 0;
   const previewKey = `${page}:${angle}`;
-  const busy = activity !== null;
+  const pendingSample = Boolean(sample && handledSampleId !== sample.id);
+  const busy = activity !== null || pendingSample;
 
   useEffect(() => {
     mounted.current = true;
@@ -41,6 +44,7 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
     return () => {
       mounted.current = false;
       active.current?.abort();
+      sampleFetch.current?.abort();
       detector.current?.dispose();
       for (const url of urls) URL.revokeObjectURL(url);
     };
@@ -113,8 +117,11 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
 
   useEffect(() => {
     if (!sample) return;
+    active.current?.abort();
+    detector.current?.dispose();
     const currentLoad = loadId.current;
     const controller = new AbortController();
+    sampleFetch.current = controller;
     async function openSample() {
       try {
         const response = await fetch(sample!.url, { signal: controller.signal });
@@ -124,6 +131,9 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
       } catch (failure) {
         if (!controller.signal.aborted && currentLoad === loadId.current) recordPdfFailure("deskew", "sample", failure, { input: "sample" });
         if (!controller.signal.aborted && currentLoad === loadId.current) setError(failure instanceof Error ? failure.message : "Could not load the sample PDF.");
+      } finally {
+        if (!controller.signal.aborted && mounted.current) setHandledSampleId(sample!.id);
+        if (sampleFetch.current === controller) sampleFetch.current = null;
       }
     }
     void openSample();
@@ -131,6 +141,8 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
   }, [sample, selectFile]);
 
   function cancel() {
+    sampleFetch.current?.abort();
+    setHandledSampleId(sample?.id ?? null);
     active.current?.abort();
     detector.current?.dispose();
     loadId.current++;
@@ -190,12 +202,12 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
   return (
     <div className="mx-auto max-w-4xl px-6 text-left">
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-8">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div><h2 className="text-lg font-semibold text-neutral-100">Page-by-page scan alignment</h2></div>
-          <span className="rounded-full border border-amber-400/20 bg-amber-400/5 px-3 py-1 text-xs text-amber-300">Files stay on your device</span>
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold text-neutral-100">Page-by-page scan alignment</h2>
         </div>
         {!source && !busy && <DropZone onFile={selectFile} />}
         {source && <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-950/40 p-4"><div className="min-w-0"><p className="break-all text-sm font-medium text-neutral-200">{source.file.name}</p><p className="mt-1 text-xs text-neutral-400">{source.pdf.numPages} {source.pdf.numPages === 1 ? "page" : "pages"}</p></div><button type="button" onClick={reset} disabled={busy} className={buttonClass}>Choose another PDF</button></div>}
+        {pendingSample && !activity && <div role="status" className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><p className="text-sm text-amber-200">Opening the sample PDF…</p><button type="button" onClick={cancel} className={buttonClass}>Cancel</button></div>}
         {activity && <div role="status" aria-live="polite" className="mb-5 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-amber-200">{activity.kind === "loading" ? "Opening your PDF…" : `${activity.kind === "detecting" ? "Analyzing" : "Exporting"} pages ${activity.done} / ${source?.pdf.numPages ?? "…"}`}</p><button type="button" onClick={cancel} className={buttonClass}>Cancel</button></div>{source && activity.kind !== "loading" && <progress aria-label={activity.kind === "detecting" ? "Analysis progress" : "Export progress"} value={activity.done} max={source.pdf.numPages} className="mt-3 h-2 w-full accent-amber-400" />}</div>}
         {error && <p role="alert" className="mb-5 rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-sm text-red-300">{error}</p>}
         {source && <>

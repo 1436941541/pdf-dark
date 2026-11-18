@@ -3,13 +3,13 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { BackgroundWorkspace } from "@/components/background-workspace";
 import { Footer } from "@/components/footer";
-import { IconLock, IconPalette } from "@/components/icons";
+import { IconLock } from "@/components/icons";
 import { ToolNavigation } from "@/components/tool-navigation";
 import { getSiteUrl } from "@/lib/site";
 
 const TITLE = "Whiten PDF Background Online (Gray & Yellow Scans)";
 const DESCRIPTION =
-  "Whiten PDF background shading on gray or yellow scans in your browser. Preview 0-100% strength, protect colored stamps and highlights, and upload nothing.";
+  "Whiten PDF background shading on gray or yellow scans for printing. Preview 0-100% strength in your browser, protect colored stamps, and upload nothing.";
 const SLUG = "/whiten-pdf-background";
 const SOCIAL = {
   url: "/examples/background-remover/whiten-social.png",
@@ -29,49 +29,55 @@ export const metadata: Metadata = {
 const inlineLink = "text-amber-400 underline decoration-amber-400/30 underline-offset-4 hover:decoration-amber-400";
 
 const STEPS = [
-  ["Open your scan locally", "Select a PDF from your device or load one of the sample scans above."],
-  ["Tune strength & stamp protection", "Adjust the 0-100% slider (65% default), keep colored marks protected, or uncheck Clean page on full-page photos."],
-  ["Download at 144 or 72 DPI", "Choose Sharper or Compact output and save your -whitened.pdf copy directly in the browser."],
+  ["Open a scanned PDF", "Drop a scan into the workspace or load a test sample above."],
+  [
+    "Tune strength & stamp protection",
+    "Adjust the 0–100% slider (65% default), keep color protection on for stamps, or uncheck Clean page on photo sheets.",
+  ],
+  [
+    "Download at 144 or 72 DPI",
+    "Select Sharper or Compact output and save your -whitened.pdf file.",
+  ],
 ] as const;
 
 const SPEC_ROWS: { item: string; behavior: ReactNode; note: ReactNode }[] = [
   {
-    item: "Cleaning strength (0-100% in 5% steps, default 65%)",
+    item: "Cleaning strength (0–100% in 5% steps, default 65%)",
     behavior:
-      "Estimates local paper brightness on a smoothed grid and pulls light gray or yellow backgrounds toward white; dark-background pages (brightness below 90/255) are skipped automatically.",
-    note: "Raise toward 85-100% for heavier photocopy haze; step down below 50% if light pencil notes or thin serif strokes start fading.",
+      "Maps local paper brightness across a smoothed grid and pulls gray or yellow backgrounds toward white; dark-themed pages (paper brightness below 90/255) are skipped automatically.",
+    note: "Raise toward 85–100% for heavy photocopy haze; lower below 50% if faint pencil notes or thin serif strokes start fading.",
   },
   {
     item: "Protect colored text & marks (on by default)",
     behavior:
-      "Leaves colored ink, blue or red stamps, and bright highlighter bands untouched whenever a pixel's color spread exceeds 18% relative to the surrounding paper.",
-    note: "Turn off if tea stains, colored watermarks, or tinted slips scanned inside a bright white border stay uncleaned.",
+      "Compares each pixel against the surrounding paper tone and leaves ink, blue or red stamps, and highlighter bands untouched whenever color saturation exceeds 18% above the paper tint.",
+    note: "Uncheck if colored watermarks, tea stains, or tinted slips scanned inside a bright white border stay uncleaned.",
   },
   {
     item: "Clean page N (per-page checkbox)",
-    behavior: "Bypasses paper whitening on unchecked pages so embedded color photographs or cover sheets keep their original tones.",
-    note: "Browse with Previous and Next to uncheck photo-heavy pages in a mixed document.",
+    behavior: "Skips background whitening on unchecked pages so full-page photographs or color covers keep their original tones.",
+    note: "Step through pages with Previous and Next after loading a multi-page PDF to uncheck photo-heavy sheets.",
   },
   {
-    item: "Download quality (Sharper up to 144 DPI / Compact up to 72 DPI)",
+    item: "Download quality (Sharper 144 DPI / Compact 72 DPI)",
     behavior:
-      "Encodes pages locally into a new -whitened.pdf at up to 2x scale (144 DPI) or 1x scale (72 DPI), capped at 8,192 px or ~16 MP per page.",
-    note: "Pick Sharper for small contract footnotes and Compact when sharing multi-page scans over email.",
+      "Builds a new -whitened.pdf at 2x scale (up to 144 DPI) or 1x scale (72 DPI), capped at 8,192 px on the longest edge and ~16 MP per page.",
+    note: "Pick Sharper for small contract footnotes and Compact when emailing multi-page scans.",
   },
   {
-    item: "Two-color monochrome or dark lecture slides",
-    behavior: "Paper whitening keeps continuous gray shading on text and leaves dark-themed slide backgrounds unchanged.",
+    item: "Dark lecture slides or strict two-color printing",
+    behavior: "Paper whitening preserves smooth gray anti-aliasing on text and skips dark-background slides (below 90/255) instead of inverting them.",
     note: (
       <>
-        Use{" "}
-        <Link href="/pdf-to-black-and-white" className={inlineLink}>
-          Convert PDF to Black and White
-        </Link>{" "}
-        (1-254 cutoff) for strict two-color printing, or{" "}
+        Switch to{" "}
         <Link href="/invert-pdf-colors" className={inlineLink}>
           Invert PDF Colors
         </Link>{" "}
-        to flip black slides to white.
+        and pick Dark → Light (Print) to turn black coaching or lecture slides into a white -light.pdf, or use{" "}
+        <Link href="/pdf-to-black-and-white" className={inlineLink}>
+          Convert PDF to Black and White
+        </Link>{" "}
+        (1–254 cutoff) for strict two-color output.
       </>
     ),
   },
@@ -79,29 +85,22 @@ const SPEC_ROWS: { item: string; behavior: ReactNode; note: ReactNode }[] = [
 
 const FAQ: { q: string; a: ReactNode }[] = [
   {
-    q: "Are sensitive contracts or ID scans uploaded to a server during cleanup?",
-    a: "Never. PDF rendering and pixel whitening run inside your browser tab via a local Web Worker, so confidential contracts, tax forms, and ID scans stay on your computer with no account signup or small file-size paywall.",
+    q: "Are confidential contracts or ID scans uploaded to a server during cleanup?",
+    a: "Never. Page rendering and PDF assembly happen inside your browser tab while pixel whitening runs in a local Web Worker, so contracts, tax forms, and ID scans stay on your device with no signup or 4 MB file-size cap.",
   },
   {
-    q: "Does this make a PDF background transparent or white out specific words?",
-    a: "Neither. Every exported page has a solid opaque white backing rather than an alpha-transparent cutout, and there is no brush or redaction box for covering individual words or numbers.",
+    q: "Does this make a PDF background transparent or act as a whitener to cover words?",
+    a: "Neither. Exported pages always have a solid opaque white background rather than an alpha-transparent cutout, and there is no white-out (whitener) brush or redaction box for masking individual words or numbers.",
   },
   {
-    q: "Will the -whitened.pdf keep selectable text, links, or lossless skipped pages?",
-    a: (
-      <>
-        No. Every page in the download, including pages where Clean page is unchecked, is saved as a flat PNG image without OCR. Selectable text, clickable links, form fields, and digital signatures are not carried over, and born-digital PDFs can grow in byte size; if an upright English PDF needs crisp monochrome output with its existing Latin text layer preserved, use{" "}
-        <Link href="/pdf-to-black-and-white" className={inlineLink}>
-          Convert PDF to Black and White
-        </Link>
-        .
-      </>
-    ),
+    q: "Will the -whitened.pdf keep selectable text, links, or vector pages?",
+    a: "No. Every page in the download, including pages where Clean page is unchecked, is rebuilt as a flat PNG image without built-in OCR. Selectable text layers, clickable links, form fields, and digital signatures are not carried over, and born-digital PDFs can grow in file size.",
   },
 ];
 
 export default function WhitenPdfBackgroundPage() {
-  const url = `${getSiteUrl()}${SLUG}`;
+  const siteUrl = getSiteUrl();
+  const url = `${siteUrl}${SLUG}`;
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -110,6 +109,7 @@ export default function WhitenPdfBackgroundPage() {
     description: DESCRIPTION,
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any modern browser",
+    screenshot: `${siteUrl}${SOCIAL.url}`,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
   return (
@@ -133,17 +133,17 @@ export default function WhitenPdfBackgroundPage() {
             Whiten PDF Background
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-300">
-            Whiten PDF background shading on gray photocopies, yellowed book pages, and shadowy scans on your computer. Fine-tune 0% to 100% cleaning strength with a side-by-side preview, keeping blue stamps and colored highlights intact.
+            Whiten PDF background shading on gray photocopies, yellowed book pages, and shadowy scans for cleaner printing. Preview 0% to 100% cleaning strength side by side while keeping blue stamps and colored highlights intact.
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
             <span className="rounded-full border border-neutral-800 px-3 py-1">
-              0-100% live strength preview
+              144 or 72 DPI output
+            </span>
+            <span className="rounded-full border border-neutral-800 px-3 py-1">
+              Per-page photo skip
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 px-3 py-1">
-              <IconPalette className="text-neutral-500" /> Protect colored stamps &amp; marks
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 px-3 py-1">
-              <IconLock className="text-neutral-500" /> Processed on your device (no upload)
+              <IconLock className="text-neutral-500" /> Processed in your browser (no upload)
             </span>
           </div>
         </section>

@@ -29,6 +29,7 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
   const [downloaded, setDownloaded] = useState(false);
   const [handledSampleId, setHandledSampleId] = useState<number | null>(null);
   const sampleFetch = useRef<AbortController | null>(null);
+  const customized = useRef(false);
   const mounted = useRef(true);
   const loadId = useRef(0);
   const active = useRef<AbortController | null>(null);
@@ -111,8 +112,10 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
         if (!response.ok) throw new Error("Could not load the sample PDF.");
         const blob = await response.blob();
         if (!controller.signal.aborted && currentLoad === loadId.current) {
-          setSettings({ strength: 65, preserveColors: true });
-          setQuality("standard");
+          if (!customized.current) {
+            setSettings({ strength: 65, preserveColors: true });
+            setQuality("standard");
+          }
           await selectFile(new File([blob], sample!.name, { type: "application/pdf" }), "sample");
         }
       } catch (failure) {
@@ -143,7 +146,7 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
     setError(null);
     setDownloaded(false);
   }
-  function updateSettings(next: BackgroundSettings) { setSettings(next); setDownloaded(false); }
+  function updateSettings(next: BackgroundSettings) { customized.current = true; setSettings(next); setDownloaded(false); }
   function togglePage(enabled: boolean) {
     setSkipped((current) => { const next = new Set(current); if (enabled) next.delete(page); else next.add(page); return next; });
     setDownloaded(false);
@@ -188,25 +191,28 @@ export function BackgroundConverter({ sample }: { sample?: { url: string; name: 
   return (
     <div className="mx-auto max-w-4xl px-6 text-left">
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-8">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div><h2 className="text-lg font-semibold text-neutral-100">Scan paper cleanup</h2></div>
-          <span className="rounded-full border border-amber-400/20 bg-amber-400/5 px-3 py-1 text-xs text-amber-300">Files stay on your device</span>
-        </div>
+        <fieldset disabled={busy} className="mb-5 rounded-xl border border-neutral-800 bg-neutral-950/40 p-4">
+          <legend className="px-2 text-sm font-semibold text-neutral-100">Scan paper cleanup</legend>
+          <div className="flex justify-between gap-3"><label htmlFor="background-strength" className="text-sm text-neutral-300">Cleaning strength · all enabled pages</label><output htmlFor="background-strength" className="font-mono text-amber-300">{settings.strength}%</output></div>
+          <input id="background-strength" type="range" min="0" max="100" step="5" value={settings.strength} onChange={(e) => updateSettings({ ...settings, strength: Number(e.target.value) })} className="mt-3 w-full accent-amber-400" />
+          <div className="flex justify-between text-xs text-neutral-500"><span>Gentle</span><span>Stronger cleaning</span></div>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 sm:items-end">
+            <div className="space-y-2.5">
+              <label className="flex items-center gap-2 text-sm text-neutral-300"><input type="checkbox" checked={settings.preserveColors} onChange={(e) => updateSettings({ ...settings, preserveColors: e.target.checked })} className="size-4 accent-amber-400" />Protect colored text &amp; marks</label>
+              {source && <label className="flex items-center gap-2 text-sm text-neutral-300"><input type="checkbox" checked={!skipped.has(page)} onChange={(e) => togglePage(e.target.checked)} className="size-4 accent-amber-400" />Clean page {page}</label>}
+            </div>
+            <div>
+              <label htmlFor="background-quality" className="block text-xs text-neutral-400">Download quality</label>
+              <select id="background-quality" value={quality} onChange={(e) => { customized.current = true; setQuality(e.target.value as "standard" | "compact"); setDownloaded(false); }} className="mt-1.5 w-full rounded-lg border border-neutral-700 bg-neutral-950 p-2 text-sm text-neutral-300"><option value="standard">Sharper · up to 144 DPI</option><option value="compact">Compact · up to 72 DPI</option></select>
+            </div>
+          </div>
+        </fieldset>
         {!source && !busy && <DropZone onFile={selectFile} />}
         {source && <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-950/40 p-4"><div className="min-w-0"><p className="break-all text-sm font-medium text-neutral-200">{source.file.name}</p><p className="mt-1 text-xs text-neutral-400">{source.pdf.numPages} {source.pdf.numPages === 1 ? "page" : "pages"}</p></div><button type="button" onClick={reset} disabled={busy} className={buttonClass}>Choose another PDF</button></div>}
         {pendingSample && !activity && <div role="status" className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><p className="text-sm text-amber-200">Opening the sample PDF…</p><button type="button" onClick={cancel} className={buttonClass}>Cancel</button></div>}
         {activity && <div role="status" aria-live="polite" className="mb-5 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-amber-200">{activity.kind === "loading" ? "Opening your PDF…" : `Cleaning pages ${activity.done} / ${source?.pdf.numPages ?? "…"}`}</p><button type="button" onClick={cancel} className={buttonClass}>Cancel</button></div>{source && activity.kind !== "loading" && <progress aria-label="Export progress" value={activity.done} max={source.pdf.numPages} className="mt-3 h-2 w-full accent-amber-400" />}</div>}
         {error && <p role="alert" className="mb-5 rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-sm text-red-300">{error}</p>}
         {source && <>
-          <fieldset disabled={busy} className="mb-5 rounded-xl border border-neutral-800 p-4">
-            <legend className="px-2 text-sm font-medium">Cleaning controls</legend>
-            <div className="flex justify-between gap-3"><label htmlFor="background-strength" className="text-sm text-neutral-300">Cleaning strength · all enabled pages</label><output htmlFor="background-strength" className="font-mono text-amber-300">{settings.strength}%</output></div>
-            <input id="background-strength" type="range" min="0" max="100" step="5" value={settings.strength} onChange={(e) => updateSettings({ ...settings, strength: Number(e.target.value) })} className="mt-3 w-full accent-amber-400" />
-            <div className="flex justify-between text-xs text-neutral-500"><span>Gentle</span><span>Stronger cleaning</span></div>
-            <label className="mt-4 flex items-center gap-2 text-sm text-neutral-300"><input type="checkbox" checked={settings.preserveColors} onChange={(e) => updateSettings({ ...settings, preserveColors: e.target.checked })} className="size-4 accent-amber-400" />Protect colored text &amp; marks</label>
-            <label className="mt-3 flex items-center gap-2 text-sm text-neutral-300"><input type="checkbox" checked={!skipped.has(page)} onChange={(e) => togglePage(e.target.checked)} className="size-4 accent-amber-400" />Clean page {page}</label>
-            <label htmlFor="background-quality" className="mt-4 block text-xs text-neutral-400">Download quality</label><select id="background-quality" value={quality} onChange={(e) => { setQuality(e.target.value as "standard" | "compact"); setDownloaded(false); }} className="mt-2 w-full rounded-lg border border-neutral-700 bg-neutral-950 p-2 text-sm text-neutral-300"><option value="standard">Sharper · up to 144 DPI</option><option value="compact">Compact · up to 72 DPI</option></select>
-          </fieldset>
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-neutral-300">Page {page} of {source.pdf.numPages}</p><div className="flex gap-2"><button type="button" disabled={busy || page <= 1} onClick={() => setPage(page - 1)} className={buttonClass}>Previous</button><button type="button" disabled={busy || page >= source.pdf.numPages} onClick={() => setPage(page + 1)} className={buttonClass}>Next</button></div></div>
           {preview.error && <p role="alert" className="mb-4 text-sm text-red-300">{preview.error}</p>}
           <div className="grid gap-4 sm:grid-cols-2" aria-busy={preview.loading || preview.key !== previewKey}>

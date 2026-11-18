@@ -8,8 +8,14 @@ import { getSiteUrl } from "@/lib/site";
 
 const TITLE = "Deskew PDF Online Free (Auto & 0.1° Manual Preview)";
 const DESCRIPTION =
-  "Deskew PDF scans in your browser with no upload or hourly task limit. Auto-detect page tilt or fine-tune ±10° in 0.1° steps with a side-by-side preview.";
+  "Deskew PDF scans to straighten crooked pages in your browser with no upload or task cap. Auto-detect tilt or dial in ±10° in 0.1° steps with live preview.";
 const SLUG = "/deskew-pdf";
+const SOCIAL = {
+  url: "/examples/deskew/social.png",
+  width: 1200,
+  height: 630,
+  alt: "Tilted invoice scan before and after PDF deskew",
+};
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -20,53 +26,47 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: SLUG,
     type: "website",
-    images: [{ url: "/examples/deskew/social.png", width: 1200, height: 630, alt: "Tilted invoice scan before and after PDF deskew" }],
+    images: [SOCIAL],
   },
-  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: ["/examples/deskew/social.png"] },
+  twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: [SOCIAL] },
 };
 
 const STEPS = [
-  ["Open your scan locally", "Choose a PDF from your computer; each page is checked automatically for page tilt."],
-  ["Review or dial in ±10.0°", "Inspect the side-by-side preview and drag any page's 0.1° slider if sparse or steep pages stay at 0.0°."],
-  ["Save your -deskewed.pdf", "Export all pages with white corner margins preserved and no server upload."],
+  ["Open your scanned PDF", "Choose a PDF or load a test sample above to run automatic tilt detection on each page."],
+  ["Check or dial in ±10.0°", "Compare Original vs Straightened and drag the 0.1° slider on sparse or steep pages left at 0.0°."],
+  ["Save your -deskewed.pdf", "Download all pages at up to 144 DPI with white corner margins intact."],
 ] as const;
 
 const SPEC_ROWS = [
   {
-    item: "Local browser processing",
-    behavior:
-      "Runs skew analysis in a local Web Worker and renders rotated pages directly in your browser, with no server upload, desktop app install, or hourly task cap.",
-    boundary: "Caps each exported page at 8,192 px on the longest edge (16 MP) to stay within browser canvas limits.",
-  },
-  {
     item: "Automatic text-line detector",
     behavior:
-      "Scales pages down to at most 700 px, isolates text characters from photos, table borders, and dust speckles, and searches ±7° (0.25° coarse, 0.05° fine steps) before rounding to 0.1°.",
-    boundary: "Applies automatic angles from 0.2° to 6.8° when clear horizontal print is present.",
+      "Scales each page down to at most 700 px, then uses a local Web Worker to filter out photos, table borders, and scanner speckles and search ±7° (0.25° coarse, 0.05° fine steps) before rounding to 0.1°.",
+    boundary: "Applies automatic corrections from ±0.2° to ±6.8° when clear horizontal print is found.",
   },
   {
     item: "Per-page manual slider",
     behavior:
-      "Stores an independent −10.0° to +10.0° angle in 0.1° steps for every page, paired with a live Original vs Straightened preview and one-click reset to auto or 0.0°.",
-    boundary: "Negative values rotate counterclockwise; positive values rotate clockwise.",
+      "Saves an independent −10.0° to +10.0° angle in 0.1° steps for every page with a live side-by-side preview and buttons to restore the automatic angle or reset to 0.0°.",
+    boundary: "Negative angles rotate counterclockwise; positive angles rotate clockwise.",
   },
   {
     item: "Corner-safe white margin expansion",
     behavior:
-      "Expands rotated width to w·|cosθ| + h·|sinθ| and height to h·|cosθ| + w·|sinθ|, filling the outer wedges with white instead of trimming back to the old frame.",
-    boundary: "Rotated pages become slightly wider and taller than the source sheet; check print scaling if exact paper size matters.",
+      "Expands each rotated page's width and height to fit the tilted corners and fills the outer triangular wedges with white instead of cropping back to the old frame.",
+    boundary: "Rotated sheets become slightly wider and taller than the original page; check print scaling if exact paper size matters.",
   },
   {
     item: "Image-based PDF export (up to 144 DPI)",
-    behavior: "Encodes every page at up to 2x scale (144 DPI) into a new -deskewed.pdf copy while leaving your source file untouched.",
-    boundary: "Keep your original PDF alongside the straightened copy if you want to adjust angles again later without double-rasterizing.",
+    behavior: "Renders rotated pages in your browser tab at up to 2x scale (144 DPI) and assembles a new -deskewed.pdf file.",
+    boundary: "Capped at 8,192 px on the longest edge and 16 MP per page to stay within browser canvas memory limits.",
   },
 ];
 
 const FAQ = [
   [
     "Why did automatic deskew leave a crooked page at 0.0° in my multi-page scan?",
-    "Each sheet from a document feeder is scored on its own so clockwise and counterclockwise pages receive independent angles, while ambiguous pages stay at 0.0° rather than risking a wrong turn. Automatic detection holds at 0.0° whenever a page has fewer than 3 clear text lines, heavy photos or dark shading (over 35% dark pixels), conflicting text directions, or a tilt of 6.85° or steeper; drag that page's slider to align it visually.",
+    "Each sheet from a document feeder is scored independently so clockwise and counterclockwise pages get their own angles, while ambiguous pages stay at 0.0° instead of risking a wrong turn. Automatic detection holds at 0.0° whenever a page has fewer than 3 clear text lines, heavy photos or dark shading (over 35% dark pixels), competing text angles, or a tilt of 6.85° or steeper; drag that page's slider to align it visually.",
   ],
   [
     "Will the downloaded PDF keep searchable text, links, or original vector pages?",
@@ -74,19 +74,21 @@ const FAQ = [
   ],
   [
     "Can this flatten curved book-spine scans or flip pages scanned sideways at 90°?",
-    "No. Deskew PDF applies one flat 2D rotation within ±10.0° per page. Sideways or upside-down scans lack horizontal lines and need a 90° / 180° orientation rotator first, while warped text along a thick book binding requires dedicated page-dewarping software.",
+    "No. Deskew PDF applies one flat 2D rotation within ±10.0° per page. Sideways or upside-down scans lack horizontal rows of print and need a 90° or 180° page rotator first, while warped text along a thick book binding requires dedicated page-dewarping software.",
   ],
 ];
 
 export default function DeskewPage() {
+  const siteUrl = getSiteUrl();
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "Deskew PDF",
-    url: `${getSiteUrl()}${SLUG}`,
+    url: `${siteUrl}${SLUG}`,
     description: DESCRIPTION,
     applicationCategory: "UtilitiesApplication",
     operatingSystem: "Any modern browser",
+    screenshot: `${siteUrl}${SOCIAL.url}`,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
   return (
@@ -108,16 +110,16 @@ export default function DeskewPage() {
         <section className="mx-auto max-w-5xl px-6 pb-8 pt-10 text-center">
           <h1 className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl">Deskew PDF</h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-neutral-300">
-            Deskew PDF scans page by page in your browser with no file upload or hourly task limit. Auto-detect tilted text lines or dial in any page from −10.0° to +10.0° in 0.1° steps with a live side-by-side preview.
+            Deskew PDF documents to straighten crooked scanned pages one by one. Auto-detect tilted text lines or adjust any sheet from −10.0° to +10.0° in 0.1° steps with a live Original vs Straightened preview.
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
             <span className="rounded-full border border-neutral-800 px-3 py-1">
-              Auto + ±10.0° (0.1° step) slider
+              Corner-safe white margins
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 px-3 py-1">
-              <IconLock className="text-neutral-500" /> Processed on your device (no upload)
+              <IconLock className="text-neutral-500" /> Processed in your browser (no upload)
             </span>
-            <span className="rounded-full border border-neutral-800 px-3 py-1">No hourly cap or signup</span>
+            <span className="rounded-full border border-neutral-800 px-3 py-1">Free, no 3-task hourly cap</span>
           </div>
         </section>
         <DeskewWorkspace />
