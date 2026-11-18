@@ -10,9 +10,9 @@ import { getSiteUrl } from "@/lib/site";
 const SLUG = "/invert-pdf-colors";
 const TITLE = "Invert PDF Colors — Free Online PDF Inverter, No Upload";
 const DESCRIPTION =
-  "Invert PDF colors and download the new file. Keep photos in their original colors instead of turning them into negatives. Free, browser-side, no upload.";
+  "Free online PDF inverter (color / colour): turn white PDFs dark without photo negatives, or flip dark-background slides & notes to white for printing.";
 const SOCIAL_IMAGE_ALT =
-  "Invert PDF Colors with PDF Dark — free browser-side PDF inverter";
+  "Invert PDF Colors with PDF Dark: free browser-side PDF inverter for dark mode and print";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -44,61 +44,39 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "What happens when I invert a PDF?",
-    a: "The tool creates a new PDF with the color changes saved inside each page. Background and text swap, while images follow your Images setting. Open the result in Acrobat, Preview, a browser, or an e-reader and it looks the same everywhere because the change is in the file, not the viewer.",
+    q: "How do I invert PDF colour from black or dark-blue to white for printing?",
+    a: "Switch the converter at the top to Dark → Light (Print) and drop your file. Black, dark-navy, and dark-green slide backgrounds snap to pure white (#FFFFFF), already-white cover or question pages stay white, and white or colored strokes (yellow, cyan, green, royal blue, red) darken within their hue family so formulas print clearly.",
   },
   {
-    q: "Which setting gives a true, exact inversion?",
-    a: "For grayscale content, choose OLED with Darkness at 100% and Warmth at 0%. This uses a 255 − input color mapping, turning white into black and black into white. Set Images to Invert if scanned pages and embedded images should change too. Colored content uses a different mapping, and rendering or compression means converting twice may not restore the original.",
+    q: "Which Light → Dark setting gives an exact grayscale reversal?",
+    a: "Choose OLED with Darkness at 100% and Warmth at 0%. On grayscale text and backgrounds, OLED applies a symmetric 255 − value mapping without the blue or warm tint of Midnight, Sepia, or Solarized. Because saturated colors keep their hue and rasterized pages save as JPEG, running a converted PDF through a second time will not restore the original file byte-for-byte.",
   },
   {
-    q: "Can it turn a black background PDF back to white?",
-    a: "Yes. Because the OLED mapping is symmetric, a dark document run through it comes out light: black backgrounds become white and light text becomes black. A dark-themed handout is expensive to print, so flipping its colors first can save toner.",
+    q: "How does Auto decide which images to invert and which to keep?",
+    a: "In Light → Dark mode, Auto keeps photographs in their original colors, lightly dims bright colorful graphics, and inverts white-background screenshots, diagrams, and full-page scans (85% or more page coverage). Dark → Light (Print) applies the reverse rule automatically: dark blackboard captures flip to white while pasted white textbook questions and daylight photos stay untouched.",
   },
   {
-    q: "Will photos turn into negatives?",
-    a: "Only if you want them to. The default Auto mode keeps photos in their original colors, inverts white screenshots and diagrams so they blend with the page, and gently dims very bright images. Set Images to Invert for a literal flip of everything, or Original to leave every picture untouched.",
+    q: "Does the downloaded PDF keep sharp selectable text and a small file size?",
+    a: "On compatible vector pages whose images do not require pixel inversion, PDF Dark rewrites the PDF color stream directly (including manuals with copy-restriction owner passwords), keeping crisp vector glyphs, clickable links, and compact file sizes instead of ballooning 15–20x. Scanned pages and pages with inverted images render as JPEG up to 1.5x scale (capped at 4,096 px per side and ~8.4 MP per page) with an invisible Helvetica text layer added on upright Latin pages (no OCR).",
   },
   {
-    q: "Can I invert the text and background but leave images alone?",
-    a: "Yes — set Images to Original to keep embedded images in their original colors while changing text and page backgrounds. A full-page scan keeps its original appearance because the whole page is an image; use Images to Invert if you want that scanned page to change too. Some pages are re-rendered or compressed, so pixel-for-pixel preservation is not guaranteed.",
-  },
-  {
-    q: "Does the downloaded PDF keep selectable text?",
-    a: "Usually, on supported text-based pages. Some pages are rendered as images and may lose text selection or search, including pages with unsupported layouts or characters. Image-only scans do not gain selectable text because this tool does not add OCR. Check the downloaded copy before relying on text search.",
-  },
-  {
-    q: "Can I print the result?",
-    a: "Yes. That is one of the main reasons to invert PDF colors instead of using a viewer theme. Print the downloaded file from any reader and the page comes out exactly as you see it.",
-  },
-  {
-    q: "Is there a file size limit?",
-    a: "There is no fixed file-size limit. Conversion runs on your device and depends on available browser memory. Very large PDFs may take longer or fail, especially on phones. If conversion fails, try a smaller document or a desktop browser.",
-  },
-  {
-    q: "Is my PDF uploaded to a server?",
-    a: "No. Rendering, color mapping, and rebuilding the PDF all happen inside your browser tab. The downloaded file is assembled locally, so no server ever sees your document.",
-  },
-  {
-    q: "Can I share the downloaded PDF with someone else?",
-    a: "Yes. Email it, AirDrop it, or upload it to Google Drive or Dropbox. The recipient sees the changed colors automatically, with no setup on their end.",
+    q: "Is my PDF uploaded to a server or limited by file size?",
+    a: "Nothing is uploaded. Page rendering, color mapping, and PDF assembly all run locally in your browser tab (with pixel mapping offloaded to a background worker), with no account, watermark, or hourly task cap. Practical document size only depends on available device memory, so desktop browsers handle multi-hundred-page textbooks best.",
   },
 ];
 
-/** Conversion steps — single source of truth for the visible "How it works"
- *  cards and the HowTo JSON-LD, so the two can never drift apart. */
 const STEPS = [
   {
-    t: "Pick your settings",
-    d: "Choose how colors are mapped: Images can stay Original, use Auto, or fully Invert. You can also set the background, darkness, and warmth.",
+    t: "Pick direction & settings",
+    d: "Keep Light → Dark (Midnight, Sepia, Solarized, or OLED with Auto, Original, or Invert images), or choose Dark → Light (Print) for dark lecture slides and notes.",
   },
   {
     t: "Drop your PDF",
-    d: "Drag & drop or click to browse. Never leaves your browser.",
+    d: "Drag and drop or click to select a local PDF. Conversion runs inside your browser tab with zero server upload.",
   },
   {
-    t: "Download your PDF",
-    d: "Conversion starts immediately and the new file downloads itself — colors written into the document, ready to share, print, or read anywhere.",
+    t: "Download your new PDF",
+    d: "Your converted file saves automatically as -midnight.pdf, -oled.pdf, or -light.pdf with the new colors baked into the document.",
   },
 ];
 
@@ -109,32 +87,19 @@ function StructuredData() {
     "@type": "WebApplication",
     name: "PDF Color Inverter",
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Any (browser-based)",
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Any modern browser",
     screenshot: `${site}/compare/pdf-dark.png`,
     description: DESCRIPTION,
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
-  const faq = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(app) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
-      />
-    </>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(app).replace(/</g, "\\u003c"),
+      }}
+    />
   );
 }
 
@@ -165,22 +130,25 @@ export default function InvertPdfColorsPage() {
             Invert PDF Colors
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Choose how you want to invert PDF colors online, then drop your file.
-            This PDF color inverter downloads a new copy automatically with the
-            colors written into the file itself, so it stays that way in every viewer — Acrobat,
-            Preview, browsers, e-readers. Free, and your file never leaves the
-            browser.
+            Choose how you want to invert PDF colors online, then drop your
+            file. This PDF color inverter turns white documents dark without
+            turning photos into negatives, or switches to{" "}
+            <strong className="text-neutral-100 font-medium">
+              Dark → Light (Print)
+            </strong>{" "}
+            to flip dark-background lecture slides into clean white pages for
+            printing. Free, local in your browser, and saved into the new PDF.
           </p>
 
           <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconDownload className="text-neutral-500" /> Invert PDF &amp; Download
+              <IconDownload className="text-neutral-500" /> Light → Dark &amp; Dark → Light
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
               <IconLock className="text-neutral-500" /> 100% Browser-side
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconPalette className="text-neutral-500" /> 3 Image Modes
+              <IconPalette className="text-neutral-500" /> Photos Stay Natural (Auto)
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
               <IconSmartphone className="text-neutral-500" /> Works on Mobile
@@ -193,19 +161,32 @@ export default function InvertPdfColorsPage() {
           </div>
 
           <p className="mt-6 text-sm text-neutral-500">
-            Just here to read, not to save a file?{" "}
+            Just here to read tonight without saving a copy?{" "}
             <Link href="/" className="text-amber-400 hover:underline">
               Open the dark mode PDF reader
             </Link>
             .
           </p>
-          <p className="mt-3 text-sm text-neutral-500">
-            Want to remove color without inverting the page?{" "}
-            <Link href="/pdf-to-black-and-white" className="text-amber-400 hover:underline">Convert the PDF to grayscale or black and white</Link>.
+          <p className="mt-2.5 text-sm text-neutral-500">
+            Need monochrome without flipping backgrounds?{" "}
+            <Link
+              href="/pdf-to-black-and-white"
+              className="text-amber-400 hover:underline"
+            >
+              Convert PDF to black and white
+            </Link>{" "}
+            or{" "}
+            <Link
+              href="/whiten-pdf-background"
+              className="text-amber-400 hover:underline"
+            >
+              whiten gray scan paper
+            </Link>
+            .
           </p>
         </section>
 
-        {/* How it works */}
+        {/* How it works + two real 3-column output comparisons */}
         <section
           id="how"
           className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
@@ -215,16 +196,14 @@ export default function InvertPdfColorsPage() {
               How to invert PDF colors
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              This PDF inverter changes the colors of text and page backgrounds.
-              What happens to the
-              pictures is your call — that&apos;s what the Images control is
-              for: leave them untouched, flip them with the page, or let each
-              one be judged separately. Curious how that detection decides?{" "}
+              This PDF inverter rewrites page backgrounds and text in either
+              direction, while letting you control how embedded pictures and
+              board snapshots are handled. Curious about the per-page pipeline?{" "}
               <Link
                 href="/blog/how-pdf-dark-mode-conversion-works"
                 className="text-amber-400 hover:underline"
               >
-                Here&apos;s how the conversion works
+                Read how the conversion works
               </Link>
               .
             </p>
@@ -234,22 +213,23 @@ export default function InvertPdfColorsPage() {
                   key={s.t}
                   className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30"
                 >
-                  <div className="text-2xl font-bold text-amber-400">{i + 1}</div>
+                  <div className="text-2xl font-bold text-amber-400">
+                    {i + 1}
+                  </div>
                   <h3 className="mt-2 font-semibold text-neutral-50">{s.t}</h3>
                   <div className="mt-1 text-sm text-neutral-400">{s.d}</div>
                 </div>
               ))}
             </div>
 
-            {/* What the output looks like — same real assets as the home page */}
+            {/* Real comparison 1 — Light → Dark with embedded photo */}
             <div className="mt-14">
               <h3 className="text-lg font-semibold text-neutral-50 text-center m-0">
-                What the Images setting changes
+                Light → Dark: what the Images setting changes
               </h3>
               <p className="mt-2 mb-6 text-sm text-neutral-400 text-center max-w-xl mx-auto">
-                Text and background flip either way. The photograph is where
-                the difference shows up — and where flipping every pixel
-                blindly falls down.
+                Text and background darken either way. The photograph shows why
+                flipping every RGB pixel blindly ruins illustrated documents.
               </p>
               <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 <figure className="m-0">
@@ -259,7 +239,7 @@ export default function InvertPdfColorsPage() {
                       alt="PDF page before inversion: black text on a white background with a full-color sunset photo"
                       width={720}
                       height={933}
-                      sizes="33vw"
+                      sizes="(max-width: 768px) 33vw, 280px"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-neutral-500">
@@ -270,10 +250,10 @@ export default function InvertPdfColorsPage() {
                   <div className="rounded-lg overflow-hidden border border-neutral-800">
                     <Image
                       src="/compare/naive-invert.png"
-                      alt="The same page after a raw pixel inversion — the sunset photo becomes a false-color negative"
+                      alt="The same page after a raw pixel inversion where the sunset photo turns into a blue negative"
                       width={720}
                       height={933}
-                      sizes="33vw"
+                      sizes="(max-width: 768px) 33vw, 280px"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-neutral-500">
@@ -284,23 +264,82 @@ export default function InvertPdfColorsPage() {
                   <div className="rounded-lg overflow-hidden border border-amber-400/40">
                     <Image
                       src="/compare/pdf-dark.png"
-                      alt="The same page processed here — flipped background and text, photo keeps its original colors"
+                      alt="The same page processed here in Light to Dark with Images on Auto: dark background and natural sunset photo"
                       width={720}
                       height={933}
-                      sizes="33vw"
+                      sizes="(max-width: 768px) 33vw, 280px"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-amber-400">
-                    Processed here, Images: Auto
+                    Midnight + Images: Auto
                   </figcaption>
                 </figure>
               </div>
-              <p className="mt-3 text-xs text-neutral-600 text-center">
-                Real output, not a mockup: left is the source page, middle a
-                plain RGB reversal of every pixel, right this tool on Auto
-                (Midnight theme). Choosing Images: Invert flips photos along
-                with the page too — which is what a scan or a whiteboard shot
-                needs.
+              <p className="mt-3 text-xs text-neutral-500 text-center">
+                Actual tool output: left is the source page, middle is a plain
+                RGB reversal, right is Midnight with Images on Auto.
+              </p>
+            </div>
+
+            {/* Real comparison 2 — Dark → Light (Print) on dark coaching / smartboard notes */}
+            <div className="mt-14 pt-12 border-t border-neutral-900">
+              <h3 className="text-lg font-semibold text-neutral-50 text-center m-0">
+                Printing dark lecture slides &amp; blackboard notes
+              </h3>
+              <p className="mt-2 mb-6 text-sm text-neutral-400 text-center max-w-xl mx-auto">
+                Digital smartboard handouts often use dark-blue or green
+                backgrounds with yellow and cyan writing. Plain RGB inversion
+                tints the whole sheet and scrambles pen colors; print mode keeps
+                the paper pure white and darkens colored ink in place.
+              </p>
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-neutral-800">
+                    <Image
+                      src="/compare/board-source.webp"
+                      alt="Dark-navy smartboard lecture PDF with white equations, yellow highlights, and cyan diagram arrows"
+                      width={720}
+                      height={933}
+                      sizes="(max-width: 768px) 33vw, 280px"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                    Dark smartboard PDF
+                  </figcaption>
+                </figure>
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-neutral-800">
+                    <Image
+                      src="/compare/board-naive.webp"
+                      alt="Plain 255 minus RGB inversion turning the dark-navy board into a tan background and flipping yellow notes to blue"
+                      width={720}
+                      height={933}
+                      sizes="(max-width: 768px) 33vw, 280px"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                    Plain RGB invert (tinted bg)
+                  </figcaption>
+                </figure>
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                    <Image
+                      src="/compare/board-print.webp"
+                      alt="Processed here in print mode: pure white paper background and crisp dark amber, teal, and black ink"
+                      width={720}
+                      height={933}
+                      sizes="(max-width: 768px) 33vw, 280px"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-amber-400">
+                    Print mode (-light.pdf)
+                  </figcaption>
+                </figure>
+              </div>
+              <p className="mt-3 text-xs text-neutral-500 text-center">
+                Actual tool output on a dark-navy lecture note PDF: pure #FFFFFF
+                paper background saves toner while yellow, cyan, and green
+                annotations stay distinct and dark enough to print.
               </p>
             </div>
           </div>
@@ -312,23 +351,19 @@ export default function InvertPdfColorsPage() {
             Why invert PDF files instead of flipping a viewer setting?
           </h2>
           <p className="text-neutral-300 leading-relaxed">
-            Viewer themes, browser extensions, and the system-wide invert switch
-            only change how a PDF looks while it&apos;s open in that one app —
-            the file itself is unchanged. This tool produces a{" "}
-            <strong className="text-neutral-100">new PDF</strong>: send it to
-            your phone or e-reader, share it with a classmate, print it, or
-            archive it, and the colors travel with the file.
+            Viewer themes, browser extensions, and OS color filters only alter
+            how a PDF looks while it stays open in that one app; the document
+            itself never changes. Exporting a{" "}
+            <strong className="text-neutral-100">new PDF</strong> writes the
+            converted colors into the pages so you can send it to a phone or
+            e-reader, share it with classmates, or take a dark handout to a
+            print shop with zero setup on the other machine.
           </p>
           <p className="text-neutral-300 leading-relaxed mt-4">
-            There&apos;s one more difference that matters: a system-level invert
-            has no idea what it&apos;s flipping, so every photo, chart, and
-            screenshot comes out as a negative. Working on the file means each
-            image can be judged separately — or left alone entirely. If you
-            only need to get through a document tonight, skip the download and{" "}
-            <Link href="/" className="text-amber-400 hover:underline">
-              read it dark in the browser
-            </Link>{" "}
-            instead.
+            A screen-wide invert switch also treats every pixel the same, so
+            photographs, charts, and colored slides shift into false-color
+            negatives. Working on the PDF directly lets each embedded image be
+            classified separately or left untouched.
           </p>
 
           <div className="grid sm:grid-cols-2 gap-5 mt-10">
@@ -337,14 +372,11 @@ export default function InvertPdfColorsPage() {
                 Viewer / extension / OS invert
               </h3>
               <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
-                <li>Effect lasts only while that app or extension is running</li>
-                <li>Reopen in another reader → back to the original</li>
-                <li>Can&apos;t share or print the changed colors</li>
-                <li>
-                  Flips photos, screenshots, and charts with no way to exempt
-                  them
-                </li>
-                <li>Breaks when you update or switch device</li>
+                <li>Applies only while that specific viewer or extension runs</li>
+                <li>Reopening in Acrobat, mobile, or a print shop reverts to the original</li>
+                <li>Cannot export or print a white copy from dark lecture slides</li>
+                <li>Turns embedded photos and charts into negatives</li>
+                <li>Resets when you switch devices or share the file</li>
               </ul>
             </div>
 
@@ -354,33 +386,27 @@ export default function InvertPdfColorsPage() {
               </h3>
               <ul className="space-y-2 text-sm text-neutral-300 list-disc pl-5">
                 <li>
-                  <strong className="text-neutral-100">Permanent</strong> — the
-                  colors are in the file
+                  <strong className="text-neutral-100">Saved in the file:</strong>{" "}
+                  displays the same way in Acrobat, Preview, mobile, and print
                 </li>
                 <li>
-                  Looks the same in <strong className="text-neutral-100">every</strong> PDF
-                  reader, on every device
+                  Works both ways: white pages to dark themes, or dark slides to
+                  pure white paper
                 </li>
                 <li>
-                  Shareable — email, AirDrop, Drive, anything; recipient sees
-                  the changed colors with zero setup
+                  Per-image control so photos stay natural while diagrams flip
                 </li>
                 <li>
-                  Per-image control — photos keep their colors while the page
-                  around them flips
+                  Hue-preserving ink mapping keeps blue, yellow, and green notes
+                  in their original color family
                 </li>
                 <li>
-                  Hue-preserving color mapping — a dark-blue heading becomes
-                  light-blue, not gray
+                  Vector pages recolor in place, keeping crisp text and compact
+                  file sizes
                 </li>
               </ul>
             </div>
           </div>
-
-          <p className="text-xs text-neutral-500 text-center mt-8">
-            Think of it this way: an extension changes the view. This tool
-            creates a new PDF.
-          </p>
         </section>
 
         {/* Use cases */}
@@ -392,12 +418,26 @@ export default function InvertPdfColorsPage() {
           <div className="space-y-6">
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
+                Dark lecture slides and blackboard notes you need to print
+              </h3>
+              <p className="text-sm text-neutral-400">
+                Coaching handouts, smartboard class exports, and dark slide
+                decks soak paper in toner at the print shop. Print mode clears
+                dark board backgrounds to white paper and darkens colored
+                chalk or marker strokes so worked derivations stay easy to
+                follow on physical sheets.
+              </p>
+            </div>
+
+            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
+              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 Scanned documents and handwritten notes
               </h3>
               <p className="text-sm text-neutral-400">
-                On a scan there is no text layer — the writing <em>is</em> the
-                image. Set Images to Invert and the whole page flips, so
-                handwriting becomes light on dark.{" "}
+                On a scan there is no separate text layer because the writing is
+                part of the page image. Whole-page scans invert automatically in
+                Auto, and cropped notebook or whiteboard photos flip when you
+                set Images to Invert.{" "}
                 <Link
                   href="/blog/scanned-pdf-dark-mode"
                   className="text-amber-400 hover:underline"
@@ -410,25 +450,12 @@ export default function InvertPdfColorsPage() {
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                A dark PDF you need to print
-              </h3>
-              <p className="text-sm text-neutral-400">
-                Dark-themed handouts and slide exports are brutal on a printer.
-                Run one through on OLED and it comes back to black text on
-                white, ready to print without redesigning anything — the
-                inversion works in both directions.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
-              <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
                 Papers and slide decks full of figures
               </h3>
               <p className="text-sm text-neutral-400">
-                Line charts, circuit diagrams, sheet music, technical drawings —
-                black-on-white artwork inverts cleanly and stays legible. Auto
-                handles the mixed case, where a paper has both diagrams and
-                photographs on the same page.
+                Line charts, circuit diagrams, sheet music, and technical
+                drawings on white boxes flip cleanly in Auto while photographs
+                on the very same page retain their natural colors.
               </p>
             </div>
 
@@ -437,9 +464,10 @@ export default function InvertPdfColorsPage() {
                 Reading at night without wrecking the pictures
               </h3>
               <p className="text-sm text-neutral-400">
-                The usual reason to invert PDF colors is a bright page in a dim room.
-                The usual reason people give up on it is that the pictures come
-                out as negatives — which is exactly the case Auto exists for.
+                Bright white textbooks glare in a dim room, especially on OLED
+                tablets and phones. Saving a Midnight or Sepia copy lets you
+                read comfortably in any native PDF app without negative-looking
+                photos.
               </p>
             </div>
           </div>

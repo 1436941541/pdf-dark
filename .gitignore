@@ -61,3 +61,4 @@ next-env.d.ts
 # 页面规划（page-plan 的 pages.py 读写）与文案调研底稿：公开仓库只留本机，不上传
 docs/PAGES.md
 docs/copy/
+docs/refresh/

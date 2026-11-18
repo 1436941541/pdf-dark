@@ -19,8 +19,10 @@ import type { ThemeId } from "./themes";
 import type { ImageRect } from "./image-regions";
 import {
   classifyImage,
+  classifyLightPrintImage,
   imageDimAlpha,
   type ImageTreatment,
+  type InvertDirection,
 } from "./dark-color";
 import { extractNativeImage } from "./native-image";
 import { drawInvisibleTextLayer } from "./text-layer";
@@ -39,6 +41,8 @@ export type PageRender = {
   rasterPageSize?: { width: number; height: number; userUnit: number };
   imageRects: ImageRect[];
   scannedPage: boolean;
+  /** True when a page already has a white/light background in Dark → Light mode. */
+  alreadyLight?: boolean;
 };
 
 type NativeImageResult = Awaited<ReturnType<typeof extractNativeImage>>;
@@ -46,20 +50,30 @@ type NativeImageResult = Awaited<ReturnType<typeof extractNativeImage>>;
 /** How raster images are treated on the dark pages:
  *  - "original": images (and full-page scans) stay exactly as in the source
  *  - "smart":    per-image classifier picks keep / dim / invert (see
- *                classifyImage in dark-color.ts)
- *  - "invert":   images go through the dark mapping like everything else */
+ *                classifyImage / classifyLightPrintImage in dark-color.ts)
+ *  - "invert":   images go through the mapping like everything else */
 export type ImageMode = "original" | "smart" | "invert";
 
 /** Resolves what actually happens to one image under a mode. The single
  *  source of truth shared by preview (pdf-viewer) and both download paths. */
-export function imageTreatment(mode: ImageMode, r: ImageRect): ImageTreatment {
+export function imageTreatment(
+  mode: ImageMode,
+  r: ImageRect,
+  direction: InvertDirection = "dark",
+): ImageTreatment {
   if (mode === "original") return "keep";
   if (mode === "invert") return "invert";
+  if (direction === "light") return classifyLightPrintImage(r.brightness);
   return classifyImage(r.brightness, r.saturation);
 }
 
-function veilAlpha(mode: ImageMode, r: ImageRect): number {
-  return imageTreatment(mode, r) === "dim" ? imageDimAlpha(r.brightness) : 0;
+function veilAlpha(
+  mode: ImageMode,
+  r: ImageRect,
+  direction: InvertDirection = "dark",
+): number {
+  if (direction === "light") return 0;
+  return imageTreatment(mode, r, direction) === "dim" ? imageDimAlpha(r.brightness) : 0;
 }
 
 /** Object-mode state for one export. Preparing it before the render loop lets
@@ -71,7 +85,10 @@ export type DarkPdfDraft = {
   objectOk: boolean[];
   /** Recolors page `index` in place when object mode applies. True means the
    *  page is final as vector content and needs no raster render. */
-  recolorPage(index: number, page: Pick<PageRender, "scannedPage" | "imageRects">): Promise<boolean>;
+  recolorPage(
+    index: number,
+    page: Pick<PageRender, "scannedPage" | "imageRects" | "alreadyLight">,
+  ): Promise<boolean>;
 };
 
 export async function prepareDarkPdf(
@@ -81,6 +98,7 @@ export async function prepareDarkPdf(
   imageMode: ImageMode,
   darkness = 1,
   warmth = 0,
+  direction: InvertDirection = "dark",
 ): Promise<DarkPdfDraft> {
   const pdfLib = await import("pdf-lib");
 
@@ -111,9 +129,16 @@ export async function prepareDarkPdf(
       // with an image slated for INVERSION (whole "invert" mode, or the Auto
       // classifier flagging a document-like figure) also go raster: object
       // mode never touches image pixels, so it can't invert them.
-      if (!doc || page.scannedPage) return false;
-      if (page.imageRects.some((r) => imageTreatment(imageMode, r) === "invert")) return false;
-      objectOk[index] = await recolorPageInPlace(doc, index, theme, formsDone, darkness, warmth);
+      if (!doc) return false;
+      // In Dark → Light mode, leave already-white pages (cover sheets, white
+      // question pages) completely untouched so they never invert to black.
+      if (direction === "light" && page.alreadyLight) {
+        objectOk[index] = true;
+        return true;
+      }
+      if (page.scannedPage) return false;
+      if (page.imageRects.some((r) => imageTreatment(imageMode, r, direction) === "invert")) return false;
+      objectOk[index] = await recolorPageInPlace(doc, index, theme, formsDone, darkness, warmth, direction);
       return objectOk[index];
     },
   };
@@ -128,18 +153,19 @@ export async function buildDarkPdf(
   darkness = 1,
   warmth = 0,
   prepared?: DarkPdfDraft,
+  direction: InvertDirection = "dark",
 ): Promise<{ bytes: Uint8Array; objectPages: number; rasterPages: number }> {
   const pdfLib = await import("pdf-lib");
   let draft = prepared;
   if (!draft) {
-    draft = await prepareDarkPdf(srcBytes, pages.length, theme, imageMode, darkness, warmth);
+    draft = await prepareDarkPdf(srcBytes, pages.length, theme, imageMode, darkness, warmth, direction);
     for (let i = 0; i < pages.length; i++) await draft.recolorPage(i, pages[i]);
   }
   const { doc, objectOk } = draft;
   if (objectOk.length !== pages.length) throw new Error("Prepared PDF does not match the rendered pages");
 
   if (!doc || !objectOk.some(Boolean)) {
-    const bytes = await buildRasterOnly(pdfLib, pages, imageMode, pdfProxy);
+    const bytes = await buildRasterOnly(pdfLib, pages, imageMode, pdfProxy, direction);
     return { bytes, objectPages: 0, rasterPages: pages.length };
   }
 
@@ -170,7 +196,7 @@ export async function buildDarkPdf(
         const mb = page.getMediaBox();
         const k = mb.width / p.width;
         for (const r of p.imageRects) {
-          const a = veilAlpha(imageMode, r);
+          const a = veilAlpha(imageMode, r, direction);
           if (a <= 0.005) continue;
           page.drawRectangle({
             x: mb.x + r.x * k,
@@ -203,7 +229,7 @@ export async function buildDarkPdf(
       y: mb.y,
       width: mb.width,
       height: mb.height,
-    });
+    }, direction);
   }
 
   const bytes = await doc.save();
@@ -227,6 +253,7 @@ async function drawRasterPage(
   textFont: PDFFont,
   nativeCache: Map<string, NativeImageResult>,
   box: { x: number; y: number; width: number; height: number },
+  direction: InvertDirection = "dark",
 ): Promise<void> {
   const { rgb } = await import("pdf-lib");
 
@@ -243,7 +270,9 @@ async function drawRasterPage(
   const compositable = pageProxy
     ? p.imageRects.filter(
         (r) =>
-          r.composite && r.objId && imageTreatment(imageMode, r) !== "invert",
+          r.composite &&
+          r.objId &&
+          imageTreatment(imageMode, r, direction) !== "invert",
       )
     : [];
   for (const r of compositable) {
@@ -266,7 +295,7 @@ async function drawRasterPage(
         height: r.h * k,
       };
       page.drawImage(img, rect);
-      const a = veilAlpha(imageMode, r);
+      const a = veilAlpha(imageMode, r, direction);
       if (a > 0.005) {
         page.drawRectangle({ ...rect, color: rgb(0, 0, 0), opacity: a });
       }
@@ -297,6 +326,7 @@ async function buildRasterOnly(
   pages: PageRender[],
   imageMode: ImageMode,
   pdfProxy: PDFDocumentProxy | null,
+  direction: InvertDirection = "dark",
 ): Promise<Uint8Array> {
   const { PDFDocument, PDFName, PDFNumber, StandardFonts } = pdfLib;
   const doc = await PDFDocument.create();
@@ -325,7 +355,7 @@ async function buildRasterOnly(
       y: 0,
       width,
       height,
-    });
+    }, direction);
   }
   return doc.save();
 }

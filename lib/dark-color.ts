@@ -11,6 +11,9 @@
 
 import type { ThemeId } from "./themes";
 
+/** Conversion direction: white-to-dark themes vs dark-slide-to-white print mode. */
+export type InvertDirection = "dark" | "light";
+
 export const THEME_RGB: Record<ThemeId, { r: number; g: number; b: number }> = {
   midnight: { r: 25, g: 30, b: 45 },
   sepia: { r: 40, g: 35, b: 25 },
@@ -116,6 +119,82 @@ export function mapColor(
   return [aR + (hR - aR) * w, aG + (hG - aG) * w, aB + (hB - aB) * w];
 }
 
+/**
+ * Dark-slide → white-paper print mapping (keep synced in lib/dark-worker.ts & lib/pixel-dark.ts):
+ * - Dark backgrounds (brightness <= 55, including noisy JPEG black, dark navy,
+ *   or dark green chalkboards) snap cleanly to pure #FFFFFF so printers spend
+ *   zero toner on background tint.
+ * - White/light gray strokes map linearly down to crisp near-black ink.
+ * - Bright colored chalk/highlighter strokes (yellow, cyan, green, coral) keep
+ *   their hue and darken onto white paper (luminance capped at <= 110) so yellow
+ *   or cyan formulas stay legible instead of vanishing on white.
+ */
+const LIGHT_BG_SNAP = 55;
+const LIGHT_CHROMA_FADE = 30;
+const LIGHT_MAX_INK_LUM = 110;
+
+export function mapLightPrint(
+  r: number,
+  g: number,
+  b: number,
+): [number, number, number] {
+  const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+  const mx = Math.max(r, g, b);
+  const mn = Math.min(r, g, b);
+  // Pure/royal blue has low Rec.601 luminance (~29-50) despite high B channel;
+  // gating on max(brightness, mx * 0.58) keeps dark board tints (mx <= 94) pure
+  // white while preserving saturated blue and deep-red strokes.
+  const level = Math.max(brightness, mx * 0.58);
+  const gray =
+    level <= LIGHT_BG_SNAP
+      ? 255
+      : 255 * (1 - (level - LIGHT_BG_SNAP) / (255 - LIGHT_BG_SNAP));
+
+  const sat = (mx - mn) / 255;
+  const bgFade = Math.min(
+    1,
+    Math.max(0, (level - LIGHT_BG_SNAP) / LIGHT_CHROMA_FADE),
+  );
+  const chromaW =
+    Math.min(1, Math.max(0, (sat - CHROMA_LO) / (CHROMA_HI - CHROMA_LO))) *
+    bgFade;
+
+  if (chromaW <= 0) return [gray, gray, gray];
+
+  const l = (mx + mn) / 510;
+  const d = (mx - mn) / 255;
+  const s = Math.min(0.9, d / (1 - Math.abs(2 * l - 1) || 1));
+  let h: number;
+  const rn = r / 255;
+  const gn = g / 255;
+  const bn = b / 255;
+  if (mx === r) h = (((gn - bn) / d) % 6) / 6;
+  else if (mx === g) h = ((bn - rn) / d + 2) / 6;
+  else h = ((rn - gn) / d + 4) / 6;
+  if (h < 0) h += 1;
+
+  const l2 = 0.36 - 0.1 * l;
+  const q = l2 < 0.5 ? l2 * (1 + s) : l2 + s - l2 * s;
+  const p = 2 * l2 - q;
+  let hR = hueToRgb(p, q, h + 1 / 3) * 255;
+  let hG = hueToRgb(p, q, h) * 255;
+  let hB = hueToRgb(p, q, h - 1 / 3) * 255;
+
+  const hLum = 0.299 * hR + 0.587 * hG + 0.114 * hB;
+  if (hLum > LIGHT_MAX_INK_LUM) {
+    const scale = LIGHT_MAX_INK_LUM / hLum;
+    hR *= scale;
+    hG *= scale;
+    hB *= scale;
+  }
+
+  return [
+    gray + (hR - gray) * chromaW,
+    gray + (hG - gray) * chromaW,
+    gray + (hB - gray) * chromaW,
+  ];
+}
+
 /** Strongest veil the smart image dimmer will apply. */
 export const IMAGE_DIM_MAX = 0.18;
 
@@ -153,4 +232,16 @@ export function classifyImage(
   if (brightness >= 190 && (saturation ?? 1) < 0.12) return "invert";
   if (brightness < 150) return "keep";
   return "dim";
+}
+
+/**
+ * Auto image classifier for Dark → Light (Print):
+ * - Dark embedded images (blackboard captures, dark plots/code, brightness <= 125)
+ *   invert to white with the slide.
+ * - Already-light pasted question screenshots and normal daylight photos
+ *   (brightness > 125) stay untouched so white boxes never flip to black blocks.
+ */
+export function classifyLightPrintImage(brightness?: number): ImageTreatment {
+  if (brightness !== undefined && brightness <= 125) return "invert";
+  return "keep";
 }

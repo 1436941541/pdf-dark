@@ -9,9 +9,11 @@ import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/component
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/de/invert-pdf-colors";
-const TITLE = "PDF-Farben invertieren — Online-Konverter ohne Upload";
+const TITLE = "PDF-Farben invertieren kostenlos (Dunkelmodus & Druck)";
 const DESCRIPTION =
-  "Invertieren Sie die Farben einer PDF und laden Sie die neue Datei herunter. Fotos können ihre Originalfarben behalten statt negativ zu werden. Kostenlos.";
+  "PDF-Farben kostenlos im Browser invertieren: helle Seiten ohne Foto-Negative abdunkeln oder dunkle Vorlesungsfolien zum Drucken auf Weiß umkehren.";
+const SOCIAL_IMAGE_ALT =
+  "PDF-Farben invertieren im Browser: Dunkelmodus und heller Folien-Druckmodus";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -37,64 +39,45 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
+    images: [{ url: `${SLUG}/opengraph-image`, alt: SOCIAL_IMAGE_ALT }],
   },
 };
 
 const FAQ = [
   {
-    q: "Was genau entsteht beim Invertieren einer PDF?",
-    a: "Eine komplett neue PDF, bei der die Farben im Seiteninhalt selbst umgekehrt sind — Hintergrund und Text vertauscht, Bilder je nach Ihrer Bildeinstellung behandelt. Öffnen Sie sie in Acrobat, in der Vorschau, im Browser oder auf einem E-Reader: überall sieht sie gleich aus, weil die Änderung in der Datei steckt und nicht in einer Einstellung des Viewers.",
+    q: "Wie kehre ich eine schwarze oder dunkelblaue PDF zum Drucken auf Weiß um?",
+    a: "Wählen Sie oben im Werkzeug Dunkel → Hell (Drucken) und legen Sie Ihre PDF ab. Schwarze, dunkelblaue und dunkelgrüne Tafel- oder Folienhintergründe werden zu Reinweiß (#FFFFFF), bereits weiße Deck- oder Aufgabenseiten bleiben weiß, und gelbe, türkise, blaue oder grüne Markierungen dunkeln im selben Farbton ab, damit Formeln auf Papier klar lesbar sind.",
   },
   {
-    q: "Welche Einstellung ergibt eine mathematisch exakte Umkehrung?",
-    a: "Das OLED-Design. Dort gilt für Graustufeninhalte exakt Ausgabe = 255 − Eingabe: reines Weiß wird reines Schwarz, reines Schwarz wird reines Weiß, und wenn Sie das Ergebnis erneut durchlaufen lassen, erhalten Sie das Original zurück. Midnight, Sepia und Solarized setzen den hellen Text stattdessen auf einen leicht getönten Hintergrund — angenehmer für lange Sitzungen, aber keine exakte Umkehrung.",
+    q: "Welche Einstellung im Dunkelmodus liefert eine exakte Graustufen-Umkehrung?",
+    a: "Nutzen Sie das Design OLED mit Dunkelheit 100 % und Wärme 0 %. Für Graustufen gilt dort Ausgabe = 255 − Eingabe ohne den blauen oder warmen Grundton von Midnight, Sepia oder Solarized. Da gesättigte Farben ihren Farbton behalten und gerasterte Seiten als JPEG gespeichert werden, stellt ein zweiter Durchlauf die Originaldatei nicht Byte für Byte wieder her.",
   },
   {
-    q: "Kann eine PDF mit schwarzem Hintergrund wieder weiß werden?",
-    a: "Ja. Weil die OLED-Abbildung symmetrisch ist, kommt ein dunkles Dokument hell wieder heraus: schwarze Flächen werden weiß, heller Text wird schwarz. Für den Druck ist das praktisch: ein dunkler Hintergrund frisst viel Toner, invertieren Sie ihn vorher weg.",
+    q: "Wie entscheidet Auto, welche Bilder umgekehrt und welche erhalten bleiben?",
+    a: "Beim Abdunkeln heller Seiten prüft Auto Helligkeit und Sättigung jedes eingebetteten Bildes: Fotos behalten ihre Originalfarben, sehr helle farbige Abbildungen werden leicht gedimmt, und weiße Screenshots, Strichdiagramme sowie ganzseitige Scans (ab 85 % Seitenfläche) werden mit umgekehrt. Der Folien-Druckmodus kehrt dunkle Tafelbilder automatisch auf Weiß um und lässt eingefügte weiße Aufgabenkästen sowie normale Fotos unangetastet.",
   },
   {
-    q: "Werden Fotos zu Negativen?",
-    a: "Nur wenn Sie es wollen. Der Auto-Modus belässt Fotos in ihren Originalfarben, kehrt weiße Screenshots und Diagramme um, damit sie zur Seite passen, und dunkelt sehr helle Bilder leicht ab. Stellen Sie Bilder auf Umkehren, um wirklich alles mit umzukehren, oder auf Original, um jedes Bild unangetastet zu lassen.",
+    q: "Bleibt der Text in der heruntergeladenen PDF scharf und auswählbar?",
+    a: "Auf kompatiblen Vektorseiten ohne invertierte Bilder färbt PDF Dark den PDF-Farbstrom direkt um (auch bei Handbüchern mit Kopierschutz ohne Öffnungspasswort). Schrift bleibt gestochen scharf, durchsuchbar und kompakt, statt auf das 15- bis 20-Fache anzuwachsen. Gescannte Seiten oder Seiten mit umgekehrten Bildern werden als JPEG bis Skalierung 1.5x (maximal 4096 px Kantenlänge und ~8,4 MP pro Seite) mit unsichtbarer Helvetica-Textebene für aufrechten lateinischen Text gespeichert, ohne OCR.",
   },
   {
-    q: "Kann ich Text und Hintergrund invertieren, Bilder aber unangetastet lassen?",
-    a: "Ja — stellen Sie Bilder auf Original. Jedes eingebettete Bild bleibt pixelgenau wie in der Quelle, auch ganzseitige Scans, und nur Text und Hintergrund werden umgekehrt. Kreisförmig beschnittene Bilder wie Profilfotos werden durch ihren runden Rahmen wiederhergestellt, sodass keine hellen Ecken auf der dunklen Seite stehen bleiben.",
-  },
-  {
-    q: "Bleibt der Text in der invertierten PDF auswählbar?",
-    a: "Ja, soweit die Originalseite das zulässt. Textseiten werden als Vektorobjekte neu eingefärbt, der ausgegebene Text bleibt also auswählbar und durchsuchbar. Gescannte Seiten sind von vornherein Bilder und werden entsprechend als Bilder invertiert.",
-  },
-  {
-    q: "Kann ich die invertierte Version drucken?",
-    a: "Ja — das ist einer der Hauptgründe, die Datei zu invertieren statt ein Design im Viewer einzustellen. Drucken Sie die heruntergeladene Datei aus einem beliebigen Reader, und die Seite kommt genau so heraus, wie Sie sie sehen.",
-  },
-  {
-    q: "Gibt es eine Begrenzung der Dateigröße?",
-    a: "Keine feste Grenze. Die Umwandlung läuft vollständig auf Ihrem Gerät, die praktische Grenze ist also der Arbeitsspeicher Ihres Browsers — große Dokumente dauern einfach länger.",
-  },
-  {
-    q: "Wird meine PDF auf einen Server hochgeladen?",
-    a: "Nein. Rendern, Invertieren und Neuaufbau der PDF passieren alle im Tab Ihres Browsers. Die heruntergeladene Datei wird lokal erzeugt — es gibt keinen Server, der Ihr Dokument je zu sehen bekommt.",
-  },
-  {
-    q: "Kann ich die invertierte Datei an andere weitergeben?",
-    a: "Ja. Per Mail verschicken, per AirDrop übertragen, in Google Drive oder Dropbox ablegen — wer sie erhält, sieht automatisch die invertierte Fassung. Es muss nichts eingestellt werden.",
+    q: "Wird meine PDF auf einen Server hochgeladen oder in der Größe begrenzt?",
+    a: "Es wird nichts hochgeladen. Seitenaufbau, Farbabbildung und PDF-Erzeugung laufen lokal in Ihrem Browser-Tab (mit Pixelberechnung im Hintergrund-Worker), ohne Registrierung, Wasserzeichen oder Stundenlimit. Die praktische Dateigröße hängt allein vom verfügbaren Arbeitsspeicher Ihres Geräts ab.",
   },
 ];
 
 const STEPS = [
   {
-    t: "Einstellungen wählen",
-    d: "Legen Sie fest, wie weit die Umkehrung geht — Bilder: Original, Auto oder vollständig Umkehren — dazu Hintergrund, Dunkelheit und Wärme.",
+    t: "Richtung & Design wählen",
+    d: "Nutzen Sie Hell → Dunkel (Midnight, Sepia, Solarized oder OLED mit Bilder auf Auto, Original oder Umkehren) oder wechseln Sie für dunkle Folien in den Druckmodus.",
   },
   {
-    t: "PDF ablegen",
-    d: "Per Drag-and-drop ablegen oder auf Ihrem Gerät auswählen. Die Datei verlässt den Browser nie.",
+    t: "PDF lokal ablegen",
+    d: "Datei per Drag-and-drop hineinziehen oder auswählen. Die Umwandlung läuft vollständig lokal im Browser-Tab ohne Upload.",
   },
   {
-    t: "Invertierte PDF erhalten",
-    d: "Die Umwandlung startet sofort und die neue Datei lädt von selbst herunter — mit den Farben im Dokument, bereit zum Teilen, Drucken oder Lesen, wo immer Sie wollen.",
+    t: "Neue PDF herunterladen",
+    d: "Die fertige Datei speichert sich automatisch als -midnight.pdf, -oled.pdf oder -light.pdf, mit fest im Dokument hinterlegten Farben.",
   },
 ];
 
@@ -105,32 +88,20 @@ function StructuredData() {
     "@type": "WebApplication",
     name: "PDF-Farben invertieren",
     url: `${site}${SLUG}`,
-    applicationCategory: "UtilityApplication",
-    operatingSystem: "Any (browser-based)",
+    applicationCategory: "UtilitiesApplication",
+    operatingSystem: "Any modern browser",
     screenshot: `${site}/compare/pdf-dark.png`,
     description: DESCRIPTION,
+    inLanguage: "de",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
-  const faq = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(app) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
-      />
-    </>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(app).replace(/</g, "\\u003c"),
+      }}
+    />
   );
 }
 
@@ -144,8 +115,14 @@ export default function GermanInvertPage() {
             <span className="text-2xl">🌙</span>
             <span className="text-lg font-semibold whitespace-nowrap">PDF Dark</span>
           </Link>
-          <ResponsiveNavigation locale="de" desktopGap="wide" language={<LanguageSwitcher page="invert" current="de" />}>
-            <Link href="/de" className="hover:text-neutral-100">PDF-Reader</Link>
+          <ResponsiveNavigation
+            locale="de"
+            desktopGap="wide"
+            language={<LanguageSwitcher page="invert" current="de" />}
+          >
+            <Link href="/de" className="hover:text-neutral-100">
+              PDF-Reader
+            </Link>
           </ResponsiveNavigation>
         </div>
       </header>
@@ -157,24 +134,28 @@ export default function GermanInvertPage() {
             PDF-Farben invertieren
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            PDF-Farben invertieren geht hier direkt: Einstellungen wählen,
-            PDF ablegen — die invertierte Kopie lädt von selbst herunter. Die Farben stehen in der Datei selbst, sie bleibt
-            also in jedem Viewer so: Acrobat, Vorschau, Browser, E-Reader.
-            Kostenlos, und Ihre Datei verlässt den Browser nie.
+            Hier lassen sich PDF-Farben direkt im Browser invertieren und als
+            neue Datei speichern: helle Dokumente abdunkeln, ohne Fotos in
+            Negative zu verwandeln, oder im{" "}
+            <strong className="text-neutral-100 font-medium">
+              Folien-Druckmodus (Dunkel zu Hell)
+            </strong>{" "}
+            dunkle Vorlesungsfolien und Tafelnotizen tonersparend auf weißen
+            Hintergrund umkehren.
           </p>
 
           <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs text-neutral-400">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconDownload className="text-neutral-500" /> Invertierte PDF herunterladen
+              <IconDownload className="text-neutral-500" /> Dunkelmodus &amp; Folien-Druck
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconLock className="text-neutral-500" /> 100% im Browser
+              <IconLock className="text-neutral-500" /> 100 % im Browser
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconPalette className="text-neutral-500" /> 3 Bildmodi
+              <IconPalette className="text-neutral-500" /> Fotos ohne Negativ-Effekt
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-neutral-800">
-              <IconSmartphone className="text-neutral-500" /> Mobil nutzbar
+              <IconSmartphone className="text-neutral-500" /> Mobil &amp; Desktop
             </span>
           </div>
 
@@ -183,7 +164,7 @@ export default function GermanInvertPage() {
           </div>
 
           <p className="mt-6 text-sm text-neutral-500">
-            Nur lesen, keine Datei speichern?{" "}
+            Heute Abend nur lesen, ohne eine Kopie zu speichern?{" "}
             <Link href="/de" className="text-amber-400 hover:underline">
               PDF-Reader im Dunkelmodus öffnen
             </Link>
@@ -191,49 +172,48 @@ export default function GermanInvertPage() {
           </p>
         </section>
 
-        {/* How it works */}
+        {/* How it works + two real comparisons */}
         <section
           id="how"
           className="w-full py-20 border-y border-neutral-900 bg-[#0e0e0e]"
         >
           <div className="max-w-4xl mx-auto px-6">
             <h2 className="text-2xl font-bold mb-3 text-center">
-              So invertieren Sie die PDF-Farben
+              So können Sie PDF-Farben invertieren
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
-              Text und Hintergrund werden immer umgekehrt. Was mit den Bildern
-              passiert, entscheiden Sie — dafür ist die Bildsteuerung da: Bilder
-              unangetastet lassen, mit der Seite umkehren, oder jedes einzeln
-              bewerten lassen.
+              Dieses Werkzeug schreibt Hintergrund- und Textfarben in beide
+              Richtungen neu und bewertet eingebettete Fotos sowie
+              Tafel-Screenshots getrennt.
             </p>
             <div className="grid sm:grid-cols-3 gap-6">
               {STEPS.map((s, i) => (
-                <div key={s.t} className="rounded-xl border border-neutral-800 p-5">
-                  <div className="text-amber-400 font-bold text-lg">{i + 1}</div>
+                <div key={s.t} className="rounded-xl border border-neutral-800 bg-neutral-900/30 p-6">
+                  <div className="text-amber-400 font-bold text-2xl">{i + 1}</div>
                   <h3 className="mt-2 font-semibold text-neutral-50">{s.t}</h3>
-                  <p className="text-sm text-neutral-400 mt-2">{s.d}</p>
+                  <p className="text-sm text-neutral-400 mt-1">{s.d}</p>
                 </div>
               ))}
             </div>
 
             <div className="mt-14">
               <h3 className="text-lg font-semibold text-neutral-50 text-center m-0">
-                Was die Bildeinstellung ändert
+                Hell → Dunkel: was die Bildeinstellung bewirkt
               </h3>
               <p className="mt-2 mb-6 text-sm text-neutral-400 text-center max-w-xl mx-auto">
-                Text und Hintergrund werden in beiden Fällen umgekehrt. Beim
-                Foto zeigt sich der Unterschied — und dort scheitert blindes
-                Umkehren jedes einzelnen Pixels.
+                Text und Seitenhintergrund dunkeln in beiden Fällen ab. Am Foto
+                zeigt sich, warum eine blinde RGB-Pixelumkehr illustrierte PDFs
+                unbrauchbar macht.
               </p>
               <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 <figure className="m-0">
                   <div className="rounded-lg overflow-hidden border border-neutral-800">
                     <Image
                       src="/compare/original.png"
-                      alt="PDF-Seite vor der Umkehrung: schwarzer Text auf weißem Hintergrund, dazu ein Farbfoto eines Sonnenuntergangs"
+                      alt="PDF-Seite vor dem Invertieren: schwarzer Text auf Weiß mit farbigem Sonnenuntergangsfoto"
                       width={720}
                       height={933}
-                      sizes="33vw"
+                      sizes="(max-width: 768px) 33vw, 280px"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-neutral-500">
@@ -244,38 +224,88 @@ export default function GermanInvertPage() {
                   <div className="rounded-lg overflow-hidden border border-neutral-800">
                     <Image
                       src="/compare/naive-invert.png"
-                      alt="Dieselbe Seite nach einfacher Pixelumkehr — das Sonnenuntergangsfoto kippt in ein farbverfälschtes Negativ"
+                      alt="Dieselbe Seite nach einfacher RGB-Umkehrung mit blau verfärbtem Negativfoto"
                       width={720}
                       height={933}
-                      sizes="33vw"
+                      sizes="(max-width: 768px) 33vw, 280px"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-neutral-500">
-                    Jedes Pixel umgekehrt
+                    Simple RGB-Umkehr
                   </figcaption>
                 </figure>
                 <figure className="m-0">
                   <div className="rounded-lg overflow-hidden border border-amber-400/40">
                     <Image
                       src="/compare/pdf-dark.png"
-                      alt="Dieselbe Seite hier invertiert — Hintergrund und Text umgekehrt, das Sonnenuntergangsfoto behält seine Originalfarben"
+                      alt="Dieselbe Seite hier mit Midnight und Bilder auf Auto verarbeitet: dunkler Hintergrund, echtes Foto"
                       width={720}
                       height={933}
-                      sizes="33vw"
+                      sizes="(max-width: 768px) 33vw, 280px"
                     />
                   </div>
                   <figcaption className="mt-2 text-center text-xs text-amber-400">
-                    Hier invertiert, Bilder: Auto
+                    Midnight + Bilder: Auto
                   </figcaption>
                 </figure>
               </div>
-              <p className="mt-3 text-xs text-neutral-600 text-center">
-                Echtes Ergebnis, kein Mockup: links die Quellseite, in der Mitte
-                eine simple RGB-Umkehr jedes Pixels, rechts dieses Werkzeug im
-                Auto-Modus (Design Midnight). Mit Bilder: Umkehren werden auch
-                die Fotos zusammen mit der Seite invertiert — genau das, was ein Scan
-                oder ein abfotografiertes Whiteboard braucht.
+            </div>
+
+            <div className="mt-14 pt-12 border-t border-neutral-900">
+              <h3 className="text-lg font-semibold text-neutral-50 text-center m-0">
+                Dunkle Vorlesungsfolien &amp; Tafelnotizen druckfertig machen
+              </h3>
+              <p className="mt-2 mb-6 text-sm text-neutral-400 text-center max-w-xl mx-auto">
+                Digitale Tafelaufschriebe nutzen oft dunkelblaue oder grüne
+                Hintergründe mit gelber und türkiser Schrift. Eine simple
+                RGB-Umkehr färbt das ganze Blatt beige ein und vertauscht
+                Stiftfarben; der Druckmodus liefert Reinweiß und dunkle,
+                farbtreue Tinte.
               </p>
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-neutral-800">
+                    <Image
+                      src="/compare/board-source.webp"
+                      alt="Dunkelblaue Smartboard-Vorlesungs-PDF mit weißen Gleichungen, gelben Kästen und türkisem Diagramm"
+                      width={720}
+                      height={933}
+                      sizes="(max-width: 768px) 33vw, 280px"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                    Dunkle Vorlesungs-PDF
+                  </figcaption>
+                </figure>
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-neutral-800">
+                    <Image
+                      src="/compare/board-naive.webp"
+                      alt="Simple RGB-Umkehr mit beigem Seitenhintergrund und blau verfärbten gelben Formeln"
+                      width={720}
+                      height={933}
+                      sizes="(max-width: 768px) 33vw, 280px"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                    Simple RGB-Umkehr (getönt)
+                  </figcaption>
+                </figure>
+                <figure className="m-0">
+                  <div className="rounded-lg overflow-hidden border border-amber-400/40">
+                    <Image
+                      src="/compare/board-print.webp"
+                      alt="Mit Dunkel zu Hell Drucken umgewandelt: reinweißes Papier und kräftig abgedunkelte Formelfarben"
+                      width={720}
+                      height={933}
+                      sizes="(max-width: 768px) 33vw, 280px"
+                    />
+                  </div>
+                  <figcaption className="mt-2 text-center text-xs text-amber-400">
+                    Druckmodus (-light.pdf)
+                  </figcaption>
+                </figure>
+              </div>
             </div>
           </div>
         </section>
@@ -283,133 +313,115 @@ export default function GermanInvertPage() {
         {/* Why invert the file */}
         <section className="max-w-3xl mx-auto px-6 py-16">
           <h2 className="text-2xl font-bold mb-8 text-center">
-            Warum die PDF-Farben invertieren statt den Viewer umzustellen?
+            Warum die PDF-Datei umfärben statt nur die Ansicht im Viewer?
           </h2>
           <p className="text-neutral-300 leading-relaxed">
-            Viewer-Designs, Browser-Erweiterungen und die Farbumkehr des
-            Betriebssystems ändern nur, wie eine PDF aussieht, solange sie in
-            dieser App geöffnet ist — die Datei selbst bleibt unverändert. Beim
-            Invertieren entsteht eine{" "}
-            <strong className="text-neutral-100">neue PDF</strong>: schicken Sie
-            sie aufs Handy oder den E-Reader, geben Sie sie an Kolleginnen
-            weiter, drucken oder archivieren Sie sie — die Farben reisen mit der
-            Datei.
+            Viewer-Designs, Browser-Erweiterungen und Betriebssystem-Filter
+            ändern nur die Bildschirmanzeige in genau diesem Programm; die
+            PDF-Datei selbst bleibt unverändert. Wenn Sie hier{" "}
+            <strong className="text-neutral-100">PDF-Farben invertieren</strong>{" "}
+            und eine neue Datei speichern, steckt das Ergebnis direkt in den
+            Seiten: zum Lesen auf dem Tablet oder E-Reader, zum Teilen im
+            Studium oder für den Ausdruck im Copyshop.
           </p>
           <p className="text-neutral-300 leading-relaxed mt-4">
-            Es gibt noch einen Unterschied, der zählt: wer eine PDF invertieren
-            will, meint fast nie „alles umkehren“ — eine Umkehr auf Systemebene
-            weiß aber nicht, was sie da umkehrt, also kommt jedes Foto,
-            jede Grafik und jeder Screenshot als Negativ heraus. An der Datei zu
-            arbeiten erlaubt es, jedes Bild einzeln zu bewerten — oder es ganz
-            in Ruhe zu lassen. Wenn Sie nur heute Abend ein Dokument
-            durchbekommen müssen, sparen Sie sich den Download und{" "}
-            <Link href="/de" className="text-amber-400 hover:underline">
-              lesen Sie es dunkel im Browser
-            </Link>
-            .
+            Eine systemweite Farbumkehr kippt außerdem jedes Foto, jedes
+            Diagramm und jede farbige Folie ungefiltert ins Negativ. Durch die
+            Verarbeitung der Datei selbst wird jedes eingebettete Bild separat
+            klassifiziert oder unverändert übernommen.
           </p>
 
           <div className="grid sm:grid-cols-2 gap-5 mt-10">
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/40">
               <h3 className="text-sm font-semibold text-neutral-400 mb-3 m-0">
-                Viewer / Erweiterung / Systemumkehr
+                Viewer / Erweiterung / Systemfilter
               </h3>
               <ul className="space-y-2 text-sm text-neutral-400 list-disc pl-5">
-                <li>Nur umgekehrt, solange diese App oder Erweiterung aktiv ist</li>
-                <li>In einem anderen Reader geöffnet, ist wieder alles hell</li>
-                <li>Die invertierte Fassung lässt sich weder teilen noch drucken</li>
-                <li>Kehrt Fotos, Screenshots und Grafiken mit um, ohne Ausnahme</li>
-                <li>Geht beim Update oder Gerätewechsel verloren</li>
+                <li>Wirkt nur lokal, solange diese App oder Erweiterung läuft</li>
+                <li>In Acrobat, auf dem Handy oder beim Drucken wieder im Originalzustand</li>
+                <li>Erzeugt keine weiße Druckdatei aus dunklen Vorlesungsfolien</li>
+                <li>Verwandelt eingebettete Fotos und Grafiken in Negative</li>
+                <li>Geht beim Gerätewechsel oder Weiterleiten verloren</li>
               </ul>
             </div>
 
             <div className="p-6 rounded-xl border border-amber-400/30 bg-amber-400/5">
               <h3 className="text-sm font-semibold text-amber-400 mb-3 m-0">
-                Eine invertierte PDF-Datei
+                PDF mit gespeicherten Farbänderungen
               </h3>
               <ul className="space-y-2 text-sm text-neutral-300 list-disc pl-5">
                 <li>
-                  <strong className="text-neutral-100">Dauerhaft</strong> — die
-                  Farben stehen in der Datei
+                  <strong className="text-neutral-100">Fest in der Datei:</strong>{" "}
+                  identische Darstellung in Acrobat, Vorschau, Mobilgeräten und im Druck
                 </li>
                 <li>
-                  Sieht in <strong className="text-neutral-100">jedem</strong>{" "}
-                  PDF-Reader gleich aus, auf jedem Gerät
+                  Beide Richtungen: helle Seiten abdunkeln oder dunkle Folien auf Reinweiß setzen
                 </li>
                 <li>
-                  Teilbar — Mail, AirDrop, Drive, egal was; wer sie bekommt,
-                  sieht die invertierte Fassung ohne eine einzige Einstellung
+                  Bildgenaue Steuerung bewahrt echte Fotos und kehrt Diagramme sauber um
                 </li>
                 <li>
-                  Steuerung pro Bild — Fotos behalten ihre Farben, während die
-                  Seite ringsum umgekehrt wird
+                  Farbtonerhaltende Abbildung für farbige Überschriften und Tafelmarkierungen
                 </li>
                 <li>
-                  Farbtonerhaltende Abbildung — eine dunkelblaue Überschrift
-                  wird hellblau, nicht grau
+                  Vektorseiten werden direkt im PDF-Strom umgefärbt und bleiben scharf sowie schlank
                 </li>
               </ul>
             </div>
           </div>
-
-          <p className="text-xs text-neutral-500 text-center mt-8">
-            Anders gesagt: eine Erweiterung ist Schminke auf der PDF.
-            PDF-Farben invertieren ergibt eine neue PDF.
-          </p>
         </section>
 
         {/* Use cases */}
         <section className="max-w-3xl mx-auto px-6 pb-16">
           <h2 className="text-2xl font-bold mb-10 text-center">
-            Wann sich das Invertieren der PDF-Farben lohnt
+            Typische Einsätze, wenn Sie PDF-Farben invertieren
           </h2>
 
           <div className="space-y-6">
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Gescannte Dokumente und handschriftliche Notizen
+                Dunkle Vorlesungsfolien und Skripte tonersparend drucken
               </h3>
               <p className="text-sm text-neutral-400">
-                In einem Scan gibt es keine Textebene — die Handschrift <em>ist</em>{" "}
-                das Bild. Stellen Sie Bilder auf Umkehren, dann dreht sich die
-                ganze Seite und die Handschrift steht hell auf dunkel.
+                Skripte im Dark Mode und exportierte Smartboard-Tafelbilder
+                verbrauchen beim Ausdrucken enorm viel Toner. Der Druckmodus
+                setzt dunkle Hintergründe auf weißes Papier und dunkelt farbige
+                Rechenwege lesbar ab.
               </p>
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Eine dunkle PDF, die Sie drucken müssen
+                Gescannte Dokumente und handschriftliche Aufschriebe
               </h3>
               <p className="text-sm text-neutral-400">
-                Broschüren mit dunklem Design und exportierte Folien sind für
-                jeden Drucker eine Zumutung. Einmal durch OLED geschickt, sind
-                sie wieder schwarzer Text auf Weiß und druckfertig, ohne dass
-                Sie etwas neu gestalten müssen — die Umkehrung funktioniert in
-                beide Richtungen.
+                In einem Scan liegt keine separate Textebene vor, da die Schrift
+                Teil des Seitenbildes ist. Ganzseitige Scans werden im
+                Auto-Modus automatisch mitgedreht; kleinere Notiz- oder
+                Whiteboard-Ausschnitte kehren Sie über Bilder: Umkehren um.
               </p>
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Fachtexte und Präsentationen voller Abbildungen
+                Fachartikel und Präsentationen mit Diagrammen und Fotos
               </h3>
               <p className="text-sm text-neutral-400">
-                Liniendiagramme, Schaltpläne, Notenblätter, technische
-                Zeichnungen — schwarze Strichgrafik auf Weiß kehrt sich sauber
-                um und bleibt lesbar. Auto übernimmt den gemischten Fall, wenn
-                ein Aufsatz Diagramme und Fotos auf derselben Seite hat.
+                Schaltpläne, Liniendiagramme, Notenblätter und technische
+                Zeichnungen auf weißem Grund kehren sich im Auto-Modus sauber
+                um, während Fotografien auf derselben Seite ihre natürlichen
+                Farben behalten.
               </p>
             </div>
 
             <div className="p-6 rounded-xl border border-neutral-800 bg-neutral-900/30">
               <h3 className="font-semibold text-neutral-50 mb-1 text-base m-0 mt-0">
-                Nachts lesen, ohne die Bilder zu ruinieren
+                Abends auf Tablet oder Smartphone augenschonend lesen
               </h3>
               <p className="text-sm text-neutral-400">
-                Der übliche Grund, eine PDF zu invertieren, ist eine grelle
-                Seite im dunklen Raum. Der übliche Grund, es wieder
-                aufzugeben, sind Bilder, die als Negative herauskommen — genau
-                der Fall, für den es den Auto-Modus gibt.
+                Grelle weiße Lehrbücher blenden im abgedunkelten Raum, besonders
+                auf OLED-Displays. Mit einer gespeicherten Midnight- oder
+                Sepia-Kopie lesen Sie entspannt in jeder nativen PDF-App.
               </p>
             </div>
           </div>

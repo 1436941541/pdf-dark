@@ -28,7 +28,12 @@ import type {
   PDFContext,
   PDFRawStream as PDFRawStreamType,
 } from "pdf-lib";
-import { effectiveThemeBg, mapColor } from "./dark-color";
+import {
+  effectiveThemeBg,
+  mapColor,
+  mapLightPrint,
+  type InvertDirection,
+} from "./dark-color";
 import type { ThemeId } from "./themes";
 
 /** Ops whose operands are colors we rewrite. value = operand count. */
@@ -225,6 +230,7 @@ type PdfLibNs = typeof import("pdf-lib");
 
 type RewriteCtx = {
   theme: ThemeId;
+  direction: InvertDirection;
   /** Darkness slider value 0.5–1; 1 = the theme as designed. */
   darkness: number;
   /** Warmth slider value 0–1; 0 = no color-temperature shift. */
@@ -260,7 +266,11 @@ function rewriteStream(src: string, resources: PDFDict | null, rc: RewriteCtx): 
     });
   };
   const emitMapped = (rgb255: [number, number, number], stroke: boolean) => {
-    out.push(` ${rgbOperands(mapColor(rgb255[0], rgb255[1], rgb255[2], rc.theme, rc.darkness, rc.warmth))} ${stroke ? "RG" : "rg"}\n`);
+    const mapped =
+      rc.direction === "light"
+        ? mapLightPrint(rgb255[0], rgb255[1], rgb255[2])
+        : mapColor(rgb255[0], rgb255[1], rgb255[2], rc.theme, rc.darkness, rc.warmth);
+    out.push(` ${rgbOperands(mapped)} ${stroke ? "RG" : "rg"}\n`);
   };
 
   let i = 0;
@@ -391,6 +401,7 @@ export async function recolorPageInPlace(
   formsDone: Map<string, boolean>,
   darkness = 1,
   warmth = 0,
+  direction: InvertDirection = "dark",
 ): Promise<boolean> {
   const pdfLib = await import("pdf-lib");
   const { PDFName, PDFArray, PDFDict: Dict, PDFRawStream, decodePDFRawStream } = pdfLib;
@@ -418,6 +429,7 @@ export async function recolorPageInPlace(
     const resources = ctx.lookupMaybe(page.node.get(PDFName.of("Resources")), Dict) ?? null;
     const rewritten = rewriteStream(src, resources, {
       theme,
+      direction,
       darkness,
       warmth,
       ctx,
@@ -426,15 +438,22 @@ export async function recolorPageInPlace(
       depth: 0,
     });
 
-    // Dark page background + remapped defaults (streams that never set a
-    // color rely on the spec default of black — which now must render white).
-    const bg = effectiveThemeBg(theme, darkness, warmth);
+    // Page background + remapped defaults (streams that never set a
+    // color rely on the spec default of black).
+    const bg =
+      direction === "light"
+        ? { r: 255, g: 255, b: 255 }
+        : effectiveThemeBg(theme, darkness, warmth);
     const mb = page.getMediaBox();
-    const white = rgbOperands(mapColor(0, 0, 0, theme, darkness, warmth));
+    const defaultFill = rgbOperands(
+      direction === "light"
+        ? mapLightPrint(0, 0, 0)
+        : mapColor(0, 0, 0, theme, darkness, warmth),
+    );
     const head =
       `q ${fmt(bg.r / 255)} ${fmt(bg.g / 255)} ${fmt(bg.b / 255)} rg ` +
       `${fmt(mb.x)} ${fmt(mb.y)} ${fmt(mb.width)} ${fmt(mb.height)} re f Q\n` +
-      `${white} rg ${white} RG\n`;
+      `${defaultFill} rg ${defaultFill} RG\n`;
 
     const newStream = ctx.flateStream(latin1ToBytes(head + rewritten));
     page.node.set(PDFName.of("Contents"), ctx.register(newStream));

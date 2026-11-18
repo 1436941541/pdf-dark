@@ -20,7 +20,11 @@ import {
   type DarkPdfDraft,
   type PageRender,
 } from "@/lib/build-dark-pdf";
-import { effectiveThemeBg, imageDimAlpha } from "@/lib/dark-color";
+import {
+  effectiveThemeBg,
+  imageDimAlpha,
+  type InvertDirection,
+} from "@/lib/dark-color";
 import { pdfOpenErrorText } from "@/lib/pdf-load-error";
 import { T, type Locale } from "@/lib/i18n";
 import { DropZone } from "./drop-zone";
@@ -84,8 +88,10 @@ function throwIfCancelled(cancelled: () => boolean) {
  */
 export function Downloader({ locale = "en" }: { locale?: Locale }) {
   const t = T[locale];
+  const [direction, setDirection] = useState<InvertDirection>("dark");
   const [theme, setTheme] = useState<ThemeId>("midnight");
-  const [imageMode, setImageMode] = useState<ImageMode>("smart");
+  const [darkImageMode, setDarkImageMode] = useState<ImageMode>("smart");
+  const imageMode: ImageMode = direction === "light" ? "smart" : darkImageMode;
   const [darkness, setDarkness] = useState(100);
   const [warmth, setWarmth] = useState(0);
   const [status, setStatus] = useState<Status>({ kind: "config" });
@@ -168,7 +174,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
       }, () => throwIfCancelled(cancelled), getCacheSnapshot);
 
       const rects = imageRects.filter(
-        (r) => imageTreatment(imageMode, r) !== "invert",
+        (r) => imageTreatment(imageMode, r, direction) !== "invert",
       );
       const id = ++msgIdRef.current;
       try {
@@ -180,6 +186,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             width,
             height,
             theme,
+            direction,
             pageNumber,
             sourceBytes: originalBlob.size,
             imageMode,
@@ -187,9 +194,11 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             warmth: warmth / 100,
             imageRects: rects,
             imageDims: rects.map((r) =>
-              imageTreatment(imageMode, r) === "dim"
-                ? imageDimAlpha(r.brightness)
-                : 0,
+              direction === "light"
+                ? 0
+                : imageTreatment(imageMode, r) === "dim"
+                  ? imageDimAlpha(r.brightness)
+                  : 0,
             ),
             releaseResources: true,
           };
@@ -207,7 +216,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         bitmap.close();
       }
     },
-    [theme, imageMode, darkness, warmth],
+    [theme, direction, imageMode, darkness, warmth],
   );
 
   /** Full pipeline: render every page, darken it, build the PDF, download. */
@@ -256,7 +265,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
 
         // Recolor vector pages during the render loop instead of retaining a
         // raster JPEG for every page until assembly (see prepareDarkPdf).
-        let draft: DarkPdfDraft | undefined = await prepareDarkPdf(srcBytes, pdf.numPages, theme, imageMode, darkness / 100, warmth / 100);
+        let draft: DarkPdfDraft | undefined = await prepareDarkPdf(srcBytes, pdf.numPages, theme, imageMode, darkness / 100, warmth / 100, direction);
         if (cancelledRef.current) return;
 
         // Small scratch canvas for per-image brightness sampling.
@@ -308,7 +317,30 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             throwIfCancelled(() => cancelledRef.current);
             await yieldToMain();
 
+            let alreadyLight = false;
             if (scratchCtx) {
+              if (direction === "light") {
+                try {
+                  scratchCtx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 32, 32);
+                  const pd = scratchCtx.getImageData(0, 0, 32, 32).data;
+                  let pageLumSum = 0;
+                  const borderLums: number[] = [];
+                  for (let py = 0; py < 32; py++) {
+                    for (let px = 0; px < 32; px++) {
+                      const idx = (py * 32 + px) * 4;
+                      const lum = 0.299 * pd[idx] + 0.587 * pd[idx + 1] + 0.114 * pd[idx + 2];
+                      pageLumSum += lum;
+                      if (px === 0 || px === 31 || py === 0 || py === 31) borderLums.push(lum);
+                    }
+                  }
+                  borderLums.sort((a, b) => a - b);
+                  const borderMedian = borderLums[borderLums.length >> 1] ?? 0;
+                  const pageMean = pageLumSum / 1024;
+                  alreadyLight = pageMean >= 150 && borderMedian >= 180;
+                } catch {
+                  alreadyLight = false;
+                }
+              }
               for (const r of imageRects) {
                 try {
                   scratchCtx.drawImage(canvas, r.x, r.y, r.w, r.h, 0, 0, 32, 32);
@@ -332,16 +364,22 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
 
             await yieldToMain();
             markStep("recolor_page");
-            const vector = await draft.recolorPage(i - 1, { scannedPage, imageRects });
+            const vector = await draft.recolorPage(i - 1, {
+              scannedPage,
+              imageRects,
+              alreadyLight,
+            });
             throwIfCancelled(() => cancelledRef.current);
             let displayBlob: Blob | undefined;
             if (!vector) {
               markStep("encode_page");
               const originalBlob = await canvasToJpegBlob(canvas, 0.88);
-              // "Original" mode keeps scanned pages exactly as in the source.
+              // "Original" mode keeps scanned pages as-is; already-light pages
+              // in Dark → Light mode also stay white instead of flipping black.
               markStep("darkify_page");
               displayBlob =
-                imageMode === "original" && scannedPage
+                (imageMode === "original" && scannedPage) ||
+                (direction === "light" && alreadyLight)
                   ? originalBlob
                   : await darkify(
                       originalBlob,
@@ -361,6 +399,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
               height: canvas.height,
               imageRects,
               scannedPage,
+              alreadyLight,
               ...(renderScale < RENDER_SCALE ? {
                 rasterPageSize: {
                   width: baseViewport.width / page.userUnit,
@@ -405,6 +444,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
           darkness / 100,
           warmth / 100,
           draft,
+          direction,
         ));
         if (cancelledRef.current) return;
         console.info(
@@ -438,7 +478,8 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         markStep("download");
         const url = URL.createObjectURL(blob);
         downloadUrlRef.current = url;
-        const filename = file.name.replace(/\.pdf$/i, "") + `-${theme}.pdf`;
+        const suffix = direction === "light" ? "light" : theme;
+        const filename = file.name.replace(/\.pdf$/i, "") + `-${suffix}.pdf`;
         const a = document.createElement("a");
         a.href = url;
         a.download = filename;
@@ -477,7 +518,7 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
         }
       }
     },
-    [theme, imageMode, darkness, warmth, darkify, locale, releaseDownloadUrl],
+    [theme, direction, imageMode, darkness, warmth, darkify, locale, releaseDownloadUrl],
   );
 
   // Slider tracks painted with the actual background colors each end of the
@@ -495,140 +536,197 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
     <div className="w-full max-w-xl mx-auto">
       {/* Step 1 — settings, chosen before the file is picked */}
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-5 text-left space-y-4">
-        <div className="text-xs uppercase tracking-widest text-neutral-500">
-          {t.downloader.step1}
-        </div>
-
-        {/* Theme cards — live preview follows the sliders */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {THEME_IDS.map((id) => {
-            const active = theme === id;
-            return (
-              <button
-                key={id}
-                onClick={() => setTheme(id)}
-                disabled={processing}
-                className={`rounded-lg border overflow-hidden text-left transition-all disabled:opacity-50 ${
-                  active
-                    ? "border-amber-400 ring-1 ring-amber-400"
-                    : "border-neutral-800 hover:border-neutral-600"
-                }`}
-                aria-pressed={active}
-              >
-                <div
-                  className="p-3 space-y-1.5"
-                  style={{
-                    background: bgCss(
-                      effectiveThemeBg(id, darkness / 100, warmth / 100),
-                    ),
-                  }}
-                >
-                  <div className="h-1.5 rounded-full bg-white/80 w-3/4" />
-                  <div className="h-1.5 rounded-full bg-white/50 w-full" />
-                  <div className="h-1.5 rounded-full bg-white/50 w-2/3" />
-                </div>
-                <div
-                  className={`text-center text-xs py-1.5 bg-neutral-900 ${
-                    active ? "text-amber-400 font-semibold" : "text-neutral-400"
-                  }`}
-                >
-                  {THEMES[id].label}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Image handling */}
-        <div
-          className="flex flex-wrap items-center gap-1 rounded-full border border-neutral-800 p-1 w-fit"
-          title={t.imageMode.imagesTitleAttr}
-        >
-          <span className="pl-2 pr-1 text-[11px] uppercase tracking-wide text-neutral-500">
-            {t.imageMode.label}
-          </span>
+        {/* Conversion direction switcher */}
+        <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-neutral-800 bg-neutral-950/70 p-1">
           {(
             [
-              ["original", t.imageMode.original, t.imageMode.originalTip],
-              ["smart", t.imageMode.auto, t.imageMode.autoTip],
-              ["invert", t.imageMode.invert, t.imageMode.invertTip],
-            ] as [ImageMode, string, string][]
-          ).map(([m, label, tip]) => {
-            const active = imageMode === m;
+              ["dark", "🌙", t.downloader.modeDark],
+              ["light", "🖨️", t.downloader.modeLight],
+            ] as [InvertDirection, string, string][]
+          ).map(([dir, icon, label]) => {
+            const active = direction === dir;
             return (
               <button
-                key={m}
-                onClick={() => setImageMode(m)}
+                key={dir}
+                type="button"
+                onClick={() => setDirection(dir)}
                 disabled={processing}
-                className={`px-3 py-1 rounded-full text-xs transition-colors disabled:opacity-50 ${
-                  active
-                    ? "bg-amber-400 text-neutral-950 font-semibold"
-                    : "text-neutral-400 hover:text-neutral-100"
-                }`}
                 aria-pressed={active}
-                title={tip}
+                className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs sm:text-sm font-medium transition-colors disabled:opacity-50 ${
+                  active
+                    ? "bg-amber-400 text-neutral-950 font-semibold shadow-sm"
+                    : "text-neutral-300 hover:text-neutral-100"
+                }`}
               >
-                {label}
+                <span aria-hidden>{icon}</span>
+                <span>{label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Darkness + warmth */}
-        <div className="flex flex-wrap gap-3">
-          <div
-            className="flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5"
-            title={t.sliders.darknessTitle}
-          >
-            <span className="text-[11px] uppercase tracking-wide text-neutral-500">
-              {t.sliders.darkness}
-            </span>
-            <input
-              type="range"
-              min={50}
-              max={100}
-              step={5}
-              value={darkness}
-              onChange={(e) => setDarkness(Number(e.target.value))}
-              disabled={processing}
-              className="slider-preview w-24 disabled:opacity-50"
-              style={{ background: darknessTrack }}
-              aria-label={t.sliders.darkness}
-            />
-            <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
-              {darkness}%
-            </span>
-          </div>
-          <div
-            className="flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5"
-            title={t.sliders.warmthTitle}
-          >
-            <span className="text-[11px] uppercase tracking-wide text-neutral-500">
-              {t.sliders.warmth}
-            </span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={5}
-              value={warmth}
-              onChange={(e) => setWarmth(Number(e.target.value))}
-              disabled={processing}
-              className="slider-preview w-24 disabled:opacity-50"
-              style={{ background: warmthTrack }}
-              aria-label={t.sliders.warmth}
-            />
-            <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
-              {warmth}%
-            </span>
-          </div>
+        <div className="text-xs uppercase tracking-widest text-neutral-500">
+          {direction === "light" ? t.downloader.step1Light : t.downloader.step1}
         </div>
+
+        {direction === "dark" ? (
+          <>
+            {/* Theme cards — live preview follows the sliders */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {THEME_IDS.map((id) => {
+                const active = theme === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setTheme(id)}
+                    disabled={processing}
+                    className={`rounded-lg border overflow-hidden text-left transition-all disabled:opacity-50 ${
+                      active
+                        ? "border-amber-400 ring-1 ring-amber-400"
+                        : "border-neutral-800 hover:border-neutral-600"
+                    }`}
+                    aria-pressed={active}
+                  >
+                    <div
+                      className="p-3 space-y-1.5"
+                      style={{
+                        background: bgCss(
+                          effectiveThemeBg(id, darkness / 100, warmth / 100),
+                        ),
+                      }}
+                    >
+                      <div className="h-1.5 rounded-full bg-white/80 w-3/4" />
+                      <div className="h-1.5 rounded-full bg-white/50 w-full" />
+                      <div className="h-1.5 rounded-full bg-white/50 w-2/3" />
+                    </div>
+                    <div
+                      className={`text-center text-xs py-1.5 bg-neutral-900 ${
+                        active ? "text-amber-400 font-semibold" : "text-neutral-400"
+                      }`}
+                    >
+                      {THEMES[id].label}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Image handling */}
+            <div
+              className="flex flex-wrap items-center gap-1 rounded-full border border-neutral-800 p-1 w-fit"
+              title={t.imageMode.imagesTitleAttr}
+            >
+              <span className="pl-2 pr-1 text-[11px] uppercase tracking-wide text-neutral-500">
+                {t.imageMode.label}
+              </span>
+              {(
+                [
+                  ["original", t.imageMode.original, t.imageMode.originalTip],
+                  ["smart", t.imageMode.auto, t.imageMode.autoTip],
+                  ["invert", t.imageMode.invert, t.imageMode.invertTip],
+                ] as [ImageMode, string, string][]
+              ).map(([m, label, tip]) => {
+                const active = darkImageMode === m;
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setDarkImageMode(m)}
+                    disabled={processing}
+                    className={`px-3 py-1 rounded-full text-xs transition-colors disabled:opacity-50 ${
+                      active
+                        ? "bg-amber-400 text-neutral-950 font-semibold"
+                        : "text-neutral-400 hover:text-neutral-100"
+                    }`}
+                    aria-pressed={active}
+                    title={tip}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Darkness + warmth */}
+            <div className="flex flex-wrap gap-3">
+              <div
+                className="flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5"
+                title={t.sliders.darknessTitle}
+              >
+                <span className="text-[11px] uppercase tracking-wide text-neutral-500">
+                  {t.sliders.darkness}
+                </span>
+                <input
+                  type="range"
+                  min={50}
+                  max={100}
+                  step={5}
+                  value={darkness}
+                  onChange={(e) => setDarkness(Number(e.target.value))}
+                  disabled={processing}
+                  className="slider-preview w-24 disabled:opacity-50"
+                  style={{ background: darknessTrack }}
+                  aria-label={t.sliders.darkness}
+                />
+                <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
+                  {darkness}%
+                </span>
+              </div>
+              <div
+                className="flex items-center gap-2 rounded-full border border-neutral-800 px-3 py-1.5"
+                title={t.sliders.warmthTitle}
+              >
+                <span className="text-[11px] uppercase tracking-wide text-neutral-500">
+                  {t.sliders.warmth}
+                </span>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={warmth}
+                  onChange={(e) => setWarmth(Number(e.target.value))}
+                  disabled={processing}
+                  className="slider-preview w-24 disabled:opacity-50"
+                  style={{ background: warmthTrack }}
+                  aria-label={t.sliders.warmth}
+                />
+                <span className="w-9 text-right text-xs tabular-nums text-neutral-300">
+                  {warmth}%
+                </span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center gap-3 rounded-xl border border-neutral-800 bg-neutral-950/60 p-3">
+            <div
+              aria-hidden
+              className="flex items-center gap-2 shrink-0"
+            >
+              <div className="w-12 rounded border border-neutral-700 bg-[#0f2042] p-2 space-y-1">
+                <div className="h-1.5 rounded-full bg-yellow-300 w-3/4" />
+                <div className="h-1.5 rounded-full bg-white/90 w-full" />
+                <div className="h-1.5 rounded-full bg-cyan-300 w-2/3" />
+              </div>
+              <span className="text-xs text-amber-400 font-semibold">→</span>
+              <div className="w-12 rounded border border-neutral-300 bg-white p-2 space-y-1">
+                <div className="h-1.5 rounded-full bg-[#847707] w-3/4" />
+                <div className="h-1.5 rounded-full bg-neutral-900 w-full" />
+                <div className="h-1.5 rounded-full bg-[#087d91] w-2/3" />
+              </div>
+            </div>
+            <p className="text-xs leading-relaxed text-neutral-300 m-0">
+              {t.downloader.lightNote}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Step 2 — the file. Drop → convert → the download starts itself. */}
       <div className="mt-4">
         <div className="text-xs uppercase tracking-widest text-neutral-500 text-left mb-3">
-          {t.downloader.step2}
+          {direction === "light" ? t.downloader.step2Light : t.downloader.step2}
         </div>
 
         {status.kind === "config" && (
@@ -640,7 +738,9 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
             <div className="text-lg text-neutral-200">
               {status.phase === "render"
                 ? t.downloader.convertingPage(status.done, status.total || "?")
-                : t.downloader.building}
+                : direction === "light"
+                  ? t.downloader.buildingLight
+                  : t.downloader.building}
             </div>
             <div className="mt-4 w-64 mx-auto h-1 bg-neutral-800 rounded-full overflow-hidden">
               <div
@@ -671,7 +771,9 @@ export function Downloader({ locale = "en" }: { locale?: Locale }) {
               {t.downloader.saved(status.filename)}
             </div>
             <div className="mt-1 text-sm text-neutral-400">
-              {t.downloader.checkDownloads}
+              {direction === "light"
+                ? t.downloader.checkDownloadsLight
+                : t.downloader.checkDownloads}
             </div>
             <button
               onClick={() => setStatus({ kind: "config" })}

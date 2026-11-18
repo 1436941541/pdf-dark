@@ -115,12 +115,84 @@ function applyDark(
   }
 }
 
+const LIGHT_BG_SNAP = 55;
+const LIGHT_CHROMA_FADE = 30;
+const LIGHT_MAX_INK_LUM = 110;
+
+/** Dark-slide → white-paper print mapping (synced with mapLightPrint in lib/dark-color.ts). */
+function applyLightPrint(data: Uint8ClampedArray): void {
+  const len = data.length;
+  for (let j = 0; j < len; j += 4) {
+    const r = data[j];
+    const g = data[j + 1];
+    const b = data[j + 2];
+
+    const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+    const mx = Math.max(r, g, b);
+    const mn = Math.min(r, g, b);
+    const level = Math.max(brightness, mx * 0.58);
+    const gray =
+      level <= LIGHT_BG_SNAP
+        ? 255
+        : 255 * (1 - (level - LIGHT_BG_SNAP) / (255 - LIGHT_BG_SNAP));
+
+    const sat = (mx - mn) / 255;
+    const bgFade = Math.min(
+      1,
+      Math.max(0, (level - LIGHT_BG_SNAP) / LIGHT_CHROMA_FADE),
+    );
+    const chromaW =
+      Math.min(1, Math.max(0, (sat - CHROMA_LO) / (CHROMA_HI - CHROMA_LO))) *
+      bgFade;
+
+    if (chromaW <= 0) {
+      data[j] = gray;
+      data[j + 1] = gray;
+      data[j + 2] = gray;
+      continue;
+    }
+
+    const l = (mx + mn) / 510;
+    const d = (mx - mn) / 255;
+    const s = Math.min(0.9, d / (1 - Math.abs(2 * l - 1) || 1));
+    let h: number;
+    const rn = r / 255;
+    const gn = g / 255;
+    const bn = b / 255;
+    if (mx === r) h = (((gn - bn) / d) % 6) / 6;
+    else if (mx === g) h = ((bn - rn) / d + 2) / 6;
+    else h = ((rn - gn) / d + 4) / 6;
+    if (h < 0) h += 1;
+
+    const l2 = 0.36 - 0.1 * l;
+    const q = l2 < 0.5 ? l2 * (1 + s) : l2 + s - l2 * s;
+    const p = 2 * l2 - q;
+    let hR = hueToRgb(p, q, h + 1 / 3) * 255;
+    let hG = hueToRgb(p, q, h) * 255;
+    let hB = hueToRgb(p, q, h - 1 / 3) * 255;
+
+    const hLum = 0.299 * hR + 0.587 * hG + 0.114 * hB;
+    if (hLum > LIGHT_MAX_INK_LUM) {
+      const scale = LIGHT_MAX_INK_LUM / hLum;
+      hR *= scale;
+      hG *= scale;
+      hB *= scale;
+    }
+
+    data[j] = gray + (hR - gray) * chromaW;
+    data[j + 1] = gray + (hG - gray) * chromaW;
+    data[j + 2] = gray + (hB - gray) * chromaW;
+  }
+}
+
 export type DarkifyRequest = {
   id: number;
   bitmap: ImageBitmap;
   width: number;
   height: number;
   theme: ThemeId;
+  /** "dark" (default) maps light pages dark; "light" flips dark slides to white paper. */
+  direction?: "dark" | "light";
   /** Darkness slider value 0.5–1; 1 (default) = the theme as designed. */
   darkness?: number;
   /** Warmth slider value 0–1; 0 (default) = no color-temperature shift. */
@@ -189,7 +261,11 @@ ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
     enter("read_pixels");
     const img = c2d.getImageData(0, 0, width, height);
     enter("apply_dark");
-    applyDark(img.data, theme, darkness ?? 1, warmth ?? 0);
+    if (e.data.direction === "light") {
+      applyLightPrint(img.data);
+    } else {
+      applyDark(img.data, theme, darkness ?? 1, warmth ?? 0);
+    }
     enter("write_pixels");
     c2d.putImageData(img, 0, 0);
 
@@ -214,7 +290,9 @@ ctx.onmessage = async (e: MessageEvent<DarkifyRequest>) => {
       }
       const byAlpha = new Map<number, ImageRect[]>();
       imageRects.forEach((r, idx) => {
-        const a = Math.round((imageDims?.[idx] ?? 0.16) * 100) / 100;
+        const rawAlpha =
+          e.data.direction === "light" ? 0 : (imageDims?.[idx] ?? 0.16);
+        const a = Math.round(rawAlpha * 100) / 100;
         if (a > 0.005) {
           const group = byAlpha.get(a);
           if (group) group.push(r);

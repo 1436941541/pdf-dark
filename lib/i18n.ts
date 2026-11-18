@@ -36,14 +36,21 @@ type Dict = {
     warmthTitleLong: string;
   };
   downloader: {
+    modeDark: string;
+    modeLight: string;
     step1: string;
+    step1Light: string;
     step2: string;
+    step2Light: string;
+    lightNote: string;
     convertingPage: (done: number, total: number | string) => string;
     building: string;
+    buildingLight: string;
     runsLocally: string;
     stayActive: string;
     saved: (filename: string) => string;
     checkDownloads: string;
+    checkDownloadsLight: string;
     convertAnother: string;
     genericError: string;
     errorHelp: string;
@@ -122,16 +129,25 @@ export const T: Record<Locale, Dict> = {
         "Background color temperature — drag right for a warmer, candle-light tint that's easier on the eyes at night",
     },
     downloader: {
+      modeDark: "Light → Dark",
+      modeLight: "Dark → Light (Print)",
       step1: "1 · Choose your dark theme",
+      step1Light: "1 · Print-ready mode for dark slides & notes",
       step2: "2 · Drop your PDF — the dark copy downloads automatically",
+      step2Light: "2 · Drop your dark PDF, and the printable copy downloads automatically",
+      lightNote:
+        "Turns dark slide backgrounds pure white (#FFF), darkens colored ink, and keeps photos & already-white pages untouched.",
       convertingPage: (done, total) => `Converting page ${done} / ${total}…`,
       building: "Building your dark PDF…",
+      buildingLight: "Building your printable PDF…",
       runsLocally: "Runs entirely in your browser — nothing is uploaded.",
       stayActive:
         "Keep this tab open and active — switching away or minimizing may pause or interrupt the conversion.",
       saved: (filename) => `Saved ${filename}`,
       checkDownloads:
         "Check your downloads folder — the dark theme is baked into the file.",
+      checkDownloadsLight:
+        "Check your downloads folder for the clean white printable copy.",
       convertAnother: "Convert another PDF",
       genericError: "Couldn't convert that PDF. Try another file?",
       errorHelp:
@@ -212,17 +228,26 @@ export const T: Record<Locale, Dict> = {
         "Temperatura de color del fondo — arrastra a la derecha para un tono más cálido, más cómodo para los ojos de noche",
     },
     downloader: {
+      modeDark: "Claro → Oscuro",
+      modeLight: "Oscuro → Claro (Imprimir)",
       step1: "1 · Elige tu tema oscuro",
+      step1Light: "1 · Modo listo para imprimir apuntes y diapositivas oscuras",
       step2: "2 · Suelta tu PDF — la copia oscura se descarga automáticamente",
+      step2Light: "2 · Suelta tu PDF oscuro y la copia clara se descarga sola",
+      lightNote:
+        "Pasa fondos oscuros a blanco puro (#FFF), oscurece trazos de color y deja intactas las fotos y páginas ya blancas.",
       convertingPage: (done, total) =>
         `Convirtiendo página ${done} / ${total}…`,
       building: "Generando tu PDF oscuro…",
+      buildingLight: "Generando tu PDF claro…",
       runsLocally: "Funciona completamente en tu navegador — no se sube nada.",
       stayActive:
         "Mantén esta pestaña abierta y activa — cambiar de pestaña o minimizar puede pausar o interrumpir la conversión.",
       saved: (filename) => `${filename} guardado`,
       checkDownloads:
         "Revisa tu carpeta de descargas — el tema oscuro queda incorporado en el archivo.",
+      checkDownloadsLight:
+        "Revisa tu carpeta de descargas — lista para imprimir con fondo blanco.",
       convertAnother: "Convertir otro PDF",
       genericError: "No se pudo convertir ese PDF. ¿Probamos con otro archivo?",
       errorHelp:
@@ -305,16 +330,25 @@ export const T: Record<Locale, Dict> = {
         "Temperatura de cor do fundo — arraste para a direita para um tom mais quente, mais confortável para os olhos à noite",
     },
     downloader: {
+      modeDark: "Claro → Escuro",
+      modeLight: "Escuro → Claro (Imprimir)",
       step1: "1 · Escolha seu tema escuro",
+      step1Light: "1 · Modo pronto para imprimir slides e notas escuras",
       step2: "2 · Solte seu PDF — a cópia escura baixa automaticamente",
+      step2Light: "2 · Solte seu PDF escuro e a cópia clara baixa sozinha",
+      lightNote:
+        "Passa fundos escuros para branco puro (#FFF), escurece traços coloridos e mantém fotos e páginas já brancas intactas.",
       convertingPage: (done, total) => `Convertendo página ${done} / ${total}…`,
       building: "Gerando seu PDF escuro…",
+      buildingLight: "Gerando seu PDF claro…",
       runsLocally: "Roda inteiramente no seu navegador — nada é enviado.",
       stayActive:
         "Mantenha esta aba aberta e ativa — trocar de aba ou minimizar pode pausar ou interromper a conversão.",
       saved: (filename) => `${filename} salvo`,
       checkDownloads:
         "Confira sua pasta de downloads — o tema escuro já está gravado no arquivo.",
+      checkDownloadsLight:
+        "Confira sua pasta de downloads — pronto para imprimir com fundo branco.",
       convertAnother: "Converter outro PDF",
       genericError: "Não deu para converter esse PDF. Tentar outro arquivo?",
       errorHelp:
@@ -385,14 +419,22 @@ export const T: Record<Locale, Dict> = {
       warmthTitleLong: "Farbtemperatur des Hintergrunds — nach rechts für einen warmen, nachts angenehmen Ton ziehen",
     },
     downloader: {
+      modeDark: "Hell → Dunkel",
+      modeLight: "Dunkel → Hell (Drucken)",
       step1: "1 · Wählen Sie Ihr dunkles Design",
+      step1Light: "1 · Druckmodus für dunkle Folien & Tafelnotizen",
       step2: "2 · PDF ablegen — die dunkle Kopie wird automatisch heruntergeladen",
+      step2Light: "2 · Dunkle PDF ablegen, die helle Druckkopie lädt automatisch",
+      lightNote:
+        "Wandelt dunkle Folienhintergründe in Reinweiß (#FFF) um, dunkelt farbige Tinte ab und lässt Fotos sowie bereits weiße Seiten unverändert.",
       convertingPage: (done, total) => `Seite wird konvertiert ${done} / ${total}…`,
       building: "Ihre dunkle PDF wird erstellt…",
+      buildingLight: "Ihre helle Druck-PDF wird erstellt…",
       runsLocally: "Läuft vollständig in Ihrem Browser — nichts wird hochgeladen.",
       stayActive: "Lassen Sie diesen Tab geöffnet und aktiv — ein Tab-Wechsel oder Minimieren kann die Konvertierung unterbrechen.",
       saved: (filename) => `${filename} gespeichert`,
       checkDownloads: "Prüfen Sie Ihren Download-Ordner — das dunkle Design ist in der Datei enthalten.",
+      checkDownloadsLight: "Prüfen Sie Ihren Download-Ordner — druckfertig mit weißem Hintergrund.",
       convertAnother: "Weitere PDF konvertieren",
       genericError: "Diese PDF konnte nicht konvertiert werden. Andere Datei versuchen?",
       errorHelp:
