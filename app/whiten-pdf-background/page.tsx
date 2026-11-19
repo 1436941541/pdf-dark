@@ -31,8 +31,8 @@ const inlineLink = "text-amber-400 underline decoration-amber-400/30 underline-o
 const STEPS = [
   ["Open a scanned PDF", "Drop a scan into the workspace or load a test sample above."],
   [
-    "Tune strength & stamp protection",
-    "Adjust the 0–100% slider (65% default), keep color protection on for stamps, or skip photo pages (e.g. 1, 8-10).",
+    "Tune strength & photo protection",
+    "Adjust the 0–100% slider (65% default) while stamps and photos stay protected automatically.",
   ],
   [
     "Download at 144 or 72 DPI",
@@ -54,10 +54,10 @@ const SPEC_ROWS: { item: string; behavior: ReactNode; note: ReactNode }[] = [
     note: "Uncheck if colored watermarks, tea stains, or tinted slips scanned inside a bright white border stay uncleaned.",
   },
   {
-    item: "Skip pages & Clean page N",
+    item: "Protect photos & covers automatically (on by default)",
     behavior:
-      "Skips background whitening on listed page ranges (such as 1, 5, 80-89) and syncs with each page's Clean page checkbox so covers or photo sheets keep their original tones.",
-    note: "Type page ranges directly or enter any page number to jump straight to that sheet in long scans.",
+      "Leaves full-page photos, dark covers, and embedded PDF photos untouched while whitening surrounding gray or yellow paper, and lists any auto-kept pages in preview and after export.",
+    note: "Click Clean page anyway in preview if a heavily shaded or dense text scan gets auto-skipped, or click Keep page original when a small B&W photo is flattened directly onto a scanned page.",
   },
   {
     item: "Download quality (Sharper 144 DPI / Compact 72 DPI)",
@@ -95,7 +95,7 @@ const FAQ: { q: string; a: ReactNode }[] = [
   },
   {
     q: "Will the -whitened.pdf keep selectable text, links, or vector pages?",
-    a: "No. Every page in the download, including pages where Clean page is unchecked, is rebuilt as a flat PNG image without built-in OCR. Selectable text layers, clickable links, form fields, and digital signatures are not carried over, and born-digital PDFs can grow in file size.",
+    a: "No. Every page in the download, including photo pages kept original, is rebuilt as a flat PNG image without built-in OCR. Selectable text layers, clickable links, form fields, and digital signatures are not carried over, and born-digital PDFs can grow in file size.",
   },
 ];
 
@@ -141,7 +141,7 @@ export default function WhitenPdfBackgroundPage() {
               144 or 72 DPI output
             </span>
             <span className="rounded-full border border-neutral-800 px-3 py-1">
-              Per-page photo skip
+              Automatic photo protection
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-800 px-3 py-1">
               <IconLock className="text-neutral-500" /> Processed in your browser (no upload)
