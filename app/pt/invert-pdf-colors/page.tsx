@@ -269,8 +269,8 @@ export default function InvertPdfColorsPtPage() {
               <p className="mt-2 mb-6 text-sm text-neutral-400 text-center max-w-xl mx-auto">
                 Apostilas de lousa digital costumam usar fundo azul-marinho ou
                 verde com fórmulas em amarelo e ciano. A inversão RGB comum
-                tinge a folha inteira e troca as cores; o modo de impressão
-                entrega papel branco puro e tinta escura legível.
+                tinge a folha inteira e troca as cores; a opção Escuro para
+                Claro entrega papel branco puro e tinta escura legível.
               </p>
               <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 <figure className="m-0">

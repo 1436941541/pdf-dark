@@ -286,7 +286,6 @@ export function BackgroundConverter({
           <div className="flex justify-between gap-3"><label htmlFor="background-strength" className="text-sm text-neutral-300">Cleaning strength · all cleaned pages</label><output htmlFor="background-strength" className="font-mono text-amber-300">{settings.strength}%</output></div>
           <input id="background-strength" type="range" min="0" max="100" step="5" value={settings.strength} onChange={(e) => updateSettings({ ...settings, strength: Number(e.target.value) }, true)} className="mt-3 w-full accent-amber-400" />
           <div className="flex justify-between text-xs text-neutral-500"><span>Gentle</span><span>Stronger cleaning</span></div>
-          {!source && !busy && <p className="mt-2 text-xs text-neutral-400">Drag the slider to preview live on a sample scan, or drop your own PDF below.</p>}
           <div className="mt-4 grid gap-4 sm:grid-cols-2 sm:items-start">
             <div className="space-y-2.5">
               <label className="flex items-center gap-2 text-sm text-neutral-300"><input type="checkbox" checked={settings.preserveColors} onChange={(e) => updateSettings({ ...settings, preserveColors: e.target.checked })} className="size-4 accent-amber-400" />Protect colored text &amp; marks</label>
@@ -297,12 +296,14 @@ export function BackgroundConverter({
               <select id="background-quality" value={quality} onChange={(e) => { customized.current = true; setQuality(e.target.value as "standard" | "compact"); setExportSummary(null); }} className="mt-1.5 w-full rounded-lg border border-neutral-700 bg-neutral-950 p-2 text-sm text-neutral-300"><option value="standard">Sharper · up to 144 DPI</option><option value="compact">Compact · up to 72 DPI</option></select>
             </div>
           </div>
-          <p className="mt-3 rounded-lg border border-neutral-800/80 bg-neutral-900/60 px-3 py-2 text-xs leading-relaxed text-neutral-400">
-            <span className="font-medium text-neutral-300">Photo protection heads-up:</span>{" "}
-            Full-page photos, dark covers, and embedded PDF photos stay untouched automatically. Heavily shaded or dense scans can occasionally trigger photo skip (use{" "}
-            <span className="text-neutral-200">&ldquo;Clean page anyway&rdquo;</span>{" "}
-            in preview), while small B&amp;W photos flattened onto a text scan may still lighten unless you keep that page original.
-          </p>
+          {source && (
+            <p className="mt-3 rounded-lg border border-neutral-800/80 bg-neutral-900/60 px-3 py-2 text-xs leading-relaxed text-neutral-400">
+              <span className="font-medium text-neutral-300">Photo protection heads-up:</span>{" "}
+              Full-page photos, dark covers, and embedded PDF photos stay untouched automatically. Heavily shaded or dense scans can occasionally trigger photo skip (use{" "}
+              <span className="text-neutral-200">&ldquo;Clean page anyway&rdquo;</span>{" "}
+              in preview), while small B&amp;W photos flattened onto a text scan may still lighten unless you keep that page original.
+            </p>
+          )}
         </fieldset>
         {!source && !busy && <DropZone onFile={selectFile} />}
         {source && (

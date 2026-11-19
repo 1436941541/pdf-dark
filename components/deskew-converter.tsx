@@ -21,6 +21,7 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
   const [source, setSource] = useState<Source | null>(null);
   const [corrections, setCorrections] = useState<Correction[]>([]);
   const [page, setPage] = useState(1);
+  const [pageInput, setPageInput] = useState("1");
   const [activity, setActivity] = useState<{ kind: "loading" | "detecting" | "exporting"; done: number } | null>(null);
   const [preview, setPreview] = useState<Preview>(emptyPreview);
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +82,7 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
     setCorrections([]);
     setPreview(emptyPreview);
     setPage(1);
+    setPageInput("1");
     setError(null);
     setDownloaded(false);
     setActivity({ kind: "loading", done: 0 });
@@ -154,9 +156,15 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
     cancel();
     setSource(null);
     setCorrections([]);
+    setPage(1);
+    setPageInput("1");
     setPreview(emptyPreview);
     setError(null);
     setDownloaded(false);
+  }
+  function goToPage(nextPage: number) {
+    setPage(nextPage);
+    setPageInput(String(nextPage));
   }
   function updateAngle(value: number, manual = true) {
     setCorrections((current) => current.map((item, index) => index === page - 1 ? { ...item, angle: value, manual } : item));
@@ -206,7 +214,20 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
           <h2 className="text-lg font-semibold text-neutral-100">Page-by-page scan alignment</h2>
         </div>
         {!source && !busy && <DropZone onFile={selectFile} />}
-        {source && <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-950/40 p-4"><div className="min-w-0"><p className="break-all text-sm font-medium text-neutral-200">{source.file.name}</p><p className="mt-1 text-xs text-neutral-400">{source.pdf.numPages} {source.pdf.numPages === 1 ? "page" : "pages"}</p></div><button type="button" onClick={reset} disabled={busy} className={buttonClass}>Choose another PDF</button></div>}
+        {source && (
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 bg-neutral-950/40 p-4">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="break-all text-sm font-medium text-neutral-200">{source.file.name}</p>
+                {source.input === "sample" && <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[11px] text-amber-300">Sample preview</span>}
+              </div>
+              <p className="mt-1 text-xs text-neutral-400">{source.pdf.numPages} {source.pdf.numPages === 1 ? "page" : "pages"}</p>
+            </div>
+            <button type="button" onClick={reset} disabled={busy} className={source.input === "sample" ? "rounded-lg border border-neutral-700 px-3 py-2 text-xs font-medium text-amber-400 hover:border-amber-400 disabled:opacity-40" : buttonClass}>
+              {source.input === "sample" ? "Upload your own PDF" : "Choose another PDF"}
+            </button>
+          </div>
+        )}
         {pendingSample && !activity && <div role="status" className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><p className="text-sm text-amber-200">Opening the sample PDF…</p><button type="button" onClick={cancel} className={buttonClass}>Cancel</button></div>}
         {activity && <div role="status" aria-live="polite" className="mb-5 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><div className="flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-amber-200">{activity.kind === "loading" ? "Opening your PDF…" : `${activity.kind === "detecting" ? "Analyzing" : "Exporting"} pages ${activity.done} / ${source?.pdf.numPages ?? "…"}`}</p><button type="button" onClick={cancel} className={buttonClass}>Cancel</button></div>{source && activity.kind !== "loading" && <progress aria-label={activity.kind === "detecting" ? "Analysis progress" : "Export progress"} value={activity.done} max={source.pdf.numPages} className="mt-3 h-2 w-full accent-amber-400" />}</div>}
         {error && <p role="alert" className="mb-5 rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-sm text-red-300">{error}</p>}
@@ -220,7 +241,34 @@ export function DeskewConverter({ sample }: { sample?: { url: string; name: stri
             <p className="mt-3 text-xs leading-relaxed text-neutral-400">{correction?.analysis?.reason ?? "This page has not been analyzed. Adjust the angle using the preview."}</p>
             <div className="mt-3 flex flex-wrap gap-2"><button type="button" className={buttonClass} onClick={() => updateAngle(correction?.analysis?.angle ?? 0, false)}>Use automatic result</button><button type="button" className={buttonClass} onClick={() => updateAngle(0)}>Leave page unchanged</button></div>
           </fieldset>
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3"><p className="text-sm text-neutral-300">Page {page} of {source.pdf.numPages}</p><div className="flex gap-2"><button type="button" disabled={busy || page <= 1} onClick={() => setPage(page - 1)} className={buttonClass}>Previous</button><button type="button" disabled={busy || page >= source.pdf.numPages} onClick={() => setPage(page + 1)} className={buttonClass}>Next</button></div></div>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm text-neutral-300">
+              <label htmlFor="deskew-page-jump">Page</label>
+              <input
+                id="deskew-page-jump"
+                type="number"
+                min={1}
+                max={source.pdf.numPages}
+                value={pageInput}
+                disabled={busy || source.pdf.numPages <= 1}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setPageInput(val);
+                  const num = Number(val);
+                  if (Number.isInteger(num) && num >= 1 && num <= source.pdf.numPages) {
+                    setPage(num);
+                  }
+                }}
+                onBlur={() => setPageInput(String(page))}
+                className="w-16 rounded-lg border border-neutral-700 bg-neutral-950 px-2 py-1 text-center font-mono text-sm text-neutral-100 focus:border-amber-400 focus:outline-none disabled:opacity-50"
+              />
+              <span>of {source.pdf.numPages}</span>
+            </div>
+            <div className="flex gap-2">
+              <button type="button" disabled={busy || page <= 1} onClick={() => goToPage(page - 1)} className={buttonClass}>Previous</button>
+              <button type="button" disabled={busy || page >= source.pdf.numPages} onClick={() => goToPage(page + 1)} className={buttonClass}>Next</button>
+            </div>
+          </div>
           {preview.error && <p role="alert" className="mb-4 text-sm text-red-300">{preview.error}</p>}
           <div className="grid gap-4 sm:grid-cols-2" aria-busy={preview.loading || preview.key !== previewKey}>
             {([["Original", preview.original], ["Straightened", preview.converted]] as const).map(([label, image]) => <figure key={label} className="overflow-hidden rounded-xl border border-neutral-800 bg-neutral-950"><figcaption className="border-b border-neutral-800 px-4 py-2 text-sm text-neutral-300">{label}</figcaption><div className="flex min-h-48 items-center justify-center p-3">{image ? <img src={image} alt={`${label} preview of PDF page ${page}`} className={`max-h-[560px] w-full object-contain ${preview.loading || preview.key !== previewKey ? "opacity-40" : ""}`} /> : <span className="text-sm text-neutral-500">Preparing preview…</span>}</div></figure>)}

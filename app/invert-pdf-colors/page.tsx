@@ -8,7 +8,7 @@ import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/component
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/invert-pdf-colors";
-const TITLE = "Invert PDF Colors — Free Online PDF Inverter, No Upload";
+const TITLE = "Invert PDF Colors: Free Online PDF Inverter (No Upload)";
 const DESCRIPTION =
   "Free online PDF inverter (color / colour): turn white PDFs dark without photo negatives, or flip dark-background slides & notes to white for printing.";
 const SOCIAL_IMAGE_ALT =
@@ -53,7 +53,7 @@ const FAQ = [
   },
   {
     q: "How does Auto decide which images to invert and which to keep?",
-    a: "In Light → Dark mode, Auto keeps photographs in their original colors, lightly dims bright colorful graphics, and inverts white-background screenshots, diagrams, and full-page scans (85% or more page coverage). Dark → Light (Print) applies the reverse rule automatically: dark blackboard captures flip to white while pasted white textbook questions and daylight photos stay untouched.",
+    a: "In Light → Dark mode, Auto keeps photographs in their original colors, lightly dims bright colorful graphics, and inverts white-background screenshots, diagrams, and full-page scans (85% or more page coverage). Print mode (Dark to Light) applies the reverse rule automatically: dark blackboard captures flip to white while pasted white textbook questions and daylight photos stay untouched.",
   },
   {
     q: "Does the downloaded PDF keep sharp selectable text and a small file size?",

@@ -9,11 +9,11 @@ import { IconLock, IconPalette, IconDownload, IconSmartphone } from "@/component
 import { getSiteUrl } from "@/lib/site";
 
 const SLUG = "/de/invert-pdf-colors";
-const TITLE = "PDF-Farben invertieren kostenlos (Dunkelmodus & Druck)";
+const TITLE = "PDF Farben invertieren kostenlos (Dunkelmodus & Druck)";
 const DESCRIPTION =
-  "PDF-Farben kostenlos im Browser invertieren: helle Seiten ohne Foto-Negative abdunkeln oder dunkle Vorlesungsfolien zum Drucken auf Weiß umkehren.";
+  "PDF Farben invertieren kostenlos im Browser: helle Seiten ohne Foto-Negative abdunkeln oder dunkle Vorlesungsfolien zum Drucken auf Weiß umkehren.";
 const SOCIAL_IMAGE_ALT =
-  "PDF-Farben invertieren im Browser: Dunkelmodus und heller Folien-Druckmodus";
+  "PDF Farben invertieren im Browser: Dunkelmodus und heller Folien-Druckmodus";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -131,10 +131,10 @@ export default function GermanInvertPage() {
         {/* Hero */}
         <section className="max-w-4xl mx-auto px-6 pt-10 pb-14 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-[1.1]">
-            PDF-Farben invertieren
+            PDF Farben invertieren
           </h1>
           <p className="mt-5 text-lg text-neutral-300 max-w-2xl mx-auto">
-            Hier lassen sich PDF-Farben direkt im Browser invertieren und als
+            Hier können Sie PDF Farben invertieren und direkt im Browser als
             neue Datei speichern: helle Dokumente abdunkeln, ohne Fotos in
             Negative zu verwandeln, oder im{" "}
             <strong className="text-neutral-100 font-medium">
@@ -179,7 +179,7 @@ export default function GermanInvertPage() {
         >
           <div className="max-w-4xl mx-auto px-6">
             <h2 className="text-2xl font-bold mb-3 text-center">
-              So können Sie PDF-Farben invertieren
+              So können Sie PDF Farben invertieren
             </h2>
             <p className="text-sm text-neutral-400 text-center mb-10 max-w-xl mx-auto">
               Dieses Werkzeug schreibt Hintergrund- und Textfarben in beide
@@ -319,8 +319,8 @@ export default function GermanInvertPage() {
             Viewer-Designs, Browser-Erweiterungen und Betriebssystem-Filter
             ändern nur die Bildschirmanzeige in genau diesem Programm; die
             PDF-Datei selbst bleibt unverändert. Wenn Sie hier{" "}
-            <strong className="text-neutral-100">PDF-Farben invertieren</strong>{" "}
-            und eine neue Datei speichern, steckt das Ergebnis direkt in den
+            <strong className="text-neutral-100">PDF Farben invertieren</strong>{" "}
+            und eine neue Kopie herunterladen, steckt das Ergebnis direkt in den
             Seiten: zum Lesen auf dem Tablet oder E-Reader, zum Teilen im
             Studium oder für den Ausdruck im Copyshop.
           </p>
@@ -374,7 +374,7 @@ export default function GermanInvertPage() {
         {/* Use cases */}
         <section className="max-w-3xl mx-auto px-6 pb-16">
           <h2 className="text-2xl font-bold mb-10 text-center">
-            Typische Einsätze, wenn Sie PDF-Farben invertieren
+            Wann sich das Umfärben einer PDF lohnt
           </h2>
 
           <div className="space-y-6">

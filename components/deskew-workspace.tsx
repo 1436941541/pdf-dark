@@ -5,12 +5,14 @@ import { DeskewConverter } from "./deskew-converter";
 
 export function DeskewWorkspace() {
   const [sample, setSample] = useState<{ url: string; name: string; id: number } | null>(null);
-  function open(name: string) {
+  function open(name: string, scroll = true) {
     setSample({ url: `/examples/deskew/${name}`, name, id: Date.now() });
-    document.querySelector("#deskew-workspace")?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
-      block: "start",
-    });
+    if (scroll) {
+      document.querySelector("#deskew-workspace")?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+        block: "start",
+      });
+    }
   }
   return (
     <>
@@ -18,7 +20,7 @@ export function DeskewWorkspace() {
         <button
           type="button"
           className="inline-flex min-h-11 items-center justify-center px-3 py-2 text-sm text-amber-400 underline decoration-amber-400/30 underline-offset-4 hover:decoration-amber-400"
-          onClick={() => open("tilted-invoice.pdf")}
+          onClick={() => open("tilted-invoice.pdf", false)}
         >
           Try a tilted invoice sample
         </button>
@@ -26,7 +28,7 @@ export function DeskewWorkspace() {
       <div id="deskew-workspace" className="scroll-mt-6">
         <DeskewConverter sample={sample} />
       </div>
-      <DeskewExamples onSample={open} />
+      <DeskewExamples onSample={(name) => open(name, true)} />
     </>
   );
 }

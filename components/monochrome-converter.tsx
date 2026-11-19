@@ -227,7 +227,6 @@ export function MonochromeConverter({
               <label htmlFor="bw-threshold" className="flex justify-between text-sm text-neutral-300"><span>Black &amp; white threshold</span><span className="font-mono text-amber-300">{threshold}</span></label>
               <input id="bw-threshold" type="range" min="1" max="254" value={threshold} onChange={(event) => { setThreshold(Number(event.target.value)); setDownloaded(false); if (!source && !busy) onAutoSample?.(); }} className="slider-preview mt-4 w-full" style={{ background: "linear-gradient(to right, #fff, #000)" }} />
               <div className="mt-2 flex justify-between text-xs text-neutral-500"><span>More white (drops light shading)</span><span>More black (darkens faint strokes)</span></div>
-              {!source && !busy && <p className="mt-2.5 text-xs text-neutral-400">Drag the slider to preview live on the sample scan, or drop your own PDF below.</p>}
             </div>
           )}
         </fieldset>
