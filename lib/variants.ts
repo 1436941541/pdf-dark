@@ -1,52 +1,50 @@
 /**
  * Registry of variant landing pages. Add a line here to create a new variant
- * — sitemap, home page "More tools" section, and cross-links pick it up
- * automatically.
+ * and sitemap, home page blog links, and cross-links pick it up automatically.
  */
 export type Variant = {
   slug: string;
   title: string;
   blurb: string;
-  /** Last real content change, YYYY-MM-DD — feeds sitemap lastModified. Bump
-   *  when the post's content actually changes — and keep the dates DISTINCT
-   *  across posts (a wall of identical dates reads as batch-generated). */
+  /** Last real content change, YYYY-MM-DD, feeding sitemap lastModified. Bump
+   *  when the post's content changes, keeping dates distinct across posts. */
   updatedAt: string;
 };
 
 export const VARIANTS: Variant[] = [
   {
     slug: "pdf-dark-mode-chrome",
-    title: "PDF Dark Mode in Chrome",
+    title: "PDF Dark Mode in Chrome (5 Ways Tested)",
     blurb:
-      "Chrome's built-in PDF viewer has no dark toggle. Skip the extensions — convert in the browser itself.",
-    updatedAt: "2026-07-30",
+      "Compare 5 Chrome methods side by side, fix local file:// extension blocks, or darken PDFs in a tab with photos intact.",
+    updatedAt: "2026-11-19",
   },
   {
     slug: "how-to-put-a-pdf-in-dark-mode",
     title: "How to Put a PDF in Dark Mode",
     blurb:
-      "A three-step walkthrough: drop, pick a theme, download. No accounts, no extensions, no uploads.",
-    updatedAt: "2026-07-30",
+      "Save a permanently darkened PDF in your browser, or find the exact built-in toggles in Acrobat, macOS 26+, and iOS 26+.",
+    updatedAt: "2026-11-18",
   },
   {
     slug: "scanned-pdf-dark-mode",
     title: "Scanned PDF Dark Mode",
     blurb:
-      "Free, browser-only tool for scanned PDFs that wash out your screen at night. Pick OLED for the deepest contrast.",
-    updatedAt: "2026-07-30",
-  },
-  {
-    slug: "how-pdf-dark-mode-conversion-works",
-    title: "How the Conversion Works",
-    blurb:
-      "Vector recoloring, image detection, and a per-page fallback chain — the engineering under the hood.",
-    updatedAt: "2026-07-30",
+      "Darken aged, shadowed scans in your browser for night reading while keeping existing OCR search layers intact.",
+    updatedAt: "2026-11-17",
   },
   {
     slug: "pdf-reader-dark-mode-comparison",
-    title: "PDF Readers with Dark Mode, Compared",
+    title: "12 PDF Readers Tested for Dark Mode",
     blurb:
-      "Acrobat, Foxit, Sumatra, Preview, Chrome, Edge, Firefox, mobile apps, extensions — which ones really darken the page, side by side.",
-    updatedAt: "2026-07-30",
+      "Side-by-side matrix across Acrobat, Foxit, Sumatra, PDFgear, Preview, Files, ReadEra, Zathura, Chrome, and Firefox.",
+    updatedAt: "2026-11-16",
+  },
+  {
+    slug: "how-pdf-dark-mode-conversion-works",
+    title: "How PDF Dark Mode Conversion Works",
+    blurb:
+      "Content-stream recoloring, HSL hue preservation, operator-level photo boxes, invisible mode-3 text, and print recovery.",
+    updatedAt: "2026-11-15",
   },
 ];

@@ -10,7 +10,7 @@ export function RelatedVariants({ currentSlug }: { currentSlug: string }) {
       <h2 className="text-2xl font-bold mb-10 text-center text-neutral-50">
         More from the PDF Dark blog
       </h2>
-      <div className="grid sm:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 gap-4">
         {others.map((v) => (
           <Link
             key={v.slug}

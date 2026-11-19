@@ -8,10 +8,11 @@ import { getSiteUrl } from "@/lib/site";
 import { VARIANTS } from "@/lib/variants";
 
 const FEATURED_BLOG_SLUGS = new Set([
+  "pdf-dark-mode-chrome",
   "how-to-put-a-pdf-in-dark-mode",
   "scanned-pdf-dark-mode",
-  "how-pdf-dark-mode-conversion-works",
   "pdf-reader-dark-mode-comparison",
+  "how-pdf-dark-mode-conversion-works",
 ]);
 
 const FEATURED_VARIANTS = VARIANTS.filter((variant) =>

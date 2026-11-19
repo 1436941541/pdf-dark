@@ -7,11 +7,11 @@ import { RelatedVariants } from "@/components/related-variants";
 import { formatPostDate, getSiteUrl } from "@/lib/site";
 
 const SLUG = "/blog/pdf-dark-mode-chrome";
-const TITLE = "PDF Dark Mode in Chrome — Without Installing an Extension";
+const TITLE = "PDF Dark Mode Chrome: 5 Ways Tested (No Extension)";
 const DESCRIPTION =
-  "Chrome's built-in PDF viewer has no dark mode toggle. Skip the extensions and their permissions — convert any PDF to dark mode right in your browser, free.";
-const PUBLISHED = "2026-04-25";
-const UPDATED = "2026-07-30";
+  "Get PDF dark mode Chrome without extensions or inverted photos. Compare 5 Chrome methods, fix local file:// permissions, or convert free in a tab.";
+const PUBLISHED = "2026-06-26";
+const UPDATED = "2026-11-19";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -30,69 +30,141 @@ export const metadata: Metadata = {
   },
 };
 
+type ChromeMethodRow = {
+  method: string;
+  href?: string;
+  darkensPage: string;
+  photos: string;
+  localFiles: string;
+  android: string;
+  outsideChrome: string;
+  highlight?: boolean;
+};
+
+const CHROME_METHODS: ChromeMethodRow[] = [
+  {
+    method: "chrome://flags/#enable-force-dark",
+    darkensPage: "No (PDFium ignores web force-dark)",
+    photos: "Untouched",
+    localFiles: "Opens on white background",
+    android: "Flag ignored on PDFs",
+    outsideChrome: "No",
+  },
+  {
+    method: "CSS filter extensions (Dark Reader, PDF Dark Mode)",
+    darkensPage: "Yes (applies CSS invert over the viewer frame)",
+    photos: "Turned into negatives unless masked",
+    localFiles: "Blocked until Allow access to file URLs is enabled",
+    android: "Not supported (no Web Store extensions on Android Chrome)",
+    outsideChrome: "No (browser overlay only)",
+  },
+  {
+    method: "Android 12+ built-in Chrome viewer",
+    darkensPage: "No (themes outer toolbar and Edit controls only)",
+    photos: "Untouched",
+    localFiles: "Hands downloaded files to external Android apps",
+    android: "Built in on Android 12+ for web links",
+    outsideChrome: "No",
+  },
+  {
+    method: "PDF Dark in-tab reader",
+    href: "/",
+    darkensPage: "Yes (Midnight, Sepia, Solarized, OLED + sliders)",
+    photos: "Kept in original color (Images: Auto)",
+    localFiles: "Opens immediately via drag-and-drop (no extension permissions)",
+    android: "Works in mobile Chrome and Incognito",
+    outsideChrome: "Live tab view (open Settings -> Invert & download → to export)",
+    highlight: true,
+  },
+  {
+    method: "PDF Dark file inverter",
+    href: "/invert-pdf-colors",
+    darkensPage: "Yes (rewrites PDF color instructions or scan pixels)",
+    photos: "Kept in original color (Images: Auto)",
+    localFiles: "Converts immediately via drag-and-drop",
+    android: "Works in desktop and Android Chrome",
+    outsideChrome: "Yes (saves <filename>-<theme>.pdf that opens dark everywhere)",
+    highlight: true,
+  },
+];
+
 const FAQ = [
   {
-    q: "Does Chrome have a built-in PDF dark mode?",
-    a: "No. Chrome's dark theme recolors the toolbar and tabs only — the PDF page itself always renders on a white background, and Google has been asked about it for years without a fix.",
+    q: "Why won't Chrome on Android open PDF links directly in Incognito mode?",
+    a: "Chrome's built-in Android 12+ PDF viewer disables inline viewing inside Incognito tabs and prompts you to download the file instead. Once downloaded, you can open the dark mode reader on our homepage inside an Incognito tab and drop the local PDF in.",
+    link: { href: "/", label: "Open dark mode reader" },
   },
   {
-    q: "Do Chrome extensions like 'Dark Reader for PDF' work?",
-    a: "Sort of. They lay a CSS invert filter over the page — text becomes readable, but photos turn into negatives, the extension needs broad permissions, and local files stay untouched until you enable 'Allow access to file URLs' manually.",
+    q: "Pure black backgrounds with bright white letters still hurt my eyes. Can I soften the contrast?",
+    a: "Yes. Pick Midnight (rgb(25, 30, 45)) instead of OLED (#000000), drag Darkness (50%–100%) left for a lighter charcoal background, or drag Warmth (0%–100%) right for an amber candle-light tint.",
   },
   {
-    q: "Is this faster than installing an extension?",
-    a: "Yes — there's nothing to install. Open the converter, drop your PDF, and in seconds you have a dark-themed file you can reopen in any viewer later, not just Chrome.",
+    q: "Will a 500-page textbook freeze my Chrome tab?",
+    a: "The in-tab reader keeps only pages near your current scroll position rendered in memory and releases distant pages automatically. When exporting a permanent copy in /invert-pdf-colors, vector pages recolor in place without storing page JPEGs; keep the Chrome tab active in the foreground until <filename>-midnight.pdf finishes saving.",
   },
   {
-    q: "What happens to images in my PDF?",
-    a: "Photos are detected and kept in their original colors — no film negatives, no theme-tinted faces. White screenshots and diagrams are inverted to blend into the dark page, and an Images toggle lets you force everything Original or Inverted.",
-  },
-  {
-    q: "Does it work on Chrome for Android?",
-    a: "Yes. The conversion runs in the phone's browser, and the dark PDF is saved to your usual download folder.",
-  },
-  {
-    q: "Is my PDF uploaded to your server?",
-    a: "No. The entire conversion runs in your Chrome tab — open DevTools → Network while converting and you'll see no upload request.",
+    q: "Does dropping a PDF into a Chrome tab upload my file to a server?",
+    a: "No. Page parsing, color mapping, and PDF export all run locally inside your Chrome tab's memory. Open Chrome DevTools (F12 -> Network) during conversion and you will see zero network requests carrying document data.",
   },
 ];
 
 function StructuredData() {
   const site = getSiteUrl();
-  const webpage = {
+  const article = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
     headline: TITLE,
     url: `${site}${SLUG}`,
     description: DESCRIPTION,
+    image: `${site}/blog/pdf-dark-mode-chrome/chrome-pdf-dark.webp`,
     author: { "@type": "Organization", name: "PDF Dark Team" },
     datePublished: PUBLISHED,
     dateModified: UPDATED,
   };
-  const faq = {
+  const howTo = {
     "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
+    "@type": "HowTo",
+    name: "How to get PDF dark mode Chrome without an extension",
+    description: DESCRIPTION,
+    totalTime: "PT1M",
+    estimatedCost: { "@type": "MonetaryAmount", currency: "USD", value: "0" },
+    tool: [{ "@type": "HowToTool", name: "Google Chrome (desktop or Android)" }],
+    step: [
+      {
+        "@type": "HowToStep",
+        position: 1,
+        name: "Open the in-tab inverter or reader",
+        text: "Open /invert-pdf-colors in a desktop or Android Chrome tab (or open / to read live in the tab without saving a new file).",
+      },
+      {
+        "@type": "HowToStep",
+        position: 2,
+        name: "Choose theme and Auto image protection",
+        text: "Pick Midnight, Sepia, Solarized, or OLED, keep Images on Auto, and adjust Darkness or Warmth if needed.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 3,
+        name: "Drop your PDF to save automatically",
+        text: "Drop any local or downloaded PDF onto the box; Chrome converts it in memory and saves <filename>-midnight.pdf automatically.",
+      },
+    ],
   };
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(webpage) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(article) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faq) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howTo) }}
       />
     </>
   );
 }
 
-export default function ChromeVariantPage() {
+export default function PdfDarkModeChromePage() {
   return (
     <div className="flex flex-col flex-1 w-full">
       <StructuredData />
@@ -117,179 +189,282 @@ export default function ChromeVariantPage() {
       </header>
 
       <main className="flex-1 w-full">
-        <article className="max-w-2xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
+        <article className="max-w-3xl mx-auto px-6 py-16 text-neutral-300 leading-relaxed">
           <h1 className="text-3xl sm:text-4xl font-bold text-neutral-50 leading-tight mb-4">
-            PDF Dark Mode in Chrome — Without Installing an Extension
+            PDF Dark Mode Chrome: 5 Ways to Read PDFs at Night (Tested)
           </h1>
-          <p className="text-sm text-neutral-500 mb-10">
+          <p className="text-sm text-neutral-500 mb-8">
             By PDF Dark Team ·{" "}
             <time dateTime={UPDATED}>Updated {formatPostDate(UPDATED)}</time> ·
             4 min read
           </p>
 
-          <p className="text-lg mb-8">
-            It&apos;s late. You double-click a PDF, it opens in a Chrome tab —
-            and a wall of white lights up the room. Your system is set to dark
-            mode, so Chrome&apos;s toolbar and tabs are already dark — yet the
-            document itself glows like a lightbox. You scan the PDF
-            viewer&apos;s toolbar — zoom, rotate, print, download — and
-            there&apos;s no dark button anywhere. That&apos;s not you missing
-            a setting. Chrome doesn&apos;t have one for PDF pages.
-            Here&apos;s the fastest way out.
+          <p className="text-lg mb-6">
+            Chrome&apos;s built-in PDFium viewer ignores your browser appearance
+            setting: the tab strip and top bar turn charcoal, yet every document
+            page still renders on bright white paper. To get PDF dark mode
+            Chrome without installing extensions or flipping textbook
+            photographs into X-ray negatives, open your document in the{" "}
+            <Link href="/" className="text-amber-400 hover:underline">
+              in-tab dark mode reader
+            </Link>{" "}
+            for live reading or save a dark copy in the{" "}
+            <Link
+              href="/invert-pdf-colors"
+              className="text-amber-400 hover:underline"
+            >
+              PDF color inverter
+            </Link>
+            . Both run locally inside desktop and Android Chrome tabs with zero
+            file uploads.
           </p>
+
+          <div className="flex flex-wrap gap-3 mb-12">
+            <Link
+              href="/"
+              className="inline-block px-5 py-2.5 bg-amber-400 text-neutral-950 rounded-full text-sm font-semibold hover:bg-amber-300 transition-colors"
+            >
+              Open in-tab dark reader →
+            </Link>
+            <Link
+              href="/invert-pdf-colors"
+              className="inline-block px-5 py-2.5 border border-neutral-700 text-neutral-100 rounded-full text-sm font-medium hover:border-amber-400/60 hover:text-amber-300 transition-colors"
+            >
+              Export a permanent dark PDF →
+            </Link>
+          </div>
 
           <h2 className="text-2xl font-bold text-neutral-50 mb-4">
-            The quick answer
+            How to get PDF dark mode Chrome without an extension
           </h2>
-          <p className="mb-5">
-            To just read tonight, open the{" "}
-            <Link href="/" className="text-amber-400 hover:underline">
-              PDF dark mode reader
-            </Link>{" "}
-            in a Chrome tab and drop your file on it. To keep a copy that
-            stays dark — in Acrobat, on your phone, everywhere — run it
-            through the{" "}
-            <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
-              converter
-            </Link>{" "}
-            and download the result. Both run entirely in your browser; the
-            file is never uploaded.
-          </p>
-
-          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
-            Option 1: read with a dark theme in Chrome
-          </h2>
-          <p className="mb-4">
-            The fastest route — nothing installed, nothing saved:
-          </p>
-          <ol className="list-decimal pl-6 space-y-3 mb-5">
+          <ol className="list-decimal pl-6 space-y-3 mb-12">
             <li>
-              Open a new Chrome tab and go to the{" "}
+              Open{" "}
+              <Link
+                href="/invert-pdf-colors"
+                className="text-amber-400 hover:underline"
+              >
+                <code>/invert-pdf-colors</code>
+              </Link>{" "}
+              in a desktop or Android Chrome tab (or open{" "}
               <Link href="/" className="text-amber-400 hover:underline">
-                PDF dark mode reader
-              </Link>
-              .
+                <code>/</code>
+              </Link>{" "}
+              to read live in the tab without saving a new file).
             </li>
             <li>
-              Drag your PDF onto the page, or click to pick it from your
-              Downloads folder.
+              Pick <code>Midnight</code>, <code>Sepia</code>,{" "}
+              <code>Solarized</code>, or <code>OLED</code>, keep{" "}
+              <code>Images</code> on <code>Auto</code>, and adjust{" "}
+              <code>Darkness</code> or <code>Warmth</code> if needed.
             </li>
             <li>
-              Pick a theme — Midnight, Sepia, Solarized, or pure-black OLED —
-              and read. Pages render dark right in the tab.
+              Drop any local or downloaded PDF onto the box; Chrome converts it
+              in memory and saves <code>&lt;filename&gt;-midnight.pdf</code>{" "}
+              (named after your chosen theme) automatically.
             </li>
           </ol>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mb-3">
+            5 Chrome PDF dark mode options compared
+          </h2>
           <p className="mb-5">
-            Nothing is stored: close the tab and the file is gone. If
-            it&apos;s a document you&apos;ll keep coming back to, Option 2
-            below gives you a copy that opens dark on its own.
+            Every option below works inside Chrome without installing a separate
+            desktop PDF app. Here is how each one handles page backgrounds,
+            embedded photos, local disk files, and mobile tabs.
           </p>
 
-          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
-            Before / after
+          <div className="overflow-x-auto rounded-xl border border-neutral-800 mb-12">
+            <table className="w-full min-w-[760px] border-collapse text-sm">
+              <thead>
+                <tr className="bg-neutral-900/60 text-left">
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    Chrome method
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    Darkens PDF page?
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    Embedded photos
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    Local <code>file://</code> PDFs
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    Android Chrome
+                  </th>
+                  <th className="px-4 py-3 font-semibold text-neutral-200 border-b border-neutral-800">
+                    Stays dark outside Chrome?
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {CHROME_METHODS.map((r) => (
+                  <tr
+                    key={r.method}
+                    className={
+                      r.highlight
+                        ? "bg-amber-400/5 border-b border-amber-400/20 last:border-b-0"
+                        : "border-b border-neutral-900 last:border-b-0"
+                    }
+                  >
+                    <td className="px-4 py-3.5 align-top font-medium text-neutral-100">
+                      {r.href ? (
+                        <Link
+                          href={r.href}
+                          className="text-amber-400 hover:underline"
+                        >
+                          {r.method}
+                        </Link>
+                      ) : (
+                        r.method
+                      )}
+                    </td>
+                    <td className="px-4 py-3.5 align-top text-neutral-300">
+                      {r.darkensPage}
+                    </td>
+                    <td className="px-4 py-3.5 align-top text-neutral-300">
+                      {r.photos}
+                    </td>
+                    <td className="px-4 py-3.5 align-top text-neutral-400">
+                      {r.localFiles}
+                    </td>
+                    <td className="px-4 py-3.5 align-top text-neutral-400">
+                      {r.android}
+                    </td>
+                    <td className="px-4 py-3.5 align-top text-neutral-300">
+                      {r.outsideChrome}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            Why Chrome extensions turn textbook photos into negatives
           </h2>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3">
+          <div className="grid sm:grid-cols-3 gap-3 mb-4">
             <figure className="m-0">
               <div className="rounded-lg overflow-hidden border border-neutral-800">
                 <Image
-                  src="/compare/original.png"
-                  alt="A PDF page as Chrome normally shows it: black text on a bright white background with a color photo"
-                  width={720}
-                  height={933}
-                  sizes="50vw"
+                  src="/blog/pdf-dark-mode-chrome/chrome-pdfium.webp"
+                  alt="Default desktop Chrome PDFium viewer rendering a white PDF page with black text and a color portrait photograph"
+                  width={966}
+                  height={1282}
+                  sizes="(max-width: 640px) 100vw, 33vw"
                 />
               </div>
               <figcaption className="mt-2 text-center text-xs text-neutral-500">
-                Before — Chrome&apos;s default white page
+                1. Default Chrome PDFium: dark toolbar, glaring white page
+              </figcaption>
+            </figure>
+            <figure className="m-0">
+              <div className="rounded-lg overflow-hidden border border-neutral-800">
+                <Image
+                  src="/blog/pdf-dark-mode-chrome/chrome-css-filter.webp"
+                  alt="The same PDF under a CSS invert filter in Chrome: dark page background, but the portrait photograph turns into an inverted negative"
+                  width={966}
+                  height={1282}
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                />
+              </div>
+              <figcaption className="mt-2 text-center text-xs text-neutral-500">
+                2. CSS filter extension: dark page, photo flipped into a negative
               </figcaption>
             </figure>
             <figure className="m-0">
               <div className="rounded-lg overflow-hidden border border-amber-400/40">
                 <Image
-                  src="/compare/pdf-dark.png"
-                  alt="The same PDF page in dark mode: dark background, light text, and the photo kept in its original colors"
-                  width={720}
-                  height={933}
-                  sizes="50vw"
+                  src="/blog/pdf-dark-mode-chrome/chrome-pdf-dark.webp"
+                  alt="The same PDF opened in a Chrome tab with PDF Dark Midnight theme and Auto image mode: dark slate page, crisp white text, and natural color photograph"
+                  width={966}
+                  height={1282}
+                  sizes="(max-width: 640px) 100vw, 33vw"
                 />
               </div>
               <figcaption className="mt-2 text-center text-xs text-amber-400">
-                After — dark page, photo untouched
+                3. PDF Dark in Chrome: Midnight page, natural photo colors kept
               </figcaption>
             </figure>
           </div>
-          <p className="text-xs text-neutral-600 mb-10">
-            Real output (Midnight theme, Auto image mode) — not a mockup.
-            Notice the photo keeps its original colors instead of flipping
-            into a negative.
+          <p className="mb-12">
+            Chrome isolates open PDFs inside an{" "}
+            <code>&lt;embed type=&quot;application/pdf&quot;&gt;</code> plugin
+            frame instead of standard HTML elements. Because extension
+            stylesheets cannot inspect individual paragraphs or images inside
+            PDFium, dark-mode extensions wrap the entire{" "}
+            <code>&lt;embed&gt;</code> frame in a CSS <code>invert()</code>{" "}
+            filter, flipping photographs, medical scans, and color-coded charts
+            into negatives right alongside the white paper. Opening the document
+            in a regular Chrome tab with{" "}
+            <Link href="/" className="text-amber-400 hover:underline">
+              PDF Dark
+            </Link>{" "}
+            parses the page structure directly in JavaScript, locates every
+            image bounding box before painting, keeps photographs in original
+            color, and inverts bright white diagrams.
           </p>
 
-          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-4">
-            Option 2: convert the file, then open it anywhere
+          <h2 className="text-2xl font-bold text-neutral-50 mb-4">
+            Fixing extensions on local files and Google Drive
           </h2>
-          <p className="mb-4">
-            The white background is written into the PDF itself, so the
-            durable fix is to change what&apos;s saved — background to dark,
-            text to light, photos left in their original colors:
-          </p>
-          <ol className="list-decimal pl-6 space-y-3 mb-5">
+          <ul className="list-disc pl-6 space-y-3 mb-12">
             <li>
-              Open the{" "}
-              <Link href="/invert-pdf-colors" className="text-amber-400 hover:underline">
-                converter
+              <span className="text-neutral-100 font-medium">
+                Local <code>file:///</code> PDFs stay white after installing an
+                extension:
+              </span>{" "}
+              Chrome blocks extensions from local disk paths by default. Open{" "}
+              <code>chrome://extensions</code>, click <code>Details</code> on
+              your dark-mode extension, turn on{" "}
+              <code>Allow access to file URLs</code>, and reload the local PDF
+              tab.
+            </li>
+            <li>
+              <span className="text-neutral-100 font-medium">
+                Google Drive PDF preview or locked work/school Chrome:
+              </span>{" "}
+              Google Drive renders PDFs inside its own web overlay rather than
+              Chrome&apos;s PDFium viewer, and enterprise-managed Chrome
+              profiles often block Web Store installs altogether. Download the
+              PDF once and drop it into{" "}
+              <Link href="/" className="text-amber-400 hover:underline">
+                <code>/</code>
               </Link>{" "}
-              in Chrome and drop your PDF on it. The rendering is done by{" "}
-              <a
-                href="https://github.com/mozilla/pdf.js"
-                target="_blank"
-                rel="noopener noreferrer"
+              or{" "}
+              <Link
+                href="/invert-pdf-colors"
                 className="text-amber-400 hover:underline"
               >
-                PDF.js
-              </a>
-              , the same open-source engine Firefox uses, running right in
-              your tab.
+                <code>/invert-pdf-colors</code>
+              </Link>{" "}
+              inside a regular tab.
             </li>
-            <li>
-              Pick a theme and click Download. If a white diagram looks out
-              of place on the dark page, use the Images toggle to force
-              everything Original or Inverted before downloading.
-            </li>
-            <li>
-              Click the file in Chrome&apos;s downloads tray — or press{" "}
-              <strong className="text-neutral-100">Ctrl+O</strong> in a new
-              tab and pick it from Downloads. It opens dark this time.
-            </li>
-          </ol>
-          <p className="mb-5">
-            The darkness is now part of the file, so it survives sharing:
-            email it, open it in Acrobat, or read it on your phone, and it
-            stays dark everywhere. Works in Chrome on Windows, Mac, Linux,
-            ChromeOS, and Android.
-          </p>
+          </ul>
 
-          <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-6 text-center mb-4">
-            <p className="text-neutral-300 mb-4">
-              Have a PDF open right now? Drop it on the reader and it renders
-              dark in this same Chrome tab — nothing installed, nothing saved.
-            </p>
-            <Link
-              href="/"
-              className="inline-block px-6 py-3 bg-amber-400 text-neutral-950 rounded-full font-semibold hover:bg-amber-300 transition-colors"
-            >
-              Read a PDF in dark mode →
-            </Link>
-          </div>
-
-          <h2 className="text-2xl font-bold text-neutral-50 mt-12 mb-6">
-            PDF dark mode in Chrome FAQ
+          <h2 className="text-2xl font-bold text-neutral-50 mb-6">
+            Frequently asked questions
           </h2>
           {FAQ.map((f) => (
             <div key={f.q} className="mb-7">
               <h3 className="text-lg font-semibold text-neutral-50 mb-2">
                 {f.q}
               </h3>
-              <p className="text-neutral-400">{f.a}</p>
+              <p className="text-neutral-400">
+                {f.a}
+                {f.link && (
+                  <>
+                    {" "}
+                    <Link
+                      href={f.link.href}
+                      className="text-amber-400 hover:underline"
+                    >
+                      {f.link.label} →
+                    </Link>
+                  </>
+                )}
+              </p>
             </div>
           ))}
         </article>
