@@ -26,25 +26,27 @@ const CASES = [
 
 export function BackgroundWorkspace() {
   const [sample, setSample] = useState<{ url: string; name: string; id: number } | null>(null);
-  function open(id: string) {
+  function open(id: string, scroll = true) {
     setSample({ url: `/examples/background-remover/${id}.pdf`, name: `${id}-paper.pdf`, id: Date.now() });
-    document.querySelector("#background-tool")?.scrollIntoView({
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
-    });
+    if (scroll) {
+      document.querySelector("#background-tool")?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      });
+    }
   }
   return (
     <>
       <div className="mb-5 px-6 text-center">
         <button
           type="button"
-          onClick={() => open("gray")}
+          onClick={() => open("yellow", false)}
           className="inline-flex min-h-11 items-center justify-center px-3 py-2 text-sm text-amber-400 underline decoration-amber-400/30 underline-offset-4 hover:decoration-amber-400"
         >
-          Try a gray-paper sample
+          Try a stamped-scan sample
         </button>
       </div>
       <div id="background-tool" className="scroll-mt-6">
-        <BackgroundConverter sample={sample} />
+        <BackgroundConverter sample={sample} onAutoSample={() => open("yellow", false)} />
       </div>
       <section className="mx-auto max-w-4xl px-6 py-12">
         <h2 className="text-center text-2xl font-bold sm:text-3xl">Before and after on scanned test pages</h2>

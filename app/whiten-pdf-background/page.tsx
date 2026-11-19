@@ -32,7 +32,7 @@ const STEPS = [
   ["Open a scanned PDF", "Drop a scan into the workspace or load a test sample above."],
   [
     "Tune strength & stamp protection",
-    "Adjust the 0–100% slider (65% default), keep color protection on for stamps, or uncheck Clean page on photo sheets.",
+    "Adjust the 0–100% slider (65% default), keep color protection on for stamps, or skip photo pages (e.g. 1, 8-10).",
   ],
   [
     "Download at 144 or 72 DPI",
@@ -54,9 +54,10 @@ const SPEC_ROWS: { item: string; behavior: ReactNode; note: ReactNode }[] = [
     note: "Uncheck if colored watermarks, tea stains, or tinted slips scanned inside a bright white border stay uncleaned.",
   },
   {
-    item: "Clean page N (per-page checkbox)",
-    behavior: "Skips background whitening on unchecked pages so full-page photographs or color covers keep their original tones.",
-    note: "Step through pages with Previous and Next after loading a multi-page PDF to uncheck photo-heavy sheets.",
+    item: "Skip pages & Clean page N",
+    behavior:
+      "Skips background whitening on listed page ranges (such as 1, 5, 80-89) and syncs with each page's Clean page checkbox so covers or photo sheets keep their original tones.",
+    note: "Type page ranges directly or enter any page number to jump straight to that sheet in long scans.",
   },
   {
     item: "Download quality (Sharper 144 DPI / Compact 72 DPI)",

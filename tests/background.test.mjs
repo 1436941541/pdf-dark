@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {cleanBackground} from '../lib/background.ts';
+import {parsePageRanges, formatPageRanges} from '../lib/page-ranges.ts';
 const options={strength:65,preserveColors:true};
 function fixture(paper=[220,220,220]) {const w=160,h=120,data=new Uint8ClampedArray(w*h*4);for(let i=0;i<data.length;i+=4)data.set([...paper,255],i);return {data,w,h};}
 const at=(data,w,x,y)=>Array.from(data.subarray((y*w+x)*4,(y*w+x)*4+3));
@@ -12,3 +13,14 @@ test('color protection keeps a blue stamp and yellow highlight',()=>{const f=fix
 test('zero strength preserves every pixel and opaque white remains white',()=>{const f=fixture();const before=f.data.slice();cleanBackground(f.data,f.w,f.h,{...options,strength:0});assert.deepEqual(f.data,before);const white=fixture([255,255,255]);cleanBackground(white.data,white.w,white.h,options);assert.deepEqual(at(white.data,white.w,10,10),[255,255,255]);});
 test('mild uneven illumination improves without making binary pixels',()=>{const f=fixture();for(let y=0;y<f.h;y++)for(let x=0;x<f.w;x++){const v=160+Math.round(x/f.w*60);f.data.set([v,v,v,255],(y*f.w+x)*4);}cleanBackground(f.data,f.w,f.h,{...options,strength:100});assert(at(f.data,f.w,20,20)[0]>210);assert(new Set(f.data.filter((_,i)=>i%4===0)).size>2);});
 test('dark pages stay unchanged and invalid sizes are rejected',()=>{const f=fixture([40,40,40]);const before=f.data.slice();cleanBackground(f.data,f.w,f.h,options);assert.deepEqual(f.data,before);assert.throws(()=>cleanBackground(f.data,0,1,options));});
+test('parses and formats page skip ranges cleanly with bounds checks',()=>{
+  const parsed=parsePageRanges('1, 5, 80-83, 82, 95-',100);
+  assert.equal(parsed.invalid,false);
+  assert.equal(parsed.outOfBounds,false);
+  assert.deepEqual(Array.from(parsed.pages).sort((a,b)=>a-b),[1,5,80,81,82,83,95]);
+  assert.equal(formatPageRanges(parsed.pages),'1, 5, 80-83, 95');
+  const oob=parsePageRanges('1, 18-25',20);
+  assert.equal(oob.outOfBounds,true);
+  assert.deepEqual(Array.from(oob.pages).sort((a,b)=>a-b),[1,18,19,20]);
+  assert.equal(parsePageRanges('abc').invalid,true);
+});
