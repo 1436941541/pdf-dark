@@ -12,75 +12,43 @@ const EXAMPLES: {
   {
     id: 4,
     badge: "128 vs. 190 cutoff",
-    title: "Scanned note with edge shadow",
+    title: "Stamped invoice scan on tinted paper",
     description:
-      "At cutoff 128, the right-edge paper shadow drops to clean white while faint text (gray level 170–210) and the bottom rule disappear. Raising the slider to 190 recovers the gray-170 line and bottom rule as solid black, and turns the dark edge shadow into a black bar.",
-    button: "Load scanned-note sample ↑",
-    mode: "black-and-white",
-  },
-  {
-    id: 2,
-    badge: "Color luminance",
-    title: "Color bar chart and highlight",
-    description:
-      "Grayscale keeps the Yellow bar lighter than Red, Blue, and Green. At cutoff 128, Red, Blue, and Green turn solid black, whereas the Yellow bar, its label, and the yellow callout box vanish into white.",
-    button: "Load color-chart sample ↑",
+      "Grayscale turns the blue signature and red PAID stamp gray while leaving the warm scan sheet visibly gray (~206 luminance). At cutoff 128, the paper snaps to pure white and dark print plus blue ink turn solid black, whereas the lighter red stamp (luminance 142) and pencil note drop out. Raising the slider to 190 recovers both the red stamp and pencil note as crisp black without bringing back the paper tint.",
+    button: "Load stamped-invoice sample ↑",
     mode: "black-and-white",
   },
   {
     id: 3,
     badge: "Grayscale recommended",
-    title: "Portrait photograph",
+    title: "Report page with studio portrait",
     description:
-      "Grayscale preserves skin tones, background gradients, and uniform detail in this U.S. Navy portrait of Rear Adm. Grace Hopper. Cutoff 128 collapses midtones into stark black-and-white patches.",
-    button: "Load portrait sample ↑",
+      "Grayscale preserves natural skin shading, blazer folds, and studio lighting gradients across 256 gray levels. Cutoff 128 collapses midtones into stark black-and-white stencil patches.",
+    button: "Load portrait-report sample ↑",
     mode: "grayscale",
-  },
-  {
-    id: 1,
-    badge: "8–24 pt type",
-    title: "Small type and thin rules",
-    description:
-      "Grayscale retains gray anti-aliasing on 8 pt to 24 pt text and three rule weights. Two-color mode strips gray edge pixels for crisp strokes on monochrome laser printers and e-ink screens.",
-    button: "Load typography sample ↑",
-    mode: "black-and-white",
   },
 ];
 
 const BASE = "/examples/black-and-white";
 
 function previewSrc(file: string, id: number) {
-  const extension = file === "original" && id === 3 ? "webp" : "png";
-  return `${BASE}/${file}-${id}.${extension}`;
+  const isWebp = file === "original" || file === "gray";
+  return `${BASE}/${file}-${id}.${isWebp ? "webp" : "png"}`;
 }
 
 function panelsFor(id: number) {
   if (id === 4) {
     return [
-      { label: "Original", file: "original", detail: "Uneven shadow + faint lines" },
-      { label: "Grayscale", file: "gray", detail: "256 gray levels" },
-      { label: "Threshold 128", file: "bw128", detail: "Shadow gone, 170 lost" },
-      { label: "Threshold 190", file: "bw190", detail: "170 back, edge black" },
-    ] as const;
-  }
-  if (id === 2) {
-    return [
-      { label: "Original", file: "original", detail: "4 colored bars" },
-      { label: "Grayscale", file: "gray", detail: "Yellow stays lighter" },
-      { label: "Threshold 128", file: "bw128", detail: "Yellow bar vanishes" },
-    ] as const;
-  }
-  if (id === 3) {
-    return [
-      { label: "Original", file: "original", detail: "Color portrait" },
-      { label: "Grayscale", file: "gray", detail: "Highlights preserved" },
-      { label: "Threshold 128", file: "bw128", detail: "Midtones collapsed" },
+      { label: "Original", file: "original", detail: "Tan paper, blue & red ink" },
+      { label: "Grayscale", file: "gray", detail: "Gray paper tint remains" },
+      { label: "Threshold 128", file: "bw128", detail: "White page, red stamp lost" },
+      { label: "Threshold 190", file: "bw190", detail: "Stamp & pencil recovered" },
     ] as const;
   }
   return [
-    { label: "Original", file: "original", detail: "8–24 pt type" },
-    { label: "Grayscale", file: "gray", detail: "Anti-aliased edges" },
-    { label: "Threshold 128", file: "bw128", detail: "Crisp binary strokes" },
+    { label: "Original", file: "original", detail: "Color studio photo" },
+    { label: "Grayscale", file: "gray", detail: "Smooth 256-gray shading" },
+    { label: "Threshold 128", file: "bw128", detail: "Midtones clipped to B&W" },
   ] as const;
 }
 
@@ -99,7 +67,7 @@ export function MonochromeExamples({
           Real page outputs: grayscale vs. two-color threshold
         </h2>
         <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-neutral-400">
-          Actual pages exported from this converter. Load any sample into the
+          Actual pages exported from this converter. Load either sample into the
           workspace above to test the page-by-page preview.
         </p>
       </div>

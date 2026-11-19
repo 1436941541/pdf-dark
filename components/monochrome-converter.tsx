@@ -14,23 +14,32 @@ import type { MonochromeDiagnostic } from "@/lib/monochrome-pdf";
 type Source = { file: File; pdf: PDFDocumentProxy; input: PdfInput };
 type Preview = { original: string; converted: string; loading: boolean; error: string | null; key: string };
 
-export function MonochromeConverter({ sample }: { sample?: { url: string; name: string; mode?: MonochromeMode; id: number } | null }) {
+export function MonochromeConverter({
+  sample,
+  onAutoSample,
+}: {
+  sample?: { url: string; name: string; mode?: MonochromeMode; id: number } | null;
+  onAutoSample?: () => void;
+}) {
   const [source, setSource] = useState<Source | null>(null);
   const [mode, setMode] = useState<MonochromeMode>("black-and-white");
   const [threshold, setThreshold] = useState(128);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [handledSampleId, setHandledSampleId] = useState<number | null>(null);
   const [preview, setPreview] = useState<Preview>({ original: "", converted: "", loading: false, error: null, key: "" });
   const [progress, setProgress] = useState<number | null>(null);
   const [downloaded, setDownloaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const loadId = useRef(0);
+  const sampleFetch = useRef<AbortController | null>(null);
   const preparation = useRef<ReturnType<typeof beginPdfOperation> | null>(null);
   const mounted = useRef(true);
   const exportController = useRef<AbortController | null>(null);
   const downloadUrls = useRef(new Set<string>());
   const processorRef = useRef<ReturnType<typeof createMonochromeProcessor> | null>(null);
-  const busy = loading || progress !== null;
+  const pendingSample = Boolean(sample && handledSampleId !== sample.id);
+  const busy = loading || progress !== null || pendingSample;
   const previewKey = `${page}:${mode}:${threshold}`;
   const previewReady = preview.key === previewKey && !preview.loading && !!preview.converted && !preview.error;
 
@@ -39,6 +48,7 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
     const urls = downloadUrls.current;
     return () => {
       mounted.current = false;
+      sampleFetch.current?.abort();
       preparation.current?.cancel();
       exportController.current?.abort();
       for (const url of urls) URL.revokeObjectURL(url);
@@ -108,7 +118,9 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
 
   useEffect(() => {
     if (!sample) return;
+    const currentLoad = loadId.current;
     const controller = new AbortController();
+    sampleFetch.current = controller;
     async function openSample() {
       await yieldToMain();
       if (controller.signal.aborted) return;
@@ -120,13 +132,18 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
         const response = await fetch(sample!.url, { signal: controller.signal });
         if (!response.ok) throw new Error("Could not load the sample PDF. Please try again.");
         const blob = await response.blob();
-        if (!controller.signal.aborted) await selectFile(new File([blob], sample!.name, { type: "application/pdf" }), "sample");
+        if (!controller.signal.aborted && currentLoad === loadId.current) {
+          await selectFile(new File([blob], sample!.name, { type: "application/pdf" }), "sample");
+        }
       } catch (failure) {
-        if (!controller.signal.aborted) recordPdfFailure("monochrome", "sample", failure, { input: "sample" });
-        if (!controller.signal.aborted) {
+        if (!controller.signal.aborted && currentLoad === loadId.current) recordPdfFailure("monochrome", "sample", failure, { input: "sample" });
+        if (!controller.signal.aborted && currentLoad === loadId.current) {
           setError(failure instanceof Error ? failure.message : "Could not load the sample PDF.");
           setLoading(false);
         }
+      } finally {
+        if (!controller.signal.aborted && mounted.current) setHandledSampleId(sample!.id);
+        if (sampleFetch.current === controller) sampleFetch.current = null;
       }
     }
     void openSample();
@@ -134,6 +151,8 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
   }, [sample, selectFile]);
 
   function reset() {
+    sampleFetch.current?.abort();
+    setHandledSampleId(sample?.id ?? null);
     loadId.current++;
     preparation.current?.cancel();
     exportController.current?.abort();
@@ -186,14 +205,14 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
   return (
     <div className="mx-auto max-w-4xl text-left">
       <div className="rounded-2xl border border-neutral-800 bg-neutral-900/50 p-5 sm:p-8">
-        <fieldset disabled={busy}>
+        <fieldset disabled={progress !== null}>
           <legend className="mb-3 text-sm font-medium text-neutral-300">Choose your conversion</legend>
           <div className="grid gap-3 sm:grid-cols-2">
             {([
               ["black-and-white", "Pure black & white", "Strict #000 and #FFF pixels with a 1–254 cutoff slider.", "Scans & printing"],
               ["grayscale", "Grayscale", "256 gray levels (0–255 luminance) for photos and gradients.", "Photos & charts"],
             ] as const).map(([value, title, description, badge]) => (
-              <label key={value} className={`relative cursor-pointer rounded-xl border p-4 transition-colors ${mode === value ? "border-amber-400/60 bg-amber-400/5" : "border-neutral-700 hover:border-neutral-500"} ${busy ? "cursor-wait opacity-60" : ""}`}>
+              <label key={value} className={`relative cursor-pointer rounded-xl border p-4 transition-colors ${mode === value ? "border-amber-400/60 bg-amber-400/5" : "border-neutral-700 hover:border-neutral-500"} ${progress !== null ? "cursor-wait opacity-60" : ""}`}>
                 <div className="flex items-center justify-between gap-3">
                   <span className="font-semibold text-neutral-100">{title}</span>
                   <input type="radio" name="conversion-mode" value={value} checked={mode === value} onChange={() => { setMode(value); setDownloaded(false); }} className="h-4 w-4 accent-amber-400" />
@@ -205,20 +224,27 @@ export function MonochromeConverter({ sample }: { sample?: { url: string; name: 
           </div>
           {mode === "black-and-white" && (
             <div className="mt-5 rounded-xl border border-neutral-800 bg-neutral-950/50 p-4">
-              <label htmlFor="bw-threshold" className="flex justify-between text-sm text-neutral-300"><span>Black &amp; white threshold</span><span>{threshold}</span></label>
-              <input id="bw-threshold" type="range" min="1" max="254" value={threshold} onChange={(event) => { setThreshold(Number(event.target.value)); setDownloaded(false); }} className="slider-preview mt-4 w-full" style={{ background: "linear-gradient(to right, #fff, #000)" }} />
+              <label htmlFor="bw-threshold" className="flex justify-between text-sm text-neutral-300"><span>Black &amp; white threshold</span><span className="font-mono text-amber-300">{threshold}</span></label>
+              <input id="bw-threshold" type="range" min="1" max="254" value={threshold} onChange={(event) => { setThreshold(Number(event.target.value)); setDownloaded(false); if (!source && !busy) onAutoSample?.(); }} className="slider-preview mt-4 w-full" style={{ background: "linear-gradient(to right, #fff, #000)" }} />
               <div className="mt-2 flex justify-between text-xs text-neutral-500"><span>More white (drops light shading)</span><span>More black (darkens faint strokes)</span></div>
+              {!source && !busy && <p className="mt-2.5 text-xs text-neutral-400">Drag the slider to preview live on the sample scan, or drop your own PDF below.</p>}
             </div>
           )}
         </fieldset>
 
-        {!source && !loading && <div className="mt-6"><DropZone onFile={(file) => void selectFile(file)} /></div>}
-        {loading && <p role="status" className="py-12 text-center text-neutral-300">Opening your PDF…</p>}
+        {!source && !busy && <div className="mt-6"><DropZone onFile={(file) => void selectFile(file)} /></div>}
+        {(loading || pendingSample) && <div role="status" className="mt-6 flex items-center justify-between gap-3 rounded-xl border border-amber-400/20 bg-amber-400/5 p-4"><p className="text-sm text-amber-200">Opening PDF preview…</p><button type="button" onClick={reset} className="rounded-lg border border-neutral-700 px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-500">Cancel</button></div>}
         {source && (
           <div className="mt-6">
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-800 px-4 py-3">
-              <div className="min-w-0"><p className="max-w-xs truncate text-sm font-medium text-neutral-200" title={source.file.name}>{source.file.name}</p><p className="mt-1 text-xs text-neutral-500">{source.pdf.numPages} {source.pdf.numPages === 1 ? "page" : "pages"} · {(source.file.size / 1024 / 1024).toFixed(2)} MB</p></div>
-              <button onClick={reset} disabled={busy} className="text-sm text-neutral-400 hover:text-amber-400 disabled:opacity-40">Choose another PDF</button>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="max-w-xs truncate text-sm font-medium text-neutral-200" title={source.file.name}>{source.file.name}</p>
+                  {source.input === "sample" && <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[11px] text-amber-300">Sample preview</span>}
+                </div>
+                <p className="mt-1 text-xs text-neutral-500">{source.pdf.numPages} {source.pdf.numPages === 1 ? "page" : "pages"} · {(source.file.size / 1024 / 1024).toFixed(2)} MB</p>
+              </div>
+              <button onClick={reset} disabled={busy} className="rounded-lg border border-neutral-700 px-3 py-1.5 text-xs font-medium text-amber-400 hover:border-amber-400 disabled:opacity-40">{source.input === "sample" ? "Upload your own PDF" : "Choose another PDF"}</button>
             </div>
             <div className="mt-5 flex items-center justify-between gap-2">
               <h2 className="text-sm font-medium text-neutral-300">Preview your result</h2>
