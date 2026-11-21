@@ -1,0 +1,25 @@
+{
+  // 2026-11-21: moved from Vercel to a Cloudflare Worker (static export in out/,
+  // thin Worker in front for 301 redirects, localized <html lang>, and Pulse crawler monitoring).
+  "name": "pdf-dark",
+  "main": "worker/index.ts",
+  "vars": {
+    "CRAWLER_COLLECTION_ENABLED": "true",
+    "CRAWLER_INGEST_URL": "https://yj-pulse.vercel.app/api/crawlers/ingest",
+    "CRAWLER_ALLOWED_HOSTS": "pdfdark.org,www.pdfdark.org"
+  },
+  // CRAWLER_KEY_ID and CRAWLER_SIGNING_SECRET are Worker secrets (wrangler secret put), never in this file.
+  "compatibility_date": "2026-11-15",
+  "observability": { "enabled": true },
+  // Production lives on pdfdark.org; disable workers.dev to prevent duplicate indexing.
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "pdfdark.org", "custom_domain": true },
+    { "pattern": "www.pdfdark.org", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": "out",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page"
+  }
+}

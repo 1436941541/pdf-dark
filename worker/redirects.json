@@ -1,0 +1,15 @@
+{
+  "/pdf-background-remover": "/whiten-pdf-background",
+  "/whiten-pdf": "/whiten-pdf-background",
+  "/converter": "/invert-pdf-colors",
+  "/blog/invert-pdf-colors": "/invert-pdf-colors",
+  "/blog/invert-pdf-colors-without-inverting-images": "/invert-pdf-colors",
+  "/convert-pdf-to-dark-mode": "/invert-pdf-colors",
+  "/blog/convert-pdf-to-dark-mode": "/invert-pdf-colors",
+  "/convert": "/invert-pdf-colors",
+  "/invert": "/invert-pdf-colors",
+  "/invert%E2%80%91pdf%E2%80%91colors": "/invert-pdf-colors",
+  "/blog/how-to-darken-a-pdf": "/blog/how-to-put-a-pdf-in-dark-mode",
+  "/pdf-dark-mode-chrome": "/blog/pdf-dark-mode-chrome",
+  "/pdf-dark-mode-firefox": "/"
+}

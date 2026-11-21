@@ -1,3 +1,4 @@
+export const dynamic = "force-static";
 import { ImageResponse } from "next/og";
 
 export const alt = "PDF Dark — Convert PDFs to dark mode in your browser";

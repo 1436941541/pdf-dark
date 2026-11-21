@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@/components/analytics";
 import { getSiteUrl } from "@/lib/site";
@@ -48,18 +47,16 @@ export const metadata: Metadata = {
   other: { "google-adsense-account": ADSENSE_CLIENT },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Set by middleware.ts from the URL's first path segment ("es"/"pt"),
-  // "en" for everything else including the unprefixed English routes.
-  const htmlLang = (await headers()).get("x-html-lang") ?? "en";
-
+  // Static export outputs lang="en"; worker/index.ts rewrites <html lang>
+  // to "es" / "pt" / "de" on localized routes via HTMLRewriter.
   return (
     <html
-      lang={htmlLang}
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       {/* AdSense 要求脚本放在每个页面的 <head> 里：用原生 script 由服务端直接输出，

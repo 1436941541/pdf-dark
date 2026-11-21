@@ -3,6 +3,8 @@ import { getSiteUrl } from "@/lib/site";
 import { VARIANTS } from "@/lib/variants";
 import { CHANGELOG_UPDATED_AT } from "@/lib/changelog";
 
+export const dynamic = "force-static";
+
 // Last real content change per static route, YYYY-MM-DD. Bump when that page's content actually changes.
 // The /tr and /id locales were retired 2026-09-21 (their pages 404 now).
 const HOME_UPDATED_AT = "2026-09-20";

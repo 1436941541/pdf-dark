@@ -15,6 +15,8 @@ export function getSiteUrl(): string {
   const vercel = process.env.VERCEL_URL;
   if (vercel) return `https://${vercel}`;
 
+  if (process.env.NODE_ENV === "production") return "https://pdfdark.org";
+
   return "http://localhost:3001";
 }
 
